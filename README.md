@@ -3,6 +3,7 @@
 基于阿里云百炼 DashScope qwen-max 大模型的 AI 对话机器人项目。采用前后端分离架构，后端通过 SSE（Server-Sent Events）流式转发 LLM 响应，前端实时渲染对话内容，提供流畅的流式交互体验。
 
 本项目由两个独立项目整合而来：
+
 - `my-chatbot` → `server/`（Express 后端）
 - `chatbot-web` → `web/`（Vite + React 前端）
 
@@ -10,15 +11,17 @@
 
 ---
 
+![AI 对话机器人](./image/image.png)
+
 ## 技术栈
 
-| 层     | 技术                                                          |
-| ------ | ------------------------------------------------------------- |
-| 后端   | Node.js + Express 5 + OpenAI SDK 6 + dotenv + cors            |
-| 前端   | React 19 + Vite 7 + ESLint 9                                  |
-| LLM    | 阿里云百炼 DashScope OpenAI 兼容模式，qwen-max 模型           |
-| 通信   | SSE（Server-Sent Events）流式传输，fetch + ReadableStream     |
-| 工程化 | npm workspaces 单仓库 + concurrently 并发启动                 |
+| 层     | 技术                                                      |
+| ------ | --------------------------------------------------------- |
+| 后端   | Node.js + Express 5 + OpenAI SDK 6 + dotenv + cors        |
+| 前端   | React 19 + Vite 7 + ESLint 9                              |
+| LLM    | 阿里云百炼 DashScope OpenAI 兼容模式，qwen-max 模型       |
+| 通信   | SSE（Server-Sent Events）流式传输，fetch + ReadableStream |
+| 工程化 | npm workspaces 单仓库 + concurrently 并发启动             |
 
 ---
 
@@ -82,6 +85,7 @@ npm run dev
 ```
 
 该命令通过 `concurrently` 并发启动：
+
 - 后端服务：`http://localhost:3000`
 - 前端开发服务器：`http://localhost:5173`（自动代理 `/api` 请求到后端）
 
@@ -91,13 +95,13 @@ npm run dev
 
 ## 开发命令
 
-| 命令                  | 说明                                        |
-| --------------------- | ------------------------------------------- |
-| `npm run dev`         | 并发启动前后端（concurrently）              |
-| `npm run dev:server`  | 仅启动后端服务（端口 3000）                 |
-| `npm run dev:web`     | 仅启动前端开发服务器（端口 5173）           |
-| `npm run build`       | 构建前端生产包（输出到 `web/dist/`）        |
-| `npm run lint`        | 对前端代码执行 ESLint 检查                  |
+| 命令                 | 说明                                 |
+| -------------------- | ------------------------------------ |
+| `npm run dev`        | 并发启动前后端（concurrently）       |
+| `npm run dev:server` | 仅启动后端服务（端口 3000）          |
+| `npm run dev:web`    | 仅启动前端开发服务器（端口 5173）    |
+| `npm run build`      | 构建前端生产包（输出到 `web/dist/`） |
+| `npm run lint`       | 对前端代码执行 ESLint 检查           |
 
 ---
 
