@@ -15,7 +15,3 @@ dist-ssr/
 # 系统
 .DS_Store
 *.log
-
-# AI 工具配置（各开发者独立管理，不纳入版本控制）
-.aone_copilot/
-.qoder/
