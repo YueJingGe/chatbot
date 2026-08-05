@@ -1,0 +1,29 @@
+:root {
+  font-family: "Inter", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color: #1A1A1A;
+  background-color: #F5F5F5;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #C2785C;
+  text-decoration: inherit;
+}
+
+a:hover {
+  color: #A8634A;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}

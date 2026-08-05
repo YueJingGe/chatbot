@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>我的AI对话机器人</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1><i class="fas fa-robot"></i> DeepSeek 对话助手</h1>
+        <p class="subtitle">基于深度求索大模型驱动的智能对话</p>
+      </header>
+
+      <main>
+        <!-- 聊天消息显示区域 -->
+        <div id="chatHistory" class="chat-history">
+          <!-- 初始欢迎消息 -->
+          <div class="message bot-message">
+            <div class="avatar"><i class="fas fa-robot"></i></div>
+            <div class="bubble">
+              你好！我是你的AI助手。我已经准备就绪，可以开始聊天了！
+              <br /><small
+                >提示：初次使用，请确保后端服务器正在运行（命令行窗口不要关闭）。</small
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- 用户输入区域 -->
+        <div class="input-area">
+          <div class="input-wrapper">
+            <input
+              type="text"
+              id="userInput"
+              placeholder="输入你想说的话... (按 Enter 发送)"
+              autocomplete="off"
+            />
+            <button id="sendButton" title="发送">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+          <div class="hint">
+            <i class="fas fa-lightbulb"></i>
+            你可以问我任何问题，比如“用JavaScript写一个hello
+            world函数”或“讲个笑话”。
+          </div>
+        </div>
+      </main>
+
+      <footer>
+        <p>
+          Powered by <strong>DeepSeek API</strong> •
+          本应用仅为演示，请勿频繁请求。
+        </p>
+      </footer>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
