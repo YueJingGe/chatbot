@@ -16,6 +16,6 @@ dist-ssr/
 .DS_Store
 *.log
 
-# AI 工具嵌套仓库
-.aone_copilot/skills/dev-agent-skills/
+# AI 工具配置（各开发者独立管理，不纳入版本控制）
+.aone_copilot/
 .qoder/
