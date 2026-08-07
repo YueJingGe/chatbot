@@ -19,7 +19,7 @@
 | 层     | 技术                                                          |
 | ------ | ------------------------------------------------------------- |
 | 后端   | Node.js + Express 5 + OpenAI SDK 6 + dotenv + cors            |
-| 前端   | React 19 + Vite 7 + ESLint 9                                  |
+| 前端   | React 19 + Vite 7 + TypeScript + ESLint 9                    |
 | LLM    | 阿里云百炼 DashScope OpenAI 兼容模式，qwen-max 模型           |
 | 通信   | SSE（Server-Sent Events）流式传输，fetch + ReadableStream     |
 | 工程化 | npm workspaces 单仓库 + concurrently 并发启动                 |
@@ -45,17 +45,19 @@ chatbot/
 └── web/                  # 前端（React + Vite, 端口 5173）
     ├── .gitignore
     ├── package.json
-    ├── vite.config.js    # Vite 配置 + dev proxy → localhost:3000
+    ├── vite.config.ts    # Vite 配置 + dev proxy → localhost:3000
+    ├── tsconfig.json     # TypeScript 配置
     ├── index.html        # HTML 模板（含 Font Awesome CDN）
-    ├── eslint.config.js
+    ├── eslint.config.ts
     └── src/
-        ├── App.jsx       # 主组件（状态中心 + SSE 消费）
+        ├── App.tsx       # 主组件（状态中心 + SSE 消费）
         ├── App.css       # 主组件样式
-        ├── main.jsx      # 入口文件
+        ├── main.tsx      # 入口文件
         ├── index.css     # 全局重置样式
+        ├── vite-env.d.ts # Vite 类型声明
         └── components/
-            ├── MessageList.jsx  # 消息列表（React.memo）
-            └── InputArea.jsx    # 输入区域（React.memo）
+            ├── MessageList.tsx  # 消息列表（React.memo）
+            └── InputArea.tsx    # 输入区域（React.memo）
 ```
 
 ### 核心文件保护清单（禁止删除/重命名）
@@ -64,9 +66,9 @@ chatbot/
 
 - `server/server.js` — 后端主入口，单例 OpenAI 客户端与 SSE 转发逻辑
 - `server/.env` — API 密钥配置（同时禁止提交到版本控制）
-- `web/src/App.jsx` — 前端状态中心与 SSE 消费逻辑
-- `web/src/main.jsx` — 前端入口文件
-- `web/vite.config.js` — Vite 配置与开发代理
+- `web/src/App.tsx` — 前端状态中心与 SSE 消费逻辑
+- `web/src/main.tsx` — 前端入口文件
+- `web/vite.config.ts` — Vite 配置与开发代理
 - `web/index.html` — HTML 模板（含 Font Awesome CDN 引用）
 - `package.json`（根目录）— npm workspaces 根配置
 
@@ -136,7 +138,7 @@ chatbot/
 
 | 类别      | 禁止的库/工具                  | 原因                                        |
 | --------- | ------------------------------ | ------------------------------------------- |
-| 状态管理  | Redux、Zustand、MobX、Jotai 等 | 单页应用，`App.jsx` 集中管理状态，无需额外方案 |
+| 状态管理  | Redux、Zustand、MobX、Jotai 等 | 单页应用，`App.tsx` 集中管理状态，无需额外方案 |
 | 路由      | React Router、wouter 等        | 单页面应用，无多页面路由需求                |
 | CSS-in-JS | styled-components、Emotion 等  | 项目使用原生 CSS，保持一致性                |
 | UI 框架   | Ant Design、MUI、Chakra 等     | 对话 UI 自定义程度高，使用原生 CSS 即可     |
@@ -193,7 +195,7 @@ chatbot/
 | 1    | 密钥管理           | API Key 硬编码在 `server.js` 中           | 迁移到 `.env` + `dotenv` + `process.env`        |
 | 2    | OpenAI 客户端      | 每次请求创建新的 OpenAI 实例              | 模块级单例，复用连接                             |
 | 3    | 组件 memo 化       | 子组件无优化，每次父组件更新都全量重渲染  | `MessageList` 和 `InputArea` 添加 `React.memo`  |
-| 4    | Font Awesome 加载  | `main.jsx` 中 DOM 动态注入 `<link>` 标签  | `index.html` 静态 CDN 引用，避免运行时 DOM 操作 |
+| 4    | Font Awesome 加载  | `main.tsx` 中 DOM 动态注入 `<link>` 标签  | `index.html` 静态 CDN 引用，避免运行时 DOM 操作 |
 | 5    | `.history` 管控    | `.history/` 目录纳入版本控制              | 添加到 `.gitignore`，不纳入版本控制             |
 | 6    | npm workspaces     | 前后端独立仓库，依赖分别管理              | 统一 `npm workspaces` + `concurrently` 并发开发 |
 | 7    | 依赖清理           | 包含未使用的 `crypto-js` 和 `node-fetch`  | 移除冗余依赖，减小包体积                        |
@@ -248,7 +250,7 @@ export default MyComponent;
 
 **要点**：原生 CSS + BEM 命名风格（`block__element--modifier`）。
 
-### App.jsx 中 callback 模板
+### App.tsx 中 callback 模板
 
 ```jsx
 import { useState, useCallback } from "react";
