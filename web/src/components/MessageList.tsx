@@ -1,6 +1,16 @@
 import { memo } from "react";
 
-const MessageList = memo(({ messages }) => {
+interface Message {
+  id: string | number;
+  role: string;
+  content?: string;
+}
+
+interface MessageListProps {
+  messages: Message[];
+}
+
+const MessageList = memo(({ messages }: MessageListProps) => {
   return (
     <>
       {messages.map((message) => (
