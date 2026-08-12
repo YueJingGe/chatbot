@@ -25,6 +25,7 @@ auto_enforced: false
 | vite       | 7    | 构建工具                     |
 | typescript | -    | 类型系统                     |
 | eslint     | 9    | 代码检查（Flat Config 格式） |
+| husky      | -    | Git 钩子管理                 |
 
 ## LLM 服务
 
