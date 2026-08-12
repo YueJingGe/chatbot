@@ -1,0 +1,5 @@
+#!/usr/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# 在这里写入你的检查脚本命令
+bash scripts/pre-commit-docs-check.sh

@@ -17,5 +17,6 @@
     "apiPatterns": ["server/server.js"],
     "knowledgeDir": "docs/knowledge",
     "harnessDir": "docs/harness"
-  }
+  },
+  "excludeFiles": ["docs/harness/index.md"]
 }

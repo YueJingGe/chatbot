@@ -19,6 +19,13 @@
 
 ---
 
+## Git Hooks
+
+- **Husky** 已启用，`pre-commit` hook 会自动执行 `npm run lint && npm run build`
+- 提交代码前请确保 lint 和 build 通过
+
+---
+
 ## 常用命令
 
 - 安装依赖：`npm install`
