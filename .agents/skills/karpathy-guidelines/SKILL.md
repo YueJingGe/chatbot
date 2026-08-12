@@ -5,6 +5,8 @@ description: 通用 AI 编程行为准则，用于减少 LLM 在写代码/改代
 
 # Karpathy Behavioral Guidelines
 
+Karpathy Behavioral Guidelines 是一套源自 Andrej Karpathy 对 LLM 编程常见陷阱观察的行为准则，旨在通过 ‌ 先思考、简洁化、精准改、目标驱动 ‌ 四大原则，减少 AI 编码中的过度工程、错误假设和无关修改。
+
 通用 LLM 编程行为准则，降低常见的编码失误。与项目专属规范结合使用。
 
 **Tradeoff**：这套准则偏向"稳"而非"快"。对显而易见的小任务，自行判断是否需要完全走一遍。
