@@ -320,6 +320,84 @@ function scanExistingAgentFiles() {
 }
 
 /**
+ * 扫描 docs/harness/ 下所有 .md 文件的 frontmatter
+ * 提取 level、owner、last_reviewed、review_cycle、auto_enforced 字段
+ */
+function scanHarnessFrontmatter() {
+  const harnessDir = path.join(PROJECT_ROOT, "docs", "harness");
+  if (!fs.existsSync(harnessDir)) return null;
+
+  const result = {};
+  const mdFiles = safeReaddir(harnessDir).filter(
+    (f) => f.endsWith(".md") && f !== "index.md"
+  );
+
+  for (const file of mdFiles) {
+    const filePath = path.join(harnessDir, file);
+    const content = readTextSafe(filePath) || "";
+
+    // 解析 YAML frontmatter（--- 包裹的部分）
+    const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    const frontmatter = {};
+
+    if (fmMatch) {
+      const lines = fmMatch[1].split("\n");
+      for (const line of lines) {
+        const kvMatch = line.match(/^(\w+):\s*(.+)$/);
+        if (kvMatch) {
+          const key = kvMatch[1].trim();
+          let value = kvMatch[2].trim().replace(/^["']|["']$/g, "");
+          // 布尔值转换
+          if (value === "true") value = true;
+          else if (value === "false") value = false;
+          frontmatter[key] = value;
+        }
+      }
+    }
+
+    // 统计 [PROPOSED] 标签数量
+    const proposedCount = (content.match(/<!--\s*\[PROPOSED\]/g) || []).length;
+
+    // 统计约束条目数量（以 "- " 开头的行，排除 frontmatter 内的）
+    const contentWithoutFm = fmMatch
+      ? content.slice(fmMatch[0].length)
+      : content;
+    const ruleLines = contentWithoutFm
+      .split("\n")
+      .filter((l) => /^\s*-\s+/.test(l));
+
+    result[file] = {
+      hasFrontmatter: !!fmMatch,
+      frontmatter: fmMatch ? frontmatter : null,
+      proposedCount,
+      ruleLineCount: ruleLines.length,
+      ruleLineCountWarning: ruleLines.length > 15,
+    };
+  }
+
+  // 汇总统计
+  const files = Object.values(result);
+  const summary = {
+    total: files.length,
+    withFrontmatter: files.filter((f) => f.hasFrontmatter).length,
+    withoutFrontmatter: files.filter((f) => !f.hasFrontmatter).length,
+    byLevel: {
+      iron: files.filter((f) => f.frontmatter?.level === "iron").length,
+      living: files.filter((f) => f.frontmatter?.level === "living").length,
+      guideline: files.filter((f) => f.frontmatter?.level === "guideline")
+        .length,
+      unclassified: files.filter((f) => !f.frontmatter?.level).length,
+    },
+    totalProposed: files.reduce((sum, f) => sum + f.proposedCount, 0),
+    overLimitFiles: Object.entries(result)
+      .filter(([, v]) => v.ruleLineCountWarning)
+      .map(([k]) => k),
+  };
+
+  return { files: result, summary };
+}
+
+/**
  * 递归列出目录结构
  * @param {string} dir - 目标目录
  * @param {string} root - 项目根目录（用于计算相对路径）
@@ -483,6 +561,7 @@ function main() {
     existingAgentFiles: scanExistingAgentFiles(),
     availableScripts: scanScripts(),
     srcStructure: scanSrcStructure(),
+    harnessStatus: scanHarnessFrontmatter(),
   };
 
   // Monorepo 场景额外扫描各 workspace 的 src 结构
