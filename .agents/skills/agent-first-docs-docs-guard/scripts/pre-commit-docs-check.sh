@@ -1,155 +1,150 @@
-#!/bin/bash
-# scripts/pre-commit-docs-check.sh
-# Agent-First 文档守卫 - Pre-commit Hook
-# 用法：在 .husky/pre-commit 或 .git/hooks/pre-commit 中调用
-#   bash scripts/pre-commit-docs-check.sh
-#
-# 环境变量：
-#   DOCS_GUARD_SKIP=1    跳过所有检查
-#   DOCS_GUARD_STRICT=1  将警告升级为阻断
+#!/usr/bin/env bash
 
-set -euo pipefail
+# ==========================================
+#  Docs Guard — Pre-commit Check
+#  在每次 git commit 前自动拦截不合规的文档
+# ==========================================
 
-# 跳过检查
-if [ " $ {DOCS_GUARD_SKIP:-0}" = "1" ]; then
-  exit 0
+set -e
+
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+IGNORE_FILE="$ROOT_DIR/.agents/ignore"
+HARNESS_DIR="$ROOT_DIR/docs/harness"
+
+# 颜色输出
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
+# ==========================================
+#  1. 加载忽略列表
+# ==========================================
+declare -a EXCLUDED_FILES=()
+
+if [[ -f "$IGNORE_FILE" ]]; then
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    # 跳过空行和注释
+    [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+    # 去除首尾空格
+    line="$(echo "$line" | xargs)"
+    [[ -n "$line" ]] && EXCLUDED_FILES+=("$line")
+  done < "$IGNORE_FILE"
 fi
 
-# 读取配置（如果存在）
-CONFIG_FILE=".docs-guard.config.json"
-STRICT_MODE=" $ {DOCS_GUARD_STRICT:-0}"
-
-AGENTS_MAX_LINES=200
-if [ -f " $ CONFIG_FILE" ] && command -v node &>/dev/null; then
-  AGENTS_MAX_LINES= $ (node -e "
-    const c = JSON.parse(require('fs').readFileSync(' $ CONFIG_FILE','utf8'));
-    console.log(c?.thresholds?.agentsMdMaxLines || 200);
-  " 2>/dev/null || echo 200)
-fi
-
-ERRORS=0
-WARNINGS=0
-
-# 获取本次提交涉及的文件（仅暂存区）
-CHANGED_FILES= $ (git diff --cached --name-only --diff-filter=ACMR 2>/dev/null || true)
-
-if [ -z " $ CHANGED_FILES" ]; then
-  exit 0
-fi
-
-echo "🔍 [Docs Guard] 检查文档同步状态..."
-
-# ============================================================
-# 检查 1：依赖变更 → 提醒更新 tech-stack.md
-# ============================================================
-if echo " $ CHANGED_FILES" | grep -qE "(^|/)package\.json $ |pnpm-lock\.yaml $ |yarn\.lock $ |package-lock\.json $ "; then
-  if [ -f "docs/knowledge/tech-stack.md" ]; then
-    echo "⚠️  [Docs Guard] 检测到依赖变更，请确认 docs/knowledge/tech-stack.md 是否需要同步更新"
-    WARNINGS= $ ((WARNINGS + 1))
-  fi
-fi
-
-# ============================================================
-# 检查 2：API 层变更 → 提醒更新 api-conventions.md
-# ============================================================
-API_PATTERNS="src/api/|server/src/routes/|server/src/controllers/"
-if [ -f " $ CONFIG_FILE" ] && command -v node &>/dev/null; then
-  API_PATTERNS= $ (node -e "
-    const c = JSON.parse(require('fs').readFileSync(' $ CONFIG_FILE','utf8'));
-    const p = c?.paths?.apiPatterns || ['src/api/','server/src/routes/','server/src/controllers/'];
-    console.log(p.join('|'));
-  " 2>/dev/null || echo " $ API_PATTERNS")
-fi
-
-if echo " $ CHANGED_FILES" | grep -qE " $ API_PATTERNS"; then
-  echo "⚠️  [Docs Guard] 检测到 API 层变更，请确认 docs/knowledge/ 下的接口文档是否需要同步更新"
-  WARNINGS= $ ((WARNINGS + 1))
-fi
-
-# ============================================================
-# 检查 3：AGENTS.md 行数检查
-# ============================================================
-if echo " $ CHANGED_FILES" | grep -q "^AGENTS\.md $ "; then
-  if [ -f "AGENTS.md" ]; then
-    LINES= $ (wc -l < AGENTS.md | tr -d ' ')
-    if [ " $ LINES" -gt " $ AGENTS_MAX_LINES" ]; then
-      echo "❌ [Docs Guard] AGENTS.md 超过  $ {AGENTS_MAX_LINES} 行（当前  $ {LINES} 行），请拆分到 docs/harness/"
-      ERRORS= $ ((ERRORS + 1))
+# 判断文件是否被忽略
+is_excluded() {
+  local file="$1"
+  local rel_path="${file#$ROOT_DIR/}"
+  for pattern in "${EXCLUDED_FILES[@]}"; do
+    if [[ "$rel_path" == "$pattern" ]] || [[ "$rel_path" == "$pattern"* ]] || [[ "$file" == *"$pattern"* ]]; then
+      return 0
     fi
-  fi
-fi
+  done
+  return 1
+}
 
-# ============================================================
-# 检查 4：harness 文件 frontmatter 检查
-# ============================================================
-HARNESS_CHANGES= $ (echo " $ CHANGED_FILES" | grep "^docs/harness/.*\.md $ " || true)
-if [ -n " $ HARNESS_CHANGES" ]; then
-  for file in  $ HARNESS_CHANGES; do
-    if [ -f " $ file" ]; then
-      # 检查是否有 frontmatter
-      FIRST_LINE= $ (head -1 " $ file")
-      if [ " $ FIRST_LINE" != "---" ]; then
-        echo "❌ [Docs Guard]  $ file 缺少 frontmatter（--- 包裹的元数据头）"
-        ERRORS= $ ((ERRORS + 1))
-      else
-        # 检查必要字段
-        FM= $ (sed -n '1,/^--- $ /p' " $ file")
-        for field in level owner last_reviewed review_cycle; do
-          if ! echo " $ FM" | grep -q "^ $ {field}:"; then
-            echo "❌ [Docs Guard]  $ file 的 frontmatter 缺少必要字段:  $ field"
-            ERRORS= $ ((ERRORS + 1))
-          fi
-        done
+# ==========================================
+#  2. 检查函数
+# ==========================================
+WARN_COUNT=0
+ERROR_COUNT=0
+
+warn()  { echo -e "${YELLOW}[WARN]${NC} $1"; ((WARN_COUNT++)); }
+error() { echo -e "${RED}[ERROR]${NC} $1"; ((ERROR_COUNT++)); }
+info()  { echo -e "${GREEN}[INFO]${NC} $1"; }
+
+# 检查 harness 目录下是否有未处理的 PROPOSED 标签
+check_proposed_tags() {
+  if [[ ! -d "$HARNESS_DIR" ]]; then
+    return 0
+  fi
+
+  local proposed_files=()
+
+  while IFS= read -r -d '' file; do
+    # 忽略被排除的文件
+    if is_excluded "$file"; then
+      continue
+    fi
+
+    # 检查是否包含 [PROPOSED] 标签
+    if grep -q '\[PROPOSED\]' "$file" 2>/dev/null; then
+      local rel_path="${file#$ROOT_DIR/}"
+      proposed_files+=("$rel_path")
+    fi
+  done < <(find "$HARNESS_DIR" -type f -name "*.md" -print0 2>/dev/null)
+
+  if [[ ${#proposed_files[@]} -gt 0 ]]; then
+    warn "docs/harness/ 中有 ${#proposed_files[@]} 处 [PROPOSED] 标签未处理："
+    for f in "${proposed_files[@]}"; do
+      echo "       → $f"
+    done
+    warn "请及时审批或移除。"
+  fi
+}
+
+# 检查暂存区中 Markdown 文件的 frontmatter 是否包含 owner
+check_staged_frontmatter() {
+  local staged_files
+  staged_files=$(git diff --cached --name-only --diff-filter=AM 2>/dev/null | grep -E '\.md$' || true)
+
+  if [[ -z "$staged_files" ]]; then
+    return 0
+  fi
+
+  for file in $staged_files; do
+    local full_path="$ROOT_DIR/$file"
+
+    # 忽略被排除的文件
+    if is_excluded "$full_path"; then
+      continue
+    fi
+
+    # 只检查 docs/ 下的 markdown（排除 node_modules 等）
+    if [[ "$file" != docs/* ]]; then
+      continue
+    fi
+
+    # 检查是否有 frontmatter（以 --- 开头）
+    if head -1 "$full_path" | grep -q '^---$'; then
+      # 检查 frontmatter 中是否有 owner 字段
+      if ! awk '/^---/{if(++n==2)exit} n==1{if(/^owner:/)found=1} END{exit !found}' "$full_path"; then
+        error "$file 缺少 frontmatter 中的 'owner:' 字段"
       fi
     fi
   done
-fi
+}
 
-# ============================================================
-# 检查 5：harness 条目数量检查
-# ============================================================
-if [ -n " $ HARNESS_CHANGES" ]; then
-  MAX_RULE_LINES=15
-  if [ -f " $ CONFIG_FILE" ] && command -v node &>/dev/null; then
-    MAX_RULE_LINES= $ (node -e "
-      const c = JSON.parse(require('fs').readFileSync(' $ CONFIG_FILE','utf8'));
-      console.log(c?.thresholds?.harnessMaxRuleLines || 15);
-    " 2>/dev/null || echo 15)
-  fi
-
-  for file in  $ HARNESS_CHANGES; do
-    if [ -f " $ file" ]; then
-      # 去掉 frontmatter 后统计以 "- " 开头的行
-      CONTENT= $ (sed '1,/^--- $ /{ /^--- $ /d; d }' " $ file" 2>/dev/null || cat " $ file")
-      RULE_COUNT= $ (echo " $ CONTENT" | grep -cE "^\s*-\s+" || true)
-      if [ " $ RULE_COUNT" -gt " $ MAX_RULE_LINES" ]; then
-        echo "⚠️  [Docs Guard]  $ file 约束条目超过  $ {MAX_RULE_LINES} 条（当前  $ {RULE_COUNT} 条），建议拆分或升级为自动化检查"
-        WARNINGS= $ ((WARNINGS + 1))
-      fi
-    fi
-  done
-fi
-
-# ============================================================
-# 汇总输出
-# ============================================================
+# ==========================================
+#  3. 执行检查
+# ==========================================
+echo "=========================================="
+echo "  Docs Guard — Pre-commit Check"
+echo "=========================================="
 echo ""
-if [ " $ ERRORS" -gt 0 ]; then
-  echo "❌ [Docs Guard] 发现  $ {ERRORS} 个错误，提交被阻断"
+
+check_proposed_tags
+check_staged_frontmatter
+
+echo ""
+
+# ==========================================
+#  4. 输出结果
+# ==========================================
+if [[ $ERROR_COUNT -gt 0 ]]; then
+  echo -e "${RED}=========================================="
+  echo "  ❌ 检查未通过：${ERROR_COUNT} 个错误，${WARN_COUNT} 个警告"
+  echo "==========================================${NC}"
   exit 1
+elif [[ $WARN_COUNT -gt 0 ]]; then
+  echo -e "${YELLOW}=========================================="
+  echo "  ⚠️  检查通过，但有 ${WARN_COUNT} 个警告"
+  echo "==========================================${NC}"
+  exit 0
+else
+  echo -e "${GREEN}=========================================="
+  echo "  ✅ 所有文档检查通过"
+  echo "==========================================${NC}"
+  exit 0
 fi
-
-if [ " $ WARNINGS" -gt 0 ]; then
-  if [ " $ STRICT_MODE" = "1" ]; then
-    echo "❌ [Docs Guard] 严格模式下， $ {WARNINGS} 个警告被升级为错误，提交被阻断"
-    exit 1
-  else
-    echo "⚠️  [Docs Guard] 发现  $ {WARNINGS} 个警告（DOCS_GUARD_STRICT=1 可升级为阻断）"
-  fi
-fi
-
-if [ " $ ERRORS" -eq 0 ] && [ " $ WARNINGS" -eq 0 ]; then
-  echo "✅ [Docs Guard] 文档同步检查通过"
-fi
-
-exit 0

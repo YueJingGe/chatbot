@@ -1,0 +1,11 @@
+# 忽略列表
+# 每行一个路径（相对于项目根目录）
+
+# harness 索引文件是目录入口，不做状态检查
+docs/harness/index.md
+
+# 自动生成的文档，不需要人工审查
+docs/harness/auto-*.md
+
+# node_modules 跳过
+node_modules/
