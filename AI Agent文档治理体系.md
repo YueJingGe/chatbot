@@ -16,7 +16,6 @@ chatbot/
 │       ├── harsh-current-branch-review/ ✅
 │       ├── frontend-design/           ✅
 │       ├── skill-creator/             ✅
-│       └── dev-agent-skills/          ✅ (子模块，含 GitHub workflow 等)
 └── ISSUES/                            ✅ 问题追踪
 ```
 
