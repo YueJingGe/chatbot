@@ -54,7 +54,7 @@ description: >
 ```yaml
 ---
 level: iron | living | guideline
-owner: "@tech-lead"
+owner: "@YueJingGe"
 last_reviewed: 2026-08-01
 review_cycle: quarterly | monthly | per-pr
 auto_enforced: false

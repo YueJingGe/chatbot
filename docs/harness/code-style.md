@@ -1,6 +1,6 @@
 ---
 level: living
-owner: "@tech-lead"
+owner: "@YueJingGe"
 last_reviewed: 2026-08-12
 review_cycle: monthly
 auto_enforced: true
@@ -12,22 +12,22 @@ auto_enforced: true
 
 ## 格式红线
 
-| 规则 | 规范 |
-|------|------|
-| 缩进 | 2 个空格，不使用 Tab |
-| 引号 | 字符串使用双引号，JSX 属性使用双引号 |
-| 分号 | 有分号风格 |
+| 规则     | 规范                                 |
+| -------- | ------------------------------------ |
+| 缩进     | 2 个空格，不使用 Tab                 |
+| 引号     | 字符串使用双引号，JSX 属性使用双引号 |
+| 分号     | 有分号风格                           |
 | 变量声明 | 禁止 `var`，统一使用 `const` / `let` |
 
 ## 命名规范
 
-| 类型 | 格式 | 示例 |
-|------|------|------|
-| 组件 | `PascalCase` | `MessageList`, `InputArea` |
-| 函数/变量 | `camelCase` | `sendMessage`, `isLoading` |
-| 接口/类型 | `PascalCase` | `Message`, `MessageListProps` |
-| 常量 | `UPPER_SNAKE` | `REQUEST_TIMEOUT`, `PORT` |
-| 事件处理 | `handleXxx` | `handleKeyPress`, `handleSend` |
+| 类型      | 格式          | 示例                           |
+| --------- | ------------- | ------------------------------ |
+| 组件      | `PascalCase`  | `MessageList`, `InputArea`     |
+| 函数/变量 | `camelCase`   | `sendMessage`, `isLoading`     |
+| 接口/类型 | `PascalCase`  | `Message`, `MessageListProps`  |
+| 常量      | `UPPER_SNAKE` | `REQUEST_TIMEOUT`, `PORT`      |
+| 事件处理  | `handleXxx`   | `handleKeyPress`, `handleSend` |
 
 ## 组件红线
 
@@ -63,5 +63,6 @@ auto_enforced: true
 ## 详细规范
 
 更详细的编码规范请参见：
+
 - `docs/reference/coding.md` — React 组件、CSS、后端 SSE、TypeScript 等完整规范
 - `docs/reference/naming.md` — 命名规范（变量、函数、组件、文件、CSS 类、Git 提交）

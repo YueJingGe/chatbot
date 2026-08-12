@@ -1,6 +1,6 @@
 ---
 level: iron
-owner: "@tech-lead"
+owner: "@@YueJingGe"
 last_reviewed: 2026-08-12
 review_cycle: quarterly
 auto_enforced: false
