@@ -1,36 +1,42 @@
 import js from "@eslint/js";
-import tsParser from "@typescript-eslint/parser";
 import tsPlugin from "@typescript-eslint/eslint-plugin";
+import tsParser from "@typescript-eslint/parser";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import globals from "globals";
 
 export default [
-  { ignores: ["dist", ".history"] },
+  { ignores: ["dist", ".history", "node_modules", "dist-ssr", "coverage"] },
   js.configs.recommended,
-  tsPlugin.configs.recommended,
-  reactHooks.configs.recommended,
-  reactRefresh.configs.vite,
   {
-    files: ['**/*.{js,jsx,ts,tsx}'],
+    files: ["**/*.{ts,tsx}"],
     languageOptions: {
       parser: tsParser,
       ecmaVersion: 2020,
+      sourceType: "module",
       globals: globals.browser,
-      parserOptions: {
-        ecmaVersion: 2020,
-        ecmaFeatures: { jsx: true },
-        sourceType: 'module',
-      },
     },
     plugins: {
-      '@typescript-eslint': tsPlugin,
-      'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
+      "@typescript-eslint": tsPlugin,
     },
     rules: {
-      'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      ...tsPlugin.configs["flat/recommended"].rules,
     },
   },
+  {
+    files: ["**/*.{js,jsx,ts,tsx}"],
+    plugins: {
+      "react-hooks": reactHooks,
+      "react-refresh": reactRefresh,
+    },
+    rules: {
+      ...reactHooks.configs.recommended.rules,
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { varsIgnorePattern: "^[A-Z_]" },
+      ],
+    },
+  },
+  reactRefresh.configs.vite,
 ];

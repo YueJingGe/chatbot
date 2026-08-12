@@ -136,8 +136,6 @@ function checkHarnessFrontmatter() {
     const content = readTextSafe(filePath);
     if (!content) continue;
 
-    if (filePath.endsWith("docs/harness/index.md")) return; // 忽略索引文件
-
     const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
     if (!fmMatch) {
       errors.push(`[Frontmatter 缺失] docs/harness/${file} 缺少 frontmatter`);
