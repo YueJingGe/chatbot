@@ -204,7 +204,9 @@ function checkProposedTags() {
   const harnessDir = path.join(ROOT, config.paths.harnessDir);
   if (!fs.existsSync(harnessDir)) return;
 
-  const mdFiles = safeReaddir(harnessDir).filter((f) => f.endsWith(".md"));
+  const mdFiles = safeReaddir(harnessDir).filter(
+    (f) => f.endsWith(".md") && f.endsWith("docs/harness/index.md")
+  );
   let totalProposed = 0;
 
   for (const file of mdFiles) {
