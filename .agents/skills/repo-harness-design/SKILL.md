@@ -1,6 +1,6 @@
 ---
 name: repo-harness-design
-description: 为任意前端项目（新项目或老项目）设计一套 Agent-First 文档治理体系。参考千问 monorepo 的 harness 架构和业界通用实践（CLAUDE.md、Cursor Rules），根据项目规模自动判断分层深度，输出完整的目录结构、文件内容和维护策略。适用于"为新项目搭建 Agent 文档体系"、"给老项目补 Agent 上下文"、"审查现有 AGENTS.md 是否合理"等场景。
+description: 为任意前端项目（新项目或老项目）设计一套 Agent-First 文档治理体系。根据项目规模自动判断分层深度，输出完整的目录结构、文件内容和维护策略。适用于"为新项目搭建 Agent 文档体系"、"给老项目补 Agent 上下文"、"审查现有 AGENTS.md 是否合理"等场景。
 ---
 
 # 项目文档治理体系设计
@@ -148,13 +148,30 @@ project/
     └── workflow/          # 通用工作流
 ```
 
-#### 超大型项目（> 5000 文件）— 完整千问式 harness
+#### 超大型项目（> 5000 文件）— 完整五层 harness
 
-参考千问 monorepo 的完整体系，包含：
-- `docs/` 下 5 个业务桶 + 2 个自动生成控制面
-- `.agents/skills/` 下 30+ 个 Skill
-- 各端专属 `.agents/context/` 和 `.agents/skills/`
-- `pnpm docs:check` 强制校验
+```
+project/
+├── AGENTS.md
+├── docs/
+│   ├── index.md
+│   ├── reference/
+│   ├── runbooks/
+│   ├── exec-plans/
+│   ├── migrations/
+│   ├── scratch/
+│   ├── catalog/          # 自动生成
+│   └── generated/        # 自动生成
+├── .agents/
+│   ├── context/
+│   ├── skills/           # 30+ 个 Skill
+│   └── workflow/
+└── apps/
+    ├── web/.agents/      # 各端专属上下文
+    └── mobile/.agents/
+```
+
+包含自动化校验（`docs:check`）和目录生成（`docs:index`）。
 
 ### 第三步：生成目录结构
 
@@ -329,7 +346,7 @@ Start by reading `AGENTS.md`, then navigate to the relevant section.
 |---|---|
 | `skill-creator` | 用于维护 Skill 体系本身，不是给业务项目用的 |
 | `figma-design-to-code` | 需要 Figma 集成 |
-| `baozi-trace` 系列 | 千问专属，依赖内部基础设施 |
+| 项目专属排查 Skill | 依赖内部基础设施，不通用 |
 
 ---
 
