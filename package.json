@@ -1,13 +1,15 @@
 {
   "name": "chatbot",
   "private": true,
-  "workspaces": ["web", "server"],
+  "workspaces": [
+    "web",
+    "server"
+  ],
   "scripts": {
     "dev": "concurrently \"npm run dev:web\" \"npm run dev:server\"",
     "dev:web": "npm run dev --workspace=web",
     "dev:server": "npm start --workspace=server",
     "build": "npm run build --workspace=web",
-    "lint": "npm run lint --workspace=web",
     "start:server": "npm start --workspace=server"
   },
   "devDependencies": {

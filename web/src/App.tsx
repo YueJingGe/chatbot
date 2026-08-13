@@ -1,19 +1,25 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, KeyboardEvent } from "react";
 import MessageList from "./components/MessageList";
 import InputArea from "./components/InputArea";
 import "./App.css";
 
+interface Message {
+  id: string | number;
+  role: string;
+  content: string;
+}
+
 function App() {
-  const [messages, setMessages] = useState([
+  const [messages, setMessages] = useState<Message[]>([
     { id: 1, role: "assistant", content: "你好！我是你的AI助手。" },
   ]);
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef(messages);
   const inputTextRef = useRef(inputText);
   const isLoadingRef = useRef(isLoading);
-  const abortControllerRef = useRef(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     messagesRef.current = messages;
@@ -121,14 +127,15 @@ function App() {
         }
       }
     } catch (error) {
-      if (error.name === "AbortError") {
+      if (error instanceof Error && error.name === "AbortError") {
         return;
       }
+      const errorMessage = error instanceof Error ? error.message : String(error);
       console.error("发送失败:", error);
       setMessages((prev) =>
         prev.map((msg) => {
           if (msg.id === assistantMessageId) {
-            return { ...msg, content: `抱歉，出错了: ${error.message}` };
+            return { ...msg, content: `抱歉，出错了: ${errorMessage}` };
           }
           return msg;
         })
@@ -139,7 +146,7 @@ function App() {
   }, []);
 
   const handleKeyPress = useCallback(
-    (e) => {
+    (e: KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
         sendMessage();

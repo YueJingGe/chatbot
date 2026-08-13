@@ -1,6 +1,14 @@
-import { memo } from "react";
+import { memo, KeyboardEvent } from "react";
 
-const InputArea = memo(({ inputText, setInputText, isLoading, sendMessage, handleKeyPress }) => {
+interface InputAreaProps {
+  inputText: string;
+  setInputText: (value: string) => void;
+  isLoading: boolean;
+  sendMessage: () => void;
+  handleKeyPress: (e: KeyboardEvent<HTMLInputElement>) => void;
+}
+
+const InputArea = memo(({ inputText, setInputText, isLoading, sendMessage, handleKeyPress }: InputAreaProps) => {
   return (
     <div className="input-area">
       <div className="input-wrapper">

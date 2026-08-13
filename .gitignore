@@ -15,3 +15,12 @@ dist-ssr/
 # 系统
 .DS_Store
 *.log
+
+# Docs Guard 运行时产生的临时文件
+.docs-guard-report.json
+
+# 本地生成的 harness 草稿（如果不想提交）
+docs/harness/draft-*.md
+
+# Qoder 本地缓存
+.qoder/.cache/
