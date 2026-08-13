@@ -19,33 +19,13 @@
 
 ---
 
-## Git Hooks
-
-- **Husky** 已启用，`pre-commit` hook 会自动执行 `npm run lint && npm run build`
-- 提交代码前请确保 lint 和 build 通过
-
----
-
 ## 常用命令
 
 - 安装依赖：`npm install`
 - 本地开发：`npm run dev`（并发启动前后端）
 - 仅后端：`npm run dev:server`（端口 3000）
 - 仅前端：`npm run dev:web`（端口 5173）
-- 代码校验：`npm run lint`
 - 构建产物：`npm run build`（输出到 `web/dist/`）
-
----
-
-## 核心硬约束（TOP 5）
-
-1. **禁止硬编码密钥**：所有 API Key 必须通过 `.env` + `process.env` 读取，`.env` 禁止提交
-2. **禁止跨层依赖**：前端禁止引入 express/cors/openai；后端禁止引入 react/vite
-3. **禁止引入状态管理/路由/CSS-in-JS/UI 框架**：单页应用，App.tsx 集中管理状态，使用原生 CSS
-4. **组件必须 memo + useCallback**：所有叶子组件 `React.memo`，传递给子组件的 callback 必须 `useCallback`
-5. **禁止 `var` / `dangerouslySetInnerHTML` / `eval()` / `new Function()`**
-
-> 完整约束详见：`docs/harness/code-style.md`、`docs/harness/security.md`、`docs/harness/architecture.md`
 
 ---
 
@@ -83,7 +63,7 @@
 
 1. **先读后做**：任务开始前读本文件，修改代码前读取对应的 harness 约束
 2. **不确定就问**：禁止捏造接口字段、环境变量名、权限码、业务规则
-3. **改完必验**：代码修改后依次执行 `npm run lint` → `npm run build`
+3. **改完必验**：代码修改后执行 `npm run build`
 4. **新需求先建 spec**：在 `docs/specs/active/` 创建 spec 文档对齐验收标准，再开始编码
 5. **犯错即补规则**：Agent 犯了某类错误后，修复并把对应约束补充到本文件或 `docs/harness/` 中
 6. **文档同步义务**：

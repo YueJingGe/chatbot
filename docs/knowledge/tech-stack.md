@@ -23,9 +23,8 @@ auto_enforced: false
 | ---------- | ---- | ---------------------------- |
 | react      | 19   | UI 框架                      |
 | vite       | 7    | 构建工具                     |
-| typescript | -    | 类型系统                     |
-| eslint     | 9    | 代码检查（Flat Config 格式） |
-| husky      | -    | Git 钩子管理                 |
+| typescript | -    | 类型系统                         |
+| @vitejs/plugin-react | -    | Vite React 插件                 |
 
 ## LLM 服务
 

@@ -18,8 +18,7 @@
 | 层     | 技术                                                      |
 | ------ | --------------------------------------------------------- |
 | 后端   | Node.js + Express 5 + OpenAI SDK 6 + dotenv + cors        |
-| 前端   | React 19 + Vite 7 + ESLint 9                              |
-| LLM    | 阿里云百炼 DashScope OpenAI 兼容模式，qwen-max 模型       |
+| 前端   | React 19 + Vite 7                              || LLM    | 阿里云百炼 DashScope OpenAI 兼容模式，qwen-max 模型       |
 | 通信   | SSE（Server-Sent Events）流式传输，fetch + ReadableStream |
 | 工程化 | npm workspaces 单仓库 + concurrently 并发启动             |
 
@@ -101,8 +100,6 @@ npm run dev
 | `npm run dev:server` | 仅启动后端服务（端口 3000）          |
 | `npm run dev:web`    | 仅启动前端开发服务器（端口 5173）    |
 | `npm run build`      | 构建前端生产包（输出到 `web/dist/`） |
-| `npm run lint`       | 对前端代码执行 ESLint 检查           |
-
 ---
 
 ## Harness 系统

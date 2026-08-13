@@ -542,35 +542,6 @@ const openai = new OpenAI({
 
 ---
 
-## 项目结构规范
-
-### 目录组织
-
-```
-chatbot/
-├── AGENTS.md              # Agent 规范
-├── package.json           # npm workspaces 根配置
-├── server/                # 后端（Express, 端口 3000）
-│   ├── .env               # API 密钥（gitignored）
-│   ├── .env.example
-│   ├── package.json
-│   └── server.js          # 主服务器
-└── web/                   # 前端（React + Vite, 端口 5173）
-    ├── package.json
-    ├── vite.config.ts
-    ├── tsconfig.json
-    ├── index.html
-    ├── eslint.config.ts
-    └── src/
-        ├── App.tsx        # 主组件（状态中心 + SSE 消费）
-        ├── App.css
-        ├── main.tsx       # 入口文件
-        ├── index.css      # 全局重置样式
-        ├── vite-env.d.ts
-        └── components/
-            ├── MessageList.tsx
-            └── InputArea.tsx
-```
 
 ### 导入规范
 
@@ -750,57 +721,6 @@ const messages = await fetchMessages();
 // 这个函数用于登录（实际是发送消息）
 async function sendMessage(message: string) { /* ... */ }
 ```
-
----
-
-## ESLint 配置规范
-
-本项目使用 ESLint 9 Flat Config 格式：
-
-```typescript
-import js from "@eslint/js";
-import tsParser from "@typescript-eslint/parser";
-import tsPlugin from "@typescript-eslint/eslint-plugin";
-import reactHooks from "eslint-plugin-react-hooks";
-import reactRefresh from "eslint-plugin-react-refresh";
-import globals from "globals";
-
-export default [
-  { ignores: ["dist", ".history"] },
-  js.configs.recommended,
-  tsPlugin.configs.recommended,
-  reactHooks.configs.recommended,
-  reactRefresh.configs.vite,
-  {
-    files: ['**/*.{js,jsx,ts,tsx}'],
-    languageOptions: {
-      parser: tsParser,
-      ecmaVersion: 2020,
-      globals: globals.browser,
-      parserOptions: {
-        ecmaVersion: 2020,
-        ecmaFeatures: { jsx: true },
-        sourceType: 'module',
-      },
-    },
-    plugins: {
-      '@typescript-eslint': tsPlugin,
-      'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
-    },
-    rules: {
-      'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
-    },
-  },
-];
-```
-
-**🎯 核心原则**
-
-1. 预设配置（`js.configs.recommended` 等）作为独立配置项放入顶层数组
-2. 自定义规则覆盖放在单独的 config 对象中
-3. 不使用 `.rules` 链式访问预设配置的规则
 
 ---
 
