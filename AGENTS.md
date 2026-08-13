@@ -61,11 +61,11 @@
 
 ## Agent 工作规则
 
-1. **先读后做**：任务开始前读本文件，修改代码前读取对应的 harness 约束
+1. **先读后做**：任务开始前必须读本文件。修改代码前，必须根据“文档导航”表格读取对应级别的 harness 约束（尤其是 iron 和 living 级别）。
 2. **不确定就问**：禁止捏造接口字段、环境变量名、权限码、业务规则
 3. **改完必验**：代码修改后执行 `npm run build`
-4. **新需求先建 spec**：在 `docs/specs/active/` 创建 spec 文档对齐验收标准，再开始编码
-5. **犯错即补规则**：Agent 犯了某类错误后，修复并把对应约束补充到本文件或 `docs/harness/` 中
+4. **新需求先规划**：在 `docs/specs/active/` 创建 spec 文档对齐验收标准。spec 确认后，必须在 `docs/exec-plans/active/` 生成执行计划（包含任务分解、依赖关系、验证方式），按步骤编码并在计划中打勾
+5. **犯错即补规则**：Agent 犯了某类错误后，修复代码，并将对应约束补充到 `docs/harness/code-style.md` 或 `docs/harness/bad-cases.md` 中，必须标注 [PROPOSED] 标签等待人类审批
 6. **文档同步义务**：
    - 升级依赖版本后 → 更新 `docs/knowledge/tech-stack.md`
    - 调整目录结构后 → 更新 `docs/knowledge/directory-structure.md`
