@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback, KeyboardEvent } from "react";
 import MessageList from "./components/MessageList";
 import InputArea from "./components/InputArea";
+import ScrollToBottomButton from "./components/ScrollToBottomButton";
 import "./App.css";
 
 interface Message {
@@ -15,7 +16,8 @@ function App() {
   ]);
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isAtBottom, setIsAtBottom] = useState(true);
+  const chatHistoryRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef(messages);
   const inputTextRef = useRef(inputText);
   const isLoadingRef = useRef(isLoading);
@@ -27,15 +29,36 @@ function App() {
     isLoadingRef.current = isLoading;
   }, [messages, inputText, isLoading]);
 
+  const checkIsAtBottom = useCallback((element: HTMLDivElement) => {
+    const threshold = 1;
+    return element.scrollHeight - element.scrollTop - element.clientHeight <= threshold;
+  }, []);
+
+  const handleScroll = useCallback(() => {
+    if (chatHistoryRef.current) {
+      setIsAtBottom(checkIsAtBottom(chatHistoryRef.current));
+    }
+  }, [checkIsAtBottom]);
+
   const scrollToBottom = useCallback(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (chatHistoryRef.current) {
+      chatHistoryRef.current.scrollTo({
+        top: chatHistoryRef.current.scrollHeight,
+        behavior: "smooth",
+      });
     }
   }, []);
 
-  useEffect(() => {
+  const handleScrollToBottomClick = useCallback(() => {
+    setIsAtBottom(true);
     scrollToBottom();
-  }, [messages, scrollToBottom]);
+  }, [scrollToBottom]);
+
+  useEffect(() => {
+    if (isAtBottom) {
+      scrollToBottom();
+    }
+  }, [messages, isAtBottom, scrollToBottom]);
 
   const sendMessage = useCallback(async () => {
     const textToSend = inputTextRef.current.trim();
@@ -54,6 +77,7 @@ function App() {
     };
     const updatedMessages = [...messagesRef.current, newUserMessage];
     setMessages((prev) => [...prev, newUserMessage]);
+    setIsAtBottom(true);
     setInputText("");
     setIsLoading(true);
 
@@ -166,9 +190,21 @@ function App() {
       </header>
 
       <main>
-        <div className="chat-history" role="log" aria-label="聊天记录" aria-live="polite">
-          <MessageList messages={messages} />
-          <div ref={messagesEndRef} />
+        <div className="chat-history-wrapper">
+          <div
+            ref={chatHistoryRef}
+            className="chat-history"
+            role="log"
+            aria-label="聊天记录"
+            aria-live="polite"
+            onScroll={handleScroll}
+          >
+            <MessageList messages={messages} />
+          </div>
+          <ScrollToBottomButton
+            visible={!isAtBottom}
+            onClick={handleScrollToBottomClick}
+          />
         </div>
 
         <InputArea

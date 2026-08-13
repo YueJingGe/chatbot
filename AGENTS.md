@@ -71,7 +71,22 @@
    - 调整目录结构后 → 更新 `docs/knowledge/directory-structure.md`
    - 变更数据流后 → 更新 `docs/knowledge/data-flow.md`
    - 发现技术债 → 记录到 `docs/exec-plans/tech-debt-tracker.md`
-
+7. **任务闭环与智能归档规则**：
+  当用户明确回复“验收通过”、“没问题”等确认词汇，且当前代码构建无报错时：
+  - **获取当前日期**：Agent 必须获取当前系统时间，格式化为 `YYYY-MM`（例如 2024-05）。
+  - **检查并创建目录**：检查 `docs/specs/completed/{YYYY-MM}/` 和 `docs/exec-plans/completed/{YYYY-MM}/` 是否存在。若不存在，**必须先创建该目录**。
+  - **执行移动与标记**：
+    - 将 Spec 文档移至 `specs/completed/{YYYY-MM}/`。
+    - 将 Exec-plan 文档移至 `exec-plans/completed/{YYYY-MM}/`。
+    - **关键动作**：在移动前，必须将文档内的验收标准 `- [ ]` 批量替换为 `- [x]`，表示已验证通过。
+  - **汇报**：回复“文档已归档至 {YYYY-MM} 目录，任务闭环。”
+8. **技术债自动记录规则**：
+  - **主动识别**：当 Agent 在代码中使用了临时方案（如 `TODO`, `FIXME`, `any` 类型, 硬编码配置）时，必须在生成代码后，自动向 `docs/exec-plans/tech-debt-tracker.md` 追加一行记录。
+  - **状态更新**：当 Agent 修复了某个已知问题时，必须找到对应的记录，将状态从 `open` 修改为 `resolved`，并填入解决日期。
+  - **优先级定义**：
+    - P0: 导致系统崩溃或严重安全漏洞。
+    - P1: 严重影响性能或后续扩展性。
+    - P2: 代码风格不统一或非关键逻辑的临时方案。
 ---
 
 > **最后更新**：本文档随项目架构演进同步更新。
