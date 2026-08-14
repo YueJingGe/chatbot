@@ -30,7 +30,7 @@ function App() {
   }, [messages, inputText, isLoading]);
 
   const checkIsAtBottom = useCallback((element: HTMLDivElement) => {
-    const threshold = 1;
+    const threshold = 100;
     return element.scrollHeight - element.scrollTop - element.clientHeight <= threshold;
   }, []);
 
