@@ -18,25 +18,25 @@
   transform: translateX(-50%) scale(1);
   transition: opacity var(--transition-normal), transform var(--transition-normal), background-color var(--transition-fast), color var(--transition-fast);
   z-index: 10;
-}
 
-.scroll-to-bottom-button:hover {
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  transform: translateX(-50%) scale(1.08);
-}
+  &:hover {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    transform: translateX(-50%) scale(1.08);
+  }
 
-.scroll-to-bottom-button:active {
-  transform: translateX(-50%) scale(0.95);
+  &:active {
+    transform: translateX(-50%) scale(0.95);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+  }
 }
 
 .scroll-to-bottom-button--hidden {
   opacity: 0;
   transform: translateX(-50%) scale(0.8);
   pointer-events: none;
-}
-
-.scroll-to-bottom-button:focus-visible {
-  outline: 3px solid var(--color-primary);
-  outline-offset: 2px;
 }

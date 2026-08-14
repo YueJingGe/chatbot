@@ -1,5 +1,5 @@
 import { memo } from "react";
-import "./MessageList.css";
+import styles from "./MessageList.module.less";
 
 interface Message {
   id: string | number;
@@ -15,16 +15,16 @@ const MessageList = memo(({ messages }: MessageListProps) => {
   return (
     <>
       {messages.map((message) => (
-        <div key={message.id} className={`message ${message.role}-message`}>
-          <div className="bubble">
+        <div key={message.id} className={`${styles.message} ${styles[message.role + "-message"]}`}>
+          <div className={styles.bubble}>
             {message.content ? (
               message.content
             ) : (
               message.role === "assistant" && (
-                <span className="typing-indicator" aria-label="正在输入">
-                  <span className="typing-dot"></span>
-                  <span className="typing-dot"></span>
-                  <span className="typing-dot"></span>
+                <span className={styles["typing-indicator"]} aria-label="正在输入">
+                  <span className={styles["typing-dot"]}></span>
+                  <span className={styles["typing-dot"]}></span>
+                  <span className={styles["typing-dot"]}></span>
                 </span>
               )
             )}

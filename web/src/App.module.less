@@ -11,7 +11,7 @@
 }
 
 /* ===== 头部 ===== */
-header {
+.header {
   background-color: var(--color-surface);
   color: var(--color-text);
   padding: var(--space-md) var(--space-xl);
@@ -20,21 +20,21 @@ header {
   justify-content: space-between;
   flex-shrink: 0;
   border-bottom: 1px solid var(--color-header-border);
-}
 
-header h1 {
-  font-size: 1.05rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
+  h1 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
 
-header .subtitle {
-  font-size: 0.8rem;
-  font-weight: 400;
-  color: var(--color-text-muted);
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  .subtitle {
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
 }
 
 .status-dot {
@@ -52,7 +52,7 @@ header .subtitle {
 }
 
 /* ===== 主区域 ===== */
-main {
+.main {
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
@@ -78,28 +78,27 @@ main {
   background: transparent;
   overflow-anchor: none;
   scroll-behavior: smooth;
-}
 
-/* ===== 滚动条 ===== */
-.chat-history::-webkit-scrollbar {
-  width: 4px;
-}
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
 
-.chat-history::-webkit-scrollbar-track {
-  background: transparent;
-}
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
 
-.chat-history::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 2px;
-}
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 2px;
 
-.chat-history::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-muted);
+    &:hover {
+      background: var(--color-text-muted);
+    }
+  }
 }
 
 /* ===== 页脚 ===== */
-footer {
+.footer {
   padding: var(--space-sm) var(--space-lg);
   text-align: center;
   color: var(--color-text-muted);
@@ -136,14 +135,14 @@ footer {
 
   .scroll-to-bottom-button {
     transition: none;
-  }
 
-  .scroll-to-bottom-button:hover {
-    transform: translateX(-50%);
-  }
+    &:hover {
+      transform: translateX(-50%);
+    }
 
-  .scroll-to-bottom-button:active {
-    transform: translateX(-50%);
+    &:active {
+      transform: translateX(-50%);
+    }
   }
 }
 
@@ -160,11 +159,11 @@ footer {
     border-radius: var(--radius-lg);
   }
 
-  header {
+  .header {
     padding: var(--space-md) var(--space-lg);
   }
 
-  main {
+  .main {
     padding: 0 var(--space-lg);
   }
 
@@ -186,12 +185,12 @@ footer {
     border-radius: 0;
   }
 
-  header {
+  .header {
     padding: var(--space-sm) var(--space-md);
-  }
 
-  header h1 {
-    font-size: 0.95rem;
+    h1 {
+      font-size: 0.95rem;
+    }
   }
 
   .bubble {
@@ -214,14 +213,14 @@ footer {
     width: 40px;
     height: 40px;
     bottom: var(--space-sm);
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
   }
 
-  .scroll-to-bottom-button svg {
-    width: 18px;
-    height: 18px;
-  }
-
-  footer {
+  .footer {
     padding: var(--space-xs) var(--space-md);
     font-size: 0.7rem;
   }

@@ -20,20 +20,20 @@
   outline: none;
   background: var(--color-surface);
   color: var(--color-text);
-}
 
-.chat-input::placeholder {
-  color: var(--color-text-muted);
-}
+  &::placeholder {
+    color: var(--color-text-muted);
+  }
 
-.chat-input:focus {
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-focus);
-}
+  &:focus {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-focus);
+  }
 
-.chat-input:disabled {
-  background-color: var(--color-input-bg);
-  cursor: not-allowed;
+  &:disabled {
+    background-color: var(--color-input-bg);
+    cursor: not-allowed;
+  }
 }
 
 .send-button {
@@ -50,42 +50,42 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-}
 
-.send-button:hover:not(:disabled) {
-  background-color: var(--color-primary-hover);
-  transform: scale(1.05);
-}
+  &:hover:not(:disabled) {
+    background-color: var(--color-primary-hover);
+    transform: scale(1.05);
+  }
 
-.send-button:active:not(:disabled) {
-  background-color: var(--color-primary-active);
-  transform: scale(0.95);
-}
+  &:active:not(:disabled) {
+    background-color: var(--color-primary-active);
+    transform: scale(0.95);
+  }
 
-.send-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 
-.send-button:focus-visible {
-  outline: 3px solid var(--color-primary);
-  outline-offset: 2px;
+  &:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+  }
 }
 
 /* ===== 加载动画 ===== */
 .send-button--loading {
   position: relative;
-}
 
-.send-button--loading::after {
-  content: "";
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: var(--color-surface);
-  border-radius: var(--radius-full);
-  animation: spin 0.6s linear infinite;
+  &::after {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: var(--color-surface);
+    border-radius: var(--radius-full);
+    animation: spin 0.6s linear infinite;
+  }
 }
 
 @keyframes spin {

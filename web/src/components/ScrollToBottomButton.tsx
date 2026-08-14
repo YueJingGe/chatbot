@@ -1,5 +1,5 @@
 import { memo } from "react";
-import "./ScrollToBottomButton.css";
+import styles from "./ScrollToBottomButton.module.less";
 
 interface ScrollToBottomButtonProps {
   visible: boolean;
@@ -8,8 +8,8 @@ interface ScrollToBottomButtonProps {
 
 const ScrollToBottomButton = memo(({ visible, onClick }: ScrollToBottomButtonProps) => {
   const className = visible
-    ? "scroll-to-bottom-button"
-    : "scroll-to-bottom-button scroll-to-bottom-button--hidden";
+    ? styles["scroll-to-bottom-button"]
+    : `${styles["scroll-to-bottom-button"]} ${styles["scroll-to-bottom-button--hidden"]}`;
 
   return (
     <button

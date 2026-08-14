@@ -32,6 +32,25 @@
   font-size: 0.95rem;
   word-wrap: break-word;
   overflow-wrap: break-word;
+
+  pre {
+    background: rgba(0, 0, 0, 0.04);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-sm);
+    overflow-x: auto;
+    margin-top: var(--space-sm);
+    font-family: "SF Mono", "Fira Code", "Courier New", monospace;
+    font-size: 0.88em;
+    line-height: 1.5;
+  }
+
+  code {
+    font-family: "SF Mono", "Fira Code", "Courier New", monospace;
+    background: rgba(0, 0, 0, 0.04);
+    padding: 2px 6px;
+    border-radius: var(--space-xs);
+    font-size: 0.9em;
+  }
 }
 
 .user-message .bubble {
@@ -45,25 +64,6 @@
   color: var(--color-text);
   border: 1px solid var(--color-bot-border);
   border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--space-xs);
-}
-
-.bubble pre {
-  background: rgba(0, 0, 0, 0.04);
-  padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius-sm);
-  overflow-x: auto;
-  margin-top: var(--space-sm);
-  font-family: "SF Mono", "Fira Code", "Courier New", monospace;
-  font-size: 0.88em;
-  line-height: 1.5;
-}
-
-.bubble code {
-  font-family: "SF Mono", "Fira Code", "Courier New", monospace;
-  background: rgba(0, 0, 0, 0.04);
-  padding: 2px 6px;
-  border-radius: var(--space-xs);
-  font-size: 0.9em;
 }
 
 /* ===== 脉动加载动画 ===== */
@@ -80,14 +80,14 @@
   border-radius: var(--radius-full);
   background-color: var(--color-text-muted);
   animation: typingBounce 1.4s ease-in-out infinite;
-}
 
-.typing-dot:nth-child(2) {
-  animation-delay: 0.2s;
-}
+  &:nth-child(2) {
+    animation-delay: 0.2s;
+  }
 
-.typing-dot:nth-child(3) {
-  animation-delay: 0.4s;
+  &:nth-child(3) {
+    animation-delay: 0.4s;
+  }
 }
 
 @keyframes typingBounce {

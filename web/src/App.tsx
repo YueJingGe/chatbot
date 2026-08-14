@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback, KeyboardEvent } from "react";
 import MessageList from "./components/MessageList";
 import InputArea from "./components/InputArea";
 import ScrollToBottomButton from "./components/ScrollToBottomButton";
-import "./App.css";
+import styles from "./App.module.less";
 
 interface Message {
   id: string | number;
@@ -30,8 +30,11 @@ function App() {
   }, [messages, inputText, isLoading]);
 
   const checkIsAtBottom = useCallback((element: HTMLDivElement) => {
-    const threshold = 100;
-    return element.scrollHeight - element.scrollTop - element.clientHeight <= threshold;
+    const threshold = 30;
+    return (
+      element.scrollHeight - element.scrollTop - element.clientHeight <=
+      threshold
+    );
   }, []);
 
   const handleScroll = useCallback(() => {
@@ -154,7 +157,8 @@ function App() {
       if (error instanceof Error && error.name === "AbortError") {
         return;
       }
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       console.error("发送失败:", error);
       setMessages((prev) =>
         prev.map((msg) => {
@@ -180,20 +184,20 @@ function App() {
   );
 
   return (
-    <div className="container">
-      <header>
+    <div className={styles.container}>
+      <header className={styles.header}>
         <h1>AI 对话</h1>
-        <p className="subtitle">
-          <span className="status-dot"></span>
+        <p className={styles.subtitle}>
+          <span className={styles["status-dot"]}></span>
           在线
         </p>
       </header>
 
-      <main>
-        <div className="chat-history-wrapper">
+      <main className={styles.main}>
+        <div className={styles["chat-history-wrapper"]}>
           <div
             ref={chatHistoryRef}
-            className="chat-history"
+            className={styles["chat-history"]}
             role="log"
             aria-label="聊天记录"
             aria-live="polite"
@@ -216,9 +220,7 @@ function App() {
         />
       </main>
 
-      <footer>
-        Powered by 阿里云百炼
-      </footer>
+      <footer className={styles.footer}>Powered by 阿里云百炼</footer>
     </div>
   );
 }
