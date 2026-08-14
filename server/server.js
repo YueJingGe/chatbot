@@ -29,6 +29,21 @@ const openai = new OpenAI({
   defaultHeaders: {},
 });
 
+// ---------------- 5.5 获取实时日期时间（注入 system prompt） ----------------
+const WEEKDAYS = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+
+function getCurrentDateTime() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
+  const weekday = WEEKDAYS[now.getDay()];
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  const seconds = String(now.getSeconds()).padStart(2, "0");
+  return `${year}年${month}月${day}日 ${weekday} ${hours}:${minutes}:${seconds}`;
+}
+
 // ---------------- 6. 核心：处理聊天请求的API接口 ----------------
 const REQUEST_TIMEOUT = parseInt(process.env.REQUEST_TIMEOUT, 10) || 60000; // 默认 60s
 
@@ -59,7 +74,8 @@ app.post("/api/chat", async (req, res) => {
             1. 仔细分析用户的完整对话历史，理解当前问题的上下文。
             2. 当用户使用代词（如"它"、"这个"、"那里"）或简略表达时，结合历史明确指代对象。
             3. 如果用户的问题与历史相关，请自然衔接，不要重复已提供的信息。
-            4. 回答应简洁、准确、有帮助。`,
+            4. 回答应简洁、准确、有帮助。
+            5. 当前服务器实时时间为：${getCurrentDateTime()}。当用户询问日期、时间、星期几等问题时，请以此时间为准进行回答。`,
         },
         ...userMessages,
       ],
