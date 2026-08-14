@@ -5,6 +5,7 @@ interface Message {
   id: string | number;
   role: string;
   content?: string;
+  statusMessage?: string;
 }
 
 interface MessageListProps {
@@ -17,7 +18,9 @@ const MessageList = memo(({ messages }: MessageListProps) => {
       {messages.map((message) => (
         <div key={message.id} className={`${styles.message} ${styles[message.role + "-message"]}`}>
           <div className={styles.bubble}>
-            {message.content ? (
+            {message.statusMessage && !message.content ? (
+              <span className={styles.status}>{message.statusMessage}</span>
+            ) : message.content ? (
               message.content
             ) : (
               message.role === "assistant" && (

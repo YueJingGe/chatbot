@@ -1,7 +1,7 @@
 ---
 level: guideline
 owner: "@YueJingGe"
-last_reviewed: 2026-08-12
+last_reviewed: 2026-08-14
 review_cycle: per-pr
 auto_enforced: false
 ---
@@ -33,6 +33,13 @@ auto_enforced: false
 | 服务商   | 阿里云百炼 DashScope | OpenAI 兼容模式                |
 | 模型     | qwen-max             | 通过 `MODEL_NAME` 环境变量配置 |
 | 通信方式 | SSE 流式传输         | `fetch` + `ReadableStream`     |
+
+## 外部 API
+
+| API 服务 | 用途 | 说明 |
+| -------- | ---- | ---- |
+| Open-Meteo Geocoding | 城市名 → 经纬度 | 免费，无需 API Key |
+| Open-Meteo Forecast | 实时天气 + 预报 | 免费，通过 `server/weather.js` 封装调用 |
 
 ## 工程化
 

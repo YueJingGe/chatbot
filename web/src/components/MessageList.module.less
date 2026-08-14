@@ -66,6 +66,26 @@
   border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--space-xs);
 }
 
+/* ===== 工具调用状态提示 ===== */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+  font-style: italic;
+  animation: statusPulse 2s ease-in-out infinite;
+}
+
+@keyframes statusPulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 /* ===== 脉动加载动画 ===== */
 .typing-indicator {
   display: inline-flex;

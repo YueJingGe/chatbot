@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const OpenAI = require("openai");
+const { getWeatherTool } = require("./weather");
 
 // ---------------- 2. 创建Express应用 ----------------
 const app = express();
@@ -44,8 +45,44 @@ function getCurrentDateTime() {
   return `${year}年${month}月${day}日 ${weekday} ${hours}:${minutes}:${seconds}`;
 }
 
+// ---------------- 5.6 Function Calling 工具定义 ----------------
+const TOOLS = [
+  {
+    type: "function",
+    function: {
+      name: "get_weather",
+      description: "获取指定城市的实时天气和未来天气预报",
+      parameters: {
+        type: "object",
+        properties: {
+          location: {
+            type: "string",
+            description: "城市名称，如：北京、上海、杭州",
+          },
+          forecast_days: {
+            type: "integer",
+            description: "预报天数，0 表示仅实时天气，最大 7 天",
+            default: 0,
+          },
+        },
+        required: ["location"],
+      },
+    },
+  },
+];
+
+// 工具名称 → 执行函数的映射
+const TOOL_HANDLERS = {
+  get_weather: async (args) => {
+    const { location, forecast_days } = JSON.parse(args);
+    return getWeatherTool(location, forecast_days || 0);
+  },
+};
+
 // ---------------- 6. 核心：处理聊天请求的API接口 ----------------
 const REQUEST_TIMEOUT = parseInt(process.env.REQUEST_TIMEOUT, 10) || 60000; // 默认 60s
+
+const MAX_TOOL_ROUNDS = 5;
 
 app.post("/api/chat", async (req, res) => {
   // 1. 设置流式响应头
@@ -61,38 +98,108 @@ app.post("/api/chat", async (req, res) => {
       return res.status(400).json({ error: "请求格式错误：messages 必须为数组" });
     }
 
-    // 2. 发起流式请求（带超时控制）
+    // 2. 构建 system prompt 和消息列表
+    const systemMessage = {
+      role: "system",
+      content: `你是一个专业的客服助手。请遵循以下规则：
+        1. 仔细分析用户的完整对话历史，理解当前问题的上下文。
+        2. 当用户使用代词（如"它"、"这个"、"那里"）或简略表达时，结合历史明确指代对象。
+        3. 如果用户的问题与历史相关，请自然衔接，不要重复已提供的信息。
+        4. 回答应简洁、准确、有帮助。
+        5. 当前服务器实时时间为：${getCurrentDateTime()}。当用户询问日期、时间、星期几等问题时，请以此时间为准进行回答。`,
+    };
+    const messages = [systemMessage, ...userMessages];
+
+    // 3. 超时控制
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
-    const stream = await openai.chat.completions.create({
-      model: process.env.MODEL_NAME,
-      messages: [
-        {
-          role: "system",
-          content: `你是一个专业的客服助手。请遵循以下规则：
-            1. 仔细分析用户的完整对话历史，理解当前问题的上下文。
-            2. 当用户使用代词（如"它"、"这个"、"那里"）或简略表达时，结合历史明确指代对象。
-            3. 如果用户的问题与历史相关，请自然衔接，不要重复已提供的信息。
-            4. 回答应简洁、准确、有帮助。
-            5. 当前服务器实时时间为：${getCurrentDateTime()}。当用户询问日期、时间、星期几等问题时，请以此时间为准进行回答。`,
-        },
-        ...userMessages,
-      ],
-      stream: true,
-      signal: controller.signal,
-    });
+    // 4. Tool calling 循环（全程流式）
+    for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
+      const stream = await openai.chat.completions.create({
+        model: process.env.MODEL_NAME,
+        messages,
+        tools: TOOLS,
+        stream: true,
+        signal: controller.signal,
+      });
 
-    clearTimeout(timeoutId);
+      // 累积当前轮次的 tool_call 参数
+      const currentToolCalls = {};
+      let finishReason = "";
 
-    // 3. 流式返回数据给前端
-    for await (const chunk of stream) {
-      const content = chunk.choices[0]?.delta?.content || "";
-      if (content) {
-        res.write(`data: ${JSON.stringify({ chunk: content })}\n\n`);
+      for await (const chunk of stream) {
+        const delta = chunk.choices?.[0]?.delta;
+        const reason = chunk.choices?.[0]?.finish_reason;
+
+        // 转发文本内容给前端
+        if (delta?.content) {
+          res.write(`data: ${JSON.stringify({ chunk: delta.content })}\n\n`);
+        }
+
+        // 累积 tool_calls 参数
+        if (delta?.tool_calls) {
+          for (const tc of delta.tool_calls) {
+            const idx = tc.index;
+            if (!currentToolCalls[idx]) {
+              currentToolCalls[idx] = { id: "", function: { name: "", arguments: "" } };
+            }
+            if (tc.id) currentToolCalls[idx].id = tc.id;
+            if (tc.function?.name) currentToolCalls[idx].function.name += tc.function.name;
+            if (tc.function?.arguments) currentToolCalls[idx].function.arguments += tc.function.arguments;
+          }
+        }
+
+        if (reason) finishReason = reason;
+      }
+
+      // 没有工具调用 → 内容已在流中转发，结束
+      if (finishReason !== "tool_calls") {
+        clearTimeout(timeoutId);
+        res.write("data: [DONE]\n\n");
+        res.end();
+        return;
+      }
+
+      // 有工具调用 → 构建 assistant message 并执行工具
+      const toolCallsArray = Object.values(currentToolCalls);
+      messages.push({ role: "assistant", content: null, tool_calls: toolCallsArray });
+
+      for (const toolCall of toolCallsArray) {
+        const handler = TOOL_HANDLERS[toolCall.function.name];
+        if (!handler) {
+          messages.push({
+            role: "tool",
+            tool_call_id: toolCall.id,
+            content: `不支持的工具: ${toolCall.function.name}`,
+          });
+          continue;
+        }
+
+        // 发送状态事件给前端
+        const args = JSON.parse(toolCall.function.arguments);
+        const statusMessage = toolCall.function.name === "get_weather"
+          ? `🌤️ 正在查询${args.location || ""}的天气...`
+          : `正在调用 ${toolCall.function.name}...`;
+        res.write(`data: ${JSON.stringify({
+          status: "tool_call",
+          tool: toolCall.function.name,
+          message: statusMessage,
+        })}\n\n`);
+
+        // 执行工具
+        const result = await handler(toolCall.function.arguments);
+        messages.push({
+          role: "tool",
+          tool_call_id: toolCall.id,
+          content: result,
+        });
       }
     }
-    // 流结束标志
+
+    // 超过最大轮次
+    clearTimeout(timeoutId);
+    res.write(`data: ${JSON.stringify({ error: "工具调用次数超限" })}\n\n`);
     res.write("data: [DONE]\n\n");
     res.end();
   } catch (error) {

@@ -8,6 +8,7 @@ interface Message {
   id: string | number;
   role: string;
   content: string;
+  statusMessage?: string;
 }
 
 function App() {
@@ -136,12 +137,21 @@ function App() {
                 );
                 break;
               }
+              if (data.status) {
+                setMessages((prev) =>
+                  prev.map((msg) =>
+                    msg.id === assistantMessageId
+                      ? { ...msg, statusMessage: data.message }
+                      : msg
+                  )
+                );
+              }
               if (data.chunk) {
                 fullReply += data.chunk;
                 setMessages((prev) =>
                   prev.map((msg) => {
                     if (msg.id === assistantMessageId) {
-                      return { ...msg, content: fullReply };
+                      return { ...msg, content: fullReply, statusMessage: undefined };
                     }
                     return msg;
                   })

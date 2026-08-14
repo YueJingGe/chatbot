@@ -1,7 +1,7 @@
 ---
 level: guideline
 owner: "@YueJingGe"
-last_reviewed: 2026-08-12
+last_reviewed: 2026-08-14
 review_cycle: per-pr
 auto_enforced: false
 ---
@@ -24,14 +24,24 @@ auto_enforced: false
 | 4. 接收流   | `App.tsx`         | `ReadableStream` 消费 SSE 流，逐字更新 assistant 消息                    |
 | 5. 渲染消息 | `MessageList.tsx` | React.memo 优化，逐字显示流式内容                                        |
 
-### 后端 SSE 处理流程
+### 后端 SSE 处理流程（含 Function Calling）
 
-| 步骤             | 位置        | 说明                                              |
-| ---------------- | ----------- | ------------------------------------------------- |
-| 1. 设置响应头    | `server.js` | `Content-Type: text/event-stream`                 |
-| 2. 发起 LLM 请求 | `server.js` | OpenAI SDK 流式请求（带 AbortController 超时）    |
-| 3. 流式转发      | `server.js` | `for await...of` 消费流，`res.write()` 转发给前端 |
-| 4. 流结束        | `server.js` | 发送 `[DONE]` 标志，`res.end()`                   |
+| 步骤               | 位置          | 说明                                                        |
+| ------------------ | ------------- | ----------------------------------------------------------- |
+| 1. 设置响应头      | `server.js`   | `Content-Type: text/event-stream`                           |
+| 2. 流式 LLM 请求 | `server.js`   | OpenAI SDK 流式请求，带 `tools` 参数（含 AbortController）  |
+| 3. 流式转发/累积   | `server.js`   | 文本 chunk 直接转发；tool_calls 参数累积                    |
+| 4. 工具执行        | `weather.js`  | 若 `finish_reason: "tool_calls"`，执行工具，发 SSE status 事件 |
+| 5. 循环或结束      | `server.js`   | 有工具调用 → 回传结果，进入下一轮；无工具调用 → 发送 `[DONE]` |
+
+### SSE 事件类型
+
+| 事件格式 | 说明 |
+|----------|------|
+| `data: { "chunk": "内容" }` | 文本流式内容（逐字转发） |
+| `data: { "status": "tool_call", "tool": "get_weather", "message": "🌤️ 正在查询..." }` | 工具调用状态提示 |
+| `data: { "error": "错误信息" }` | 错误事件 |
+| `data: [DONE]` | 流结束标志 |
 
 ### 关键节点注意事项
 
