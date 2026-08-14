@@ -1,4 +1,5 @@
 import { memo } from "react";
+import "./MessageList.css";
 
 interface Message {
   id: string | number;

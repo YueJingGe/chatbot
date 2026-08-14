@@ -1,4 +1,5 @@
 import { memo } from "react";
+import "./ScrollToBottomButton.css";
 
 interface ScrollToBottomButtonProps {
   visible: boolean;

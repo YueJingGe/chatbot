@@ -1,4 +1,5 @@
 import { memo, KeyboardEvent } from "react";
+import "./InputArea.css";
 
 interface InputAreaProps {
   inputText: string;

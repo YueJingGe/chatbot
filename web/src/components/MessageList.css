@@ -1,0 +1,102 @@
+/* ===== 消息列表 ===== */
+.message {
+  display: flex;
+  margin-bottom: var(--space-lg);
+  animation: messageIn var(--transition-slow) ease-out both;
+}
+
+@keyframes messageIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.user-message {
+  justify-content: flex-end;
+}
+
+.bot-message {
+  justify-content: flex-start;
+}
+
+/* ===== 气泡 ===== */
+.bubble {
+  max-width: 75%;
+  padding: var(--space-md) var(--space-lg);
+  line-height: 1.7;
+  font-size: 0.95rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.user-message .bubble {
+  background-color: var(--color-user-bubble);
+  color: var(--color-user-text);
+  border-radius: var(--radius-lg) var(--radius-lg) var(--space-xs) var(--radius-lg);
+}
+
+.bot-message .bubble {
+  background-color: var(--color-bot-bubble);
+  color: var(--color-text);
+  border: 1px solid var(--color-bot-border);
+  border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--space-xs);
+}
+
+.bubble pre {
+  background: rgba(0, 0, 0, 0.04);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+  margin-top: var(--space-sm);
+  font-family: "SF Mono", "Fira Code", "Courier New", monospace;
+  font-size: 0.88em;
+  line-height: 1.5;
+}
+
+.bubble code {
+  font-family: "SF Mono", "Fira Code", "Courier New", monospace;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 2px 6px;
+  border-radius: var(--space-xs);
+  font-size: 0.9em;
+}
+
+/* ===== 脉动加载动画 ===== */
+.typing-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: var(--space-xs) 0;
+}
+
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-text-muted);
+  animation: typingBounce 1.4s ease-in-out infinite;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typingBounce {
+  0%, 60%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

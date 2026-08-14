@@ -1,0 +1,42 @@
+/* ===== 回到底部按钮 ===== */
+.scroll-to-bottom-button {
+  position: absolute;
+  left: 50%;
+  bottom: var(--space-md);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-card);
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+  transition: opacity var(--transition-normal), transform var(--transition-normal), background-color var(--transition-fast), color var(--transition-fast);
+  z-index: 10;
+}
+
+.scroll-to-bottom-button:hover {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  transform: translateX(-50%) scale(1.08);
+}
+
+.scroll-to-bottom-button:active {
+  transform: translateX(-50%) scale(0.95);
+}
+
+.scroll-to-bottom-button--hidden {
+  opacity: 0;
+  transform: translateX(-50%) scale(0.8);
+  pointer-events: none;
+}
+
+.scroll-to-bottom-button:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
