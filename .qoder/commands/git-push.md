@@ -37,7 +37,7 @@ description: 提交当前变更并推送到远程仓库，同时生成提交记�
 
 ### 3.4 生成提交记录文档
 
-1. 获取当前时间，格式化为 `YYYY-MM-DD-HH-mm-ss`（示例：`2026-08-17-14-30-00`）
+1. 获取当前时间，格式化为 `YYYYMMDD-HH:mm`（示例：`20260817-14:30`）
 2. 获取作者信息：
    - `git config user.name`
    - `git config user.email`
