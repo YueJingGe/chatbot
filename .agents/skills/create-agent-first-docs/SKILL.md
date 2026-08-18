@@ -1,10 +1,10 @@
 ---
 name: create-agent-first-docs
-description: >
-  为任意前端项目（React/Vue/Svelte/Angular/原生 JS，单体/Monorepo/微前端均可）
-  初始化或增强 Agent-First 文档治理体系。扫描项目结构、技术栈和已有 Agent 文件，
-  生成/合并分层文档（入口层、约束层、知识库层、协作层），并适配多种 AI 编码工具。
-  零覆盖已有文件，纯增量合并，兼容 AGENTS.md、.cursorrules、docs/、skills/、context/ 等已有资源。
+# description: >
+#   为任意前端项目（React/Vue/Svelte/Angular/原生 JS，单体/Monorepo/微前端均可）
+#   初始化或增强 Agent-First 文档治理体系。扫描项目结构、技术栈和已有 Agent 文件，
+#   生成/合并分层文档（入口层、约束层、知识库层、协作层），并适配多种 AI 编码工具。
+#   零覆盖已有文件，纯增量合并，兼容 AGENTS.md、.cursorrules、docs/、skills/、context/ 等已有资源。
 ---
 
 # Agent-First 前端文档治理初始化

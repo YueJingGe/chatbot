@@ -1,6 +1,6 @@
 ---
 name: karpathy-guidelines
-description: 通用 AI 编程行为准则，用于减少 LLM 在写代码/改代码/review 代码时常见的过度设计、越界改动、隐藏假设等问题。当任务涉及"写新代码""修 bug""重构""review diff""给实现方案"等编码动作时使用，帮助在动手前显式化假设、保持最小改动、定义可验证成功标准。源自 Andrej Karpathy 对 LLM 编码陷阱的总结。
+# description: 通用 AI 编程行为准则，用于减少 LLM 在写代码/改代码/review 代码时常见的过度设计、越界改动、隐藏假设等问题。当任务涉及"写新代码""修 bug""重构""review diff""给实现方案"等编码动作时使用，帮助在动手前显式化假设、保持最小改动、定义可验证成功标准。源自 Andrej Karpathy 对 LLM 编码陷阱的总结。
 ---
 
 # Karpathy Behavioral Guidelines

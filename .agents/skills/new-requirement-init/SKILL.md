@@ -1,6 +1,6 @@
 ---
 name: new-requirement-init
-description: 新需求初始化
+# description: 新需求初始化
 ---
 
 
