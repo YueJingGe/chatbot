@@ -118,8 +118,7 @@ function formatWeatherData(weatherData, cityName, forecastDays) {
 
   if (forecastDays > 0 && weatherData.daily) {
     parts.push(`\n【未来${forecastDays}天预报】`);
-    const { time, weather_code, temperature_2m_max, temperature_2m_min } =
-      weatherData.daily;
+    const { time, weather_code, temperature_2m_max, temperature_2m_min } = weatherData.daily;
     for (let i = 0; i < time.length; i++) {
       parts.push(
         `${time[i]}: ${getWeatherDescription(weather_code[i])}, ${temperature_2m_min[i]}°C ~ ${temperature_2m_max[i]}°C`

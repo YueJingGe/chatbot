@@ -1,0 +1,23 @@
+# Claude Code Ignore File
+# Auto-generated from .agents/ignore
+# DO NOT EDIT MANUALLY - changes will be overwritten
+# Source: .agents/ignore
+# Sync: npm run sync:ignore
+
+node_modules/
+dist/        # Vite → web/dist/
+build/       # 预防：webpack/rollup 等可能输出到 build/
+.cache/      # 预防：babel-loader/webpack 等通用缓存目录
+*.tsbuildinfo  # TypeScript 增量编译
+.env           # server/.env
+.env.local     # 预防：Vite 原生支持 .env.local
+.env.*.local   # 预防：Vite 原生支持 .env.development.local 等
+.DS_Store    # macOS
+Thumbs.db    # 预防：团队成员可能用 Windows
+*.log        # 预防：任何工具可能输出日志
+package-lock.json
+*.png
+*.jpg
+coverage/    # 预防：vitest/jest 等测试框架覆盖率报告
+.idea/       # 预防：团队成员可能用 JetBrains（WebStorm/IDEA）
+.qoder/

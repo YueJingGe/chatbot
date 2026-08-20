@@ -16,7 +16,9 @@
   border-radius: var(--radius-pill);
   font-size: 0.95rem;
   font-family: inherit;
-  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
+  transition:
+    border-color var(--transition-normal),
+    box-shadow var(--transition-normal);
   outline: none;
   background: var(--color-surface);
   color: var(--color-text);
@@ -45,7 +47,9 @@
   color: var(--color-surface);
   font-size: 1.05rem;
   cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
+  transition:
+    background-color var(--transition-fast),
+    transform var(--transition-fast);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -81,7 +85,7 @@
     position: absolute;
     width: 18px;
     height: 18px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    border: 2px solid rgb(255 255 255 / 30%);
     border-top-color: var(--color-surface);
     border-radius: var(--radius-full);
     animation: spin 0.6s linear infinite;
@@ -89,7 +93,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ===== 提示文字 ===== */

@@ -118,9 +118,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const avatarDiv = document.createElement("div");
     avatarDiv.className = "avatar";
     avatarDiv.innerHTML =
-      sender === "user"
-        ? '<i class="fas fa-user"></i>'
-        : '<i class="fas fa-robot"></i>';
+      sender === "user" ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
 
     const bubbleDiv = document.createElement("div");
     bubbleDiv.className = "bubble";

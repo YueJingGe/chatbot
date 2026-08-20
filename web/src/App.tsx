@@ -32,10 +32,7 @@ function App() {
 
   const checkIsAtBottom = useCallback((element: HTMLDivElement) => {
     const threshold = 30;
-    return (
-      element.scrollHeight - element.scrollTop - element.clientHeight <=
-      threshold
-    );
+    return element.scrollHeight - element.scrollTop - element.clientHeight <= threshold;
   }, []);
 
   const handleScroll = useCallback(() => {
@@ -86,10 +83,7 @@ function App() {
     setIsLoading(true);
 
     const assistantMessageId = crypto.randomUUID();
-    setMessages((prev) => [
-      ...prev,
-      { id: assistantMessageId, role: "assistant", content: "" },
-    ]);
+    setMessages((prev) => [...prev, { id: assistantMessageId, role: "assistant", content: "" }]);
 
     try {
       const response = await fetch("/api/chat", {
@@ -140,9 +134,7 @@ function App() {
               if (data.status) {
                 setMessages((prev) =>
                   prev.map((msg) =>
-                    msg.id === assistantMessageId
-                      ? { ...msg, statusMessage: data.message }
-                      : msg
+                    msg.id === assistantMessageId ? { ...msg, statusMessage: data.message } : msg
                   )
                 );
               }
@@ -167,8 +159,7 @@ function App() {
       if (error instanceof Error && error.name === "AbortError") {
         return;
       }
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       console.error("发送失败:", error);
       setMessages((prev) =>
         prev.map((msg) => {
@@ -215,10 +206,7 @@ function App() {
           >
             <MessageList messages={messages} />
           </div>
-          <ScrollToBottomButton
-            visible={!isAtBottom}
-            onClick={handleScrollToBottomClick}
-          />
+          <ScrollToBottomButton visible={!isAtBottom} onClick={handleScrollToBottomClick} />
         </div>
 
         <InputArea

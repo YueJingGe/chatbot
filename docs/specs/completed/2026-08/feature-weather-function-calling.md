@@ -94,11 +94,11 @@ data: { "chunk": "北京今天晴，气温..." }
 data: [DONE]
 ```
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `status` | string | 事件类型，值为 `"tool_call"` |
-| `tool` | string | 工具名称 |
-| `message` | string | 展示给用户的状态文字 |
+|字段|类型|说明|
+|-|-|-|
+|`status`|string|事件类型，值为 `"tool_call"`|
+|`tool`|string|工具名称|
+|`message`|string|展示给用户的状态文字|
 
 ## 前端设计
 
@@ -109,7 +109,7 @@ interface Message {
   id: string | number;
   role: string;
   content: string;
-  statusMessage?: string;  // 新增：工具调用状态提示
+  statusMessage?: string; // 新增：工具调用状态提示
 }
 ```
 
@@ -135,12 +135,12 @@ if (data.chunk) → 清除 statusMessage，累加 content
 
 ## 错误处理
 
-| 场景 | 处理方式 |
-|------|----------|
-| 地理编码失败（城市不存在） | 将错误信息作为 tool response 回传 LLM，让 LLM 生成友好错误提示 |
-| 天气 API 超时/失败 | 同上，tool response 返回错误描述 |
-| Tool loop 超过 5 次 | 终止循环，返回 "天气查询过程异常" 错误 |
-| 总请求超时 | 复用现有 AbortController 超时机制，可适当增大超时时间 |
+|场景|处理方式|
+|-|-|
+|地理编码失败（城市不存在）|将错误信息作为 tool response 回传 LLM，让 LLM 生成友好错误提示|
+|天气 API 超时/失败|同上，tool response 返回错误描述|
+|Tool loop 超过 5 次|终止循环，返回 "天气查询过程异常" 错误|
+|总请求超时|复用现有 AbortController 超时机制，可适当增大超时时间|
 
 ## 不涉及的范围
 

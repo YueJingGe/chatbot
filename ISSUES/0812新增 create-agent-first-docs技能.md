@@ -1,11 +1,8 @@
-
 # 完成事项
-
 
 ✅新增 create-agent-first-docs 技能
 
 初始化一份 agent-first 文档结构
-
 
 ```
 chatbot/

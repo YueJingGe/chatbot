@@ -39,7 +39,7 @@
 
 流程：用户问天气 → LLM 返回 tool_call → 后端调用天气 API → 将结果作为 tool_response 回传 LLM → LLM 生成最终回答 → SSE 流式返回前端
 
-天气API选择：Open-Meteo	完全免费，无需 Key	推荐，全球天气，RESTful，支持实时+预报
+天气API选择：Open-Meteo 完全免费，无需 Key 推荐，全球天气，RESTful，支持实时+预报
 
 支持：支持当前天气 + 未来几天天气预报，工具参数更复杂
 

@@ -1,11 +1,9 @@
 ---
 name: karpathy-guidelines
-# description: 通用 AI 编程行为准则，用于减少 LLM 在写代码/改代码/review 代码时常见的过度设计、越界改动、隐藏假设等问题。当任务涉及"写新代码""修 bug""重构""review diff""给实现方案"等编码动作时使用，帮助在动手前显式化假设、保持最小改动、定义可验证成功标准。源自 Andrej Karpathy 对 LLM 编码陷阱的总结。
+description: 通用 AI 编程行为准则，用于减少 LLM 在写代码/改代码/review 代码时常见的过度设计、越界改动、隐藏假设等问题。当任务涉及"写新代码""修 bug""重构""review diff""给实现方案"等编码动作时使用，帮助在动手前显式化假设、保持最小改动、定义可验证成功标准。源自 Andrej Karpathy 对 LLM 编码陷阱的总结。
 ---
 
 # Karpathy Behavioral Guidelines
-
-Karpathy Behavioral Guidelines 是一套源自 Andrej Karpathy 对 LLM 编程常见陷阱观察的行为准则，旨在通过 ‌ 先思考、简洁化、精准改、目标驱动 ‌ 四大原则，减少 AI 编码中的过度工程、错误假设和无关修改。
 
 通用 LLM 编程行为准则，降低常见的编码失误。与项目专属规范结合使用。
 
@@ -18,7 +16,7 @@ Karpathy Behavioral Guidelines 是一套源自 Andrej Karpathy 对 LLM 编程常
 - 写新功能、新组件、新脚本
 - 修 bug、改现有逻辑
 - 重构、抽象、整理代码
-- 评审 diff / 当前工作区改动（配合 `harsh-current-branch-review`）
+- 评审 diff / 当前工作区改动（配合 `code-review`）
 - 给实现方案、技术选型建议
 
 ## 1. Think Before Coding

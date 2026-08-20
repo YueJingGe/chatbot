@@ -146,7 +146,8 @@ app.post("/api/chat", async (req, res) => {
             }
             if (tc.id) currentToolCalls[idx].id = tc.id;
             if (tc.function?.name) currentToolCalls[idx].function.name += tc.function.name;
-            if (tc.function?.arguments) currentToolCalls[idx].function.arguments += tc.function.arguments;
+            if (tc.function?.arguments)
+              currentToolCalls[idx].function.arguments += tc.function.arguments;
           }
         }
 
@@ -178,14 +179,17 @@ app.post("/api/chat", async (req, res) => {
 
         // 发送状态事件给前端
         const args = JSON.parse(toolCall.function.arguments);
-        const statusMessage = toolCall.function.name === "get_weather"
-          ? `🌤️ 正在查询${args.location || ""}的天气...`
-          : `正在调用 ${toolCall.function.name}...`;
-        res.write(`data: ${JSON.stringify({
-          status: "tool_call",
-          tool: toolCall.function.name,
-          message: statusMessage,
-        })}\n\n`);
+        const statusMessage =
+          toolCall.function.name === "get_weather"
+            ? `🌤️ 正在查询${args.location || ""}的天气...`
+            : `正在调用 ${toolCall.function.name}...`;
+        res.write(
+          `data: ${JSON.stringify({
+            status: "tool_call",
+            tool: toolCall.function.name,
+            message: statusMessage,
+          })}\n\n`
+        );
 
         // 执行工具
         const result = await handler(toolCall.function.arguments);

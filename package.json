@@ -1,6 +1,7 @@
 {
   "name": "chatbot",
   "private": true,
+  "type": "module",
   "workspaces": [
     "web",
     "server"
@@ -9,11 +10,51 @@
     "dev": "concurrently \"npm run dev:web\" \"npm run dev:server\"",
     "dev:web": "npm run dev --workspace=web",
     "dev:server": "npm start --workspace=server",
-    "build": "npm run build --workspace=web",
-    "start:server": "npm start --workspace=server"
+    "build:web": "npm run build --workspace=web",
+    "start:server": "npm start --workspace=server",
+    "lint": "eslint web/src --fix",
+    "lint:check": "eslint web/src",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md,less,css}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md,less,css}\"",
+    "stylelint": "stylelint \"web/src/**/*.less\" --fix",
+    "stylelint:check": "stylelint \"web/src/**/*.less\"",
+    "check:all": "npm run format:check && npm run lint:check && npm run stylelint:check && npm run build:web",
+    "prepare": "husky",
+    "postinstall": "node scripts/sync-ignore.js && node scripts/sync-skills.js",
+    "sync:ignore": "node scripts/sync-ignore.js",
+    "sync:skills": "node scripts/sync-skills.js",
+    "sync:agents": "node scripts/sync-ignore.js && node scripts/sync-skills.js"
+  },
+  "lint-staged": {
+    "web/src/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{ts,tsx,js}": [
+      "prettier --write"
+    ],
+    "*.{less,css}": [
+      "stylelint --fix",
+      "prettier --write"
+    ],
+    "*.md": [
+      "prettier --write"
+    ]
   },
   "devDependencies": {
+    "@eslint/js": "10.0.1",
     "concurrently": "^9.1.2",
-    "less": "^4.8.1"
+    "eslint": "10.8.1",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "eslint-plugin-react-refresh": "0.5.4",
+    "husky": "9.1.7",
+    "less": "^4.8.1",
+    "lint-staged": "16.4.0",
+    "prettier": "3.9.6",
+    "prettier-plugin-compact-markdown-table": "^0.1.0",
+    "stylelint": "17.14.1",
+    "stylelint-config-standard": "40.0.0",
+    "stylelint-less": "4.2.1",
+    "typescript-eslint": "8.67.0"
   }
 }

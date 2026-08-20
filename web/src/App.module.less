@@ -47,8 +47,16 @@
 }
 
 @keyframes breathe {
-  0%, 100% { opacity: 0.5; transform: scale(0.85); }
-  50% { opacity: 1; transform: scale(1); }
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(0.85);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* ===== 主区域 ===== */
@@ -147,7 +155,7 @@
 }
 
 /* ===== 响应式：平板 ===== */
-@media (max-width: 900px) {
+@media (width <= 900px) {
   body {
     padding: var(--space-sm);
   }
@@ -173,7 +181,7 @@
 }
 
 /* ===== 响应式：手机 ===== */
-@media (max-width: 480px) {
+@media (width <= 480px) {
   body {
     padding: 0;
     align-items: stretch;

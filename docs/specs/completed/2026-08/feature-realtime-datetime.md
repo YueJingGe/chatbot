@@ -9,11 +9,13 @@
 在后端 `server.js` 的 `/api/chat` 接口中，构建 system prompt 时动态拼接当前服务器日期时间（格式：`YYYY-MM-DD HH:mm:ss`，包含星期几），作为 system prompt 的一部分发送给 LLM。
 
 **不改动的部分：**
+
 - 前端代码（`App.tsx`、`MessageList.tsx`、`InputArea.tsx`）无需修改
 - 数据流链路不变（仍是 SSE 流式传输）
 - 不引入新依赖
 
 **改动的部分：**
+
 - `server/server.js`：在 system prompt 中追加实时日期时间信息
 
 ## 验收标准

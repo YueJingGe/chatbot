@@ -1,0 +1,35 @@
+# AI 对话机器人
+
+基于阿里云百炼 qwen-max 的 AI 对话机器人，前后端分离（web/ + server/）。
+
+## 技术栈
+
+前端：React 19 + Vite 7 + TypeScript + Less  
+后端：Express 5 + OpenAI SDK 6  
+LLM：阿里云百炼 DashScope（OpenAI 兼容模式）qwen-max  
+通信：SSE 流式传输  
+
+## 入口
+
+- AGENTS.md — 全局 AI 指令
+- CLAUDE.md — Claude Code 专用入口
+- .agents/context/ — 项目上下文速查
+- .agents/skills/ — 任务 workflow
+- docs/harness/ — 架构和规范
+
+## 命令
+
+|命令|说明|
+|------|------|
+|npm install|安装依赖|
+|npm run dev|启动前后端|
+|npm run dev:web|启动前端（端口 5173）|
+|npm run dev:server|启动后端（端口 3000）|
+|npm run build:web|构建前端|
+|npm run check:all|全量检查（format + lint + stylelint + build）|
+|npm run format|Prettier 格式化|
+|npm run lint|ESLint 自动修复|
+|npm run stylelint|Stylelint 自动修复|
+|npm run sync:ignore|同步 ignore 规则到各 AI 工具|
+|npm run sync:skills|同步 skills 到各 AI agent（支持 --agent）|
+|npm run sync:agents|同步 ignore + skills|
