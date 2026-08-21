@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# CodeRabbit 配置：release/develop/main PR 自动 AI 审查
+# 文档：https://docs.coderabbit.ai/reference/yaml-template
+
+language: zh-CN
+
+reviews:
+  # chill：均衡反馈（quiet=只报重要，assertive=更挑剔）
+  profile: chill
+
+  auto_review:
+    enabled: true
+    drafts: false
+    # 默认分支 main 自动审查；额外加 develop 和 release/*
+    base_branches:
+      - develop
+      - "release/.*"
+
+  # 排除无需审查的路径
+  path_filters:
+    - "!**/node_modules/**"
+    - "!**/dist/**"
+    - "!**/package-lock.json"
+    - "!.agents/skills/skill-creator/**"
+
+  # 按路径注入项目红线，让审查对齐 harness 规范
+  path_instructions:
+    - path: "web/src/**/*.{ts,tsx}"
+      instructions: "遵循 docs/harness/frontend-rules.md：叶子组件用 React.memo、callback 用 useCallback、列表 key 稳定唯一且禁用数组索引、禁 dangerouslySetInnerHTML、禁前端硬编码 API key、状态集中在 App.tsx。"
+    - path: "web/src/**/*.less"
+      instructions: "遵循 docs/harness/frontend-rules.md：使用 CSS 变量、BEM 命名、禁 CSS-in-JS。"
+    - path: "server/**/*.js"
+      instructions: "遵循 docs/harness/backend-rules.md：SSE 事件格式规范、AbortController 清理、错误响应统一 code/message 结构、响应必须 JSON、用 process.env 禁硬编码 API key。"

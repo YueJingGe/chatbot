@@ -30,8 +30,10 @@ AI 对话机器人 monorepo，npm workspaces 管理前端（web/）和后端（s
 |需要详细写法参考|`docs/reference/` 下对应文件|
 |命名不确定|`docs/reference/naming.md`|
 |Markdown 格式不确定|`docs/reference/markdown.md`|
-|code review|`.agents/skills/code-review/SKILL.md`（架构/规范/决策 review）|
-|git 提交|`.agents/skills/git-commit/SKILL.md`（提交流程）|
+|code review|`.agents/skills/code-review/SKILL.md`（IDE 内手动审查）|
+|git 提交|`.agents/skills/git-commit/SKILL.md`（commit message + push）|
+|开分支/合并/发布/冲突/hotfix|`.agents/skills/git-branch/SKILL.md`（操作流程）|
+|分支模型/版本号规则|`.agents/context/git-workflow.md`|
 
 ## Default Protocol
 

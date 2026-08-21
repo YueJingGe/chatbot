@@ -1,0 +1,24 @@
+#!/usr/bin/env sh
+# 拦截直接向受保护分支推提交（绕过 PR）。真正的强制在 GitHub ruleset，本钩子是本地提醒。
+#   main：完全禁止直推
+#   release/*：允许创建/删除分支，仅拦截直接推提交（更新）
+
+zero="0000000000000000000000000000000000000000"
+
+while read -r local_ref local_oid remote_ref remote_oid; do
+  case "$remote_ref" in
+    refs/heads/main)
+      echo "❌ 禁止直接 push 到 main，请走 PR：feature/* → develop → release → main"
+      exit 1
+      ;;
+    refs/heads/release/*)
+      # remote_oid 全 0 = 创建分支；local_oid 全 0 = 删除分支；两者都放行
+      if [ "$remote_oid" != "$zero" ] && [ "$local_oid" != "$zero" ]; then
+        echo "❌ 禁止直接向 $remote_ref 推提交，请走 PR（创建/删除 release 分支不受限）"
+        exit 1
+      fi
+      ;;
+  esac
+done
+
+exit 0
