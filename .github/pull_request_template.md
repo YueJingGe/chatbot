@@ -1,4 +1,4 @@
-<!-- 默认 PR 模板（feature/fix → develop）-->
+<!-- PR 模板（所有 PR 通用）-->
 
 ## 改动说明
 
@@ -21,3 +21,15 @@
 ## 关联
 
 <!-- 关联的 issue 或需求 -->
+
+---
+
+<!-- 👇 仅发布 PR（release → main）才填，其余删掉本段 -->
+
+## 发布清单（仅 release → main）
+
+- [ ] 版本号（SemVer）：v_._._
+- [ ] 已在 develop 集成测试通过
+- [ ] CodeRabbit 审查通过
+- [ ] 合并后打 tag，并同步回 develop
+- [ ] 风险与回滚方案：
