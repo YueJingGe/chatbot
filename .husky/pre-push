@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+# 拦截直接 push 到受保护分支（main / release/*）
+# 请走 PR：feature/* → develop → release → main
+
+while read -r local_ref local_oid remote_ref remote_oid; do
+  case "$remote_ref" in
+    refs/heads/main | refs/heads/release/*)
+      echo "❌ 禁止直接 push 到 $remote_ref"
+      echo "请走 PR 流程：feature/* → develop → release → main"
+      echo "（紧急情况：hotfix/* 开 PR 到 main）"
+      exit 1
+      ;;
+  esac
+done
+
+exit 0
