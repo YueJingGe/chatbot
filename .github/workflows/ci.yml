@@ -31,8 +31,13 @@ jobs:
           node-version: 22.13.1
           cache: npm
 
+      # 本地 package-lock.json 的下载地址指向阿里内网 registry（公网访问不到），
+      # CI 里临时改成公共 npm 源；tarball 内容一致，integrity 哈希不变。
+      - name: Normalize lockfile registry to public npm
+        run: sed -i 's#registry.anpm.alibaba-inc.com#registry.npmjs.org#g' package-lock.json
+
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --no-audit --no-fund
 
       - name: Run all checks (format + lint + stylelint + build)
         run: npm run check:all
