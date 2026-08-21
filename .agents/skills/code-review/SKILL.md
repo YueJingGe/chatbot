@@ -1,14 +1,14 @@
 ---
 name: code-review
-description: 代码审查工作流（架构/规范/决策 review）。用户说"review"、"审查"、"检查代码"时手动触发；发布 PR（feature → release）时自动跑第一遍。工具检查（格式/lint/类型）由 husky pre-commit 自动跑。
+description: 代码审查工作流（架构/规范/决策 review）。用户说"review"、"审查"、"检查代码"时在 IDE 内手动触发；PR（develop/release/main）由 CodeRabbit 自动审查。工具检查（格式/lint/类型）由 husky pre-commit 自动跑。
 ---
 
 # Code Review 工作流
 
 ## 触发
 
-- 用户手动："review"、"审查"、"检查代码"
-- 发布门禁：feature → release 的 PR 时，AI 自动跑第一遍，人看报告后决定是否合并
+- IDE 内手动：用户说 "review"、"审查"、"检查代码" → 按本 skill 审查
+- PR 自动：develop/release/main 的 PR 由 **CodeRabbit** 自动审查（配置见根目录 `.coderabbit.yaml`），人看报告后决定是否合并
 
 ## 原则
 
