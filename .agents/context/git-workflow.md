@@ -4,7 +4,7 @@
 
 ## 分支模型
 
-```
+```text
 main                       ← 唯一真相源,受保护,打 SemVer tag
  │  ↑ release → main + tag,删旧 release
  │  ↑ hotfix → main + tag（紧急快车道）

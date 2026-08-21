@@ -21,16 +21,20 @@ git push -u origin feature/xxx
 
 ## 发布
 
+main 受保护，只能经 PR 合并；tag 单独推（不推 main 分支）。
+
 ```bash
 git checkout main && git pull
-git checkout -b release/v1.3.0
+git checkout -b release/v1.3.0 && git push -u origin release/v1.3.0
 # ready 的 feature PR 合入 release；静置测试后：
-git checkout main && git merge release/v1.3.0 --no-ff
-git tag v1.3.0 && git push origin main --tags
-# 同步回 develop
+# 开 PR: release/v1.3.0 → main（CI + CodeRabbit 过后，网页合并）
+# 合并后本地同步并打 tag（只推 tag）：
+git checkout main && git pull
+git tag v1.3.0 && git push origin v1.3.0
+# 同步回 develop（develop 未保护，可直接推）
 git checkout develop && git merge main && git push origin develop
 # 删旧 release
-git branch -d release/v1.3.0 && git push origin --delete release/v1.3.0
+git push origin --delete release/v1.3.0
 ```
 
 ## 紧急 hotfix
@@ -40,7 +44,11 @@ git checkout main && git pull
 git checkout -b hotfix/xxx
 # 修复 + 提交 + push
 git push -u origin hotfix/xxx
-# 开 PR: hotfix/xxx → main（快速 review），合并 + 打 PATCH tag，同步回 develop
+# 开 PR: hotfix/xxx → main（快速 review，网页合并）
+# 合并后本地同步并打 PATCH tag（只推 tag）：
+git checkout main && git pull
+git tag v1.2.1 && git push origin v1.2.1
+git checkout develop && git merge main && git push origin develop
 ```
 
 ## rebase（feature 落后 main 时）
