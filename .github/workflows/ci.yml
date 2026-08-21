@@ -36,8 +36,10 @@ jobs:
       - name: Normalize lockfile registry to public npm
         run: sed -i 's#registry.anpm.alibaba-inc.com#registry.npmjs.org#g' package-lock.json
 
+      # 用 npm install 而非 npm ci：lockfile 在 macOS 生成，缺 Linux 平台的
+      # rollup optional 依赖（npm/cli#4828）；npm install 会按当前平台重新解析补上。
       - name: Install dependencies
-        run: npm ci --no-audit --no-fund
+        run: npm install --no-audit --no-fund
 
       - name: Run all checks (format + lint + stylelint + build)
         run: npm run check:all
