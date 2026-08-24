@@ -19,31 +19,30 @@ AI 对话机器人 monorepo，npm workspaces 管理前端（web/）和后端（s
 - `npm run sync:skills` — 同步 `.agents/skills/` 到各 AI agent
 - `npm run sync:agents` — 同时同步 ignore 和 skills
 
-## Map
+## Map（结构索引，只用于定位）
 
-|场景|读取文件|
+|路径|是什么|
 |-|-|
-|新需求|`.agents/skills/new-requirement/SKILL.md`（自动路由 L0/L1/L2）|
-|写前端代码|`.agents/context/frontend-context.md` + `docs/harness/frontend-rules.md`|
-|写后端代码|`.agents/context/backend-context.md` + `docs/harness/backend-rules.md`|
-|引入新依赖/改 workspace|`.agents/context/project-overview.md` + `docs/harness/architecture.md`|
-|需要详细写法参考|`docs/reference/` 下对应文件|
-|命名不确定|`docs/reference/naming.md`|
-|Markdown 格式不确定|`docs/reference/markdown.md`|
-|code review|`.agents/skills/code-review/SKILL.md`（IDE 内手动审查）|
-|git 提交|`.agents/skills/git-commit/SKILL.md`（commit message + push）|
-|开分支/合并/发布/冲突/hotfix|`.agents/skills/git-branch/SKILL.md`（操作流程）|
-|分支模型/版本号规则|`.agents/context/git-workflow.md`|
+|`.agents/context/`|稳定事实：分支模型、技术栈、前后端上下文|
+|`.agents/skills/`|任务 workflow|
+|`docs/harness/`|前后端/架构规范|
+|`docs/reference/`|写法参考：命名 / markdown / css / 组件|
+|`docs/specs/` / `docs/exec-plans/`|需求规格 / 执行计划（active + completed）|
 
-## Default Protocol
+## Default Protocol（动作触发，跨所有 skill 始终生效）
 
-- 先读 Map，再读正文：根据任务场景读取对应文件
-- 根 AGENTS 不承载细节正文；架构、规范、技术栈详见 `.agents/` 下对应文件
-- 涉及架构或规范时，按 Map 跳转到对应文件
-- 涉及复杂任务 workflow 时，优先找对应 `SKILL.md`
+- 接到新需求（加个/做个/帮我做 xxx）：先走 `.agents/skills/new-requirement/SKILL.md` 路由
+- 任务首次代码改动前：跑 `git rev-parse --abbrev-ref HEAD` 确认当前分支；若在 main / release/*，先按 `git-branch` SKILL 切 feature 分支（模型见 `.agents/context/git-workflow.md`）
+- 改 `web/src/**` 时：先读 `.agents/context/frontend-context.md` + `docs/harness/frontend-rules.md`
+- 改 `server/**` 时：先读 `.agents/context/backend-context.md` + `docs/harness/backend-rules.md`
+- 加依赖/改 workspace 时：先读 `.agents/context/project-overview.md` + `docs/harness/architecture.md`
+- 命名/格式/写法不确定时：查 `docs/reference/` 对应文件
+- 用户说 review/审查代码：用 `.agents/skills/code-review/SKILL.md`（IDE 内手动审查）
+- commit/push 走 `git-commit` SKILL；开分支/合并/发布/冲突/hotfix 走 `git-branch` SKILL
 - 改完代码必须 `npm run build:web` 验证
-- 不确定就问，禁止捏造接口字段、环境变量名、业务规则
+- 禁止捏造接口字段、环境变量名、业务规则；不确定就问
 - AI 启动时读 `.agents/ignore`，不检查列表中的文件
+- 根 AGENTS 不承载细节正文；事实/规范按 Map 定位后读正文
 
 ## Contributor Rules
 
