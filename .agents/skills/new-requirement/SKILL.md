@@ -46,9 +46,22 @@ description: 新需求启动 + 自动路由。当用户描述新功能、新需�
 
 **L0**：直接改代码 → 汇报改动 → 等确认。
 
-**L1**：写简化 spec → 用户确认 → 直接改 → 归档（移到 `docs/specs/completed/YYYY-MM/`）。
+**L1**：
+1. **写文件**：按模板生成 spec 文件到 `docs/specs/active/<name>-L1.md`（必须落盘，禁止仅内联展示）
+2. 用户确认 spec
+3. 直接改代码
+4. 归档（移到 `docs/specs/completed/YYYY-MM/`）
 
-**L2**：写完整 spec（含设计决策）→ 用户确认 → 写 exec-plan → 用户确认 → 执行（每步打勾）→ 验收 → 归档。
+**L2**：
+1. **写文件**：按模板生成 spec 文件到 `docs/specs/active/<name>.md`（必须落盘，禁止仅内联展示）
+2. 用户确认 spec
+3. **写文件**：按模板生成 exec-plan 到 `docs/exec-plans/active/<name>.md`
+4. 用户确认 exec-plan
+5. 执行（每步打勾）
+6. 验收
+7. 归档
+
+**硬规则**：L1/L2 在 spec 文件落盘之前，禁止进入代码改动阶段。
 
 模板见 `docs/specs/active/TEMPLATE-L2.md`、`docs/specs/active/TEMPLATE-L1.md`、`docs/exec-plans/active/TEMPLATE.md`。
 
