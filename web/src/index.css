@@ -18,6 +18,14 @@
   --color-accent: #5ba89c;
   --color-input-bg: #f7f7f8;
 
+  /* 侧边栏 */
+  --color-sidebar-bg: #fafafa;
+  --color-sidebar-hover: #f0f0f0;
+  --color-sidebar-active: #ebf2ff;
+  --color-sidebar-text: #1a1a1a;
+  --color-sidebar-text-muted: #999;
+  --color-sidebar-border: #f0f0f0;
+
   /* 间距（8px 基准） */
   --space-xs: 4px;
   --space-sm: 8px;

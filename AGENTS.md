@@ -39,7 +39,7 @@ AI 对话机器人 monorepo，npm workspaces 管理前端（web/）和后端（s
 - 命名/格式/写法不确定时：查 `docs/reference/` 对应文件
 - 用户说 review/审查代码：用 `.agents/skills/code-review/SKILL.md`（IDE 内手动审查）
 - commit/push 走 `git-commit` SKILL；开分支/合并/发布/冲突/hotfix 走 `git-branch` SKILL
-- 改完代码必须 `npm run build:web` 验证
+- 改 `web/src/**` 或 `server/**` 后必须 `npm run check:all` 验证
 - 禁止捏造接口字段、环境变量名、业务规则；不确定就问
 - AI 启动时读 `.agents/ignore`，不检查列表中的文件
 - 根 AGENTS 不承载细节正文；事实/规范按 Map 定位后读正文

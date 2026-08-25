@@ -10,6 +10,15 @@
   flex-direction: column;
 }
 
+/* ===== 整体布局：sidebar + card ===== */
+.app-layout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  height: 100%;
+}
+
 /* ===== 头部 ===== */
 .header {
   background-color: var(--color-surface);
@@ -158,6 +167,10 @@
 @media (width <= 900px) {
   body {
     padding: var(--space-sm);
+  }
+
+  .app-layout {
+    justify-content: center;
   }
 
   .container {
