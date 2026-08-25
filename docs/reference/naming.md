@@ -148,18 +148,7 @@
 |类别|格式|示例|
 |-|-|-|
 |分支|type/description|`feat/weather-api`、`fix/scroll-bug`|
-|提交|type: description|`feat: 添加天气查询`、`fix: 修复滚动问题`|
-
-### 提交类型
-
-|类型|说明|
-|-|-|
-|feat|新功能|
-|fix|修复 bug|
-|docs|文档更新|
-|style|代码格式|
-|refactor|重构|
-|chore|构建/依赖|
+|提交|见 `.agents/skills/git-commit/SKILL.md`|`feat(frontend): 添加天气查询`|
 
 ## 代码迁移命名
 

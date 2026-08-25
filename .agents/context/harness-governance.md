@@ -48,6 +48,32 @@
 - ❌ 改完不跑 sync:agents — `.claude/` 等副本会与 `.agents/` 漂移
 - ❌ 改完不 meta-验证 — `check:all` 通过 ≠ 规则真的被触发
 
+## 设计约束
+
+### AGENTS.md 行数硬上限
+
+**60 行**。超过即违反 harness 设计。任何 ≥ 3 步的规则必须外移到 `.agents/skills/` 或 `.agents/context/`。每加一条 Protocol 规则自检：
+
+> 这能压成 1 行吗？压不成 → 外移。
+
+### 文件职责
+
+|文件|职责|不放什么|
+|-|-|-|
+|`README.md`|给人和 AI 共读的入口|详细规范|
+|`AGENTS.md`|给 AI 的导航入口（< 60 行）|细节正文|
+|`.agents/context/`|稳定事实：技术栈、架构、工作流|任务 workflow|
+|`.agents/skills/`|任务 workflow（按需触发）|稳定事实|
+|`docs/harness/`|前后端架构规范|AI 入口|
+|`docs/reference/`|写法参考：命名 / markdown / css|架构规范|
+|`docs/specs/` / `docs/exec-plans/`|需求规格 / 执行计划|规范正文|
+
+## 规则演进
+
+- **二击原则**（Anthropic 官方建议）：同一错误出现第二次才写规则。第一次出现记入 session 笔记，第二次出现提升为正式规则
+- **季度审查**：每季度过一遍 AGENTS.md，删除过时规则、合并重复规则
+- **失效规则**：标 `dormant` 状态（未来可能恢复）而非直接删除
+
 ## 协议本身
 
 本文件是 harness 的「karpathy-guidelines」。**修改本文件也要走上面流程**（鸡生蛋除外——首次创建 HCR 协议本身是 bootstrap 例外）。

@@ -50,7 +50,7 @@ description: 新需求启动 + 自动路由。当用户描述新功能、新需�
 1. **写文件**：按模板生成 spec 文件到 `docs/specs/active/<name>-L1.md`（必须落盘，禁止仅内联展示）
 2. 用户确认 spec
 3. 直接改代码
-4. 归档（移到 `docs/specs/completed/YYYY-MM/`）
+4. 归档（移到 `docs/specs/completed/YYYY-MM-DD-<name>-L1.md`）
 
 **L2**：
 1. **写文件**：按模板生成 spec 文件到 `docs/specs/active/<name>.md`（必须落盘，禁止仅内联展示）
@@ -68,19 +68,19 @@ description: 新需求启动 + 自动路由。当用户描述新功能、新需�
 ### 5. 归档
 验收通过后（用户明确说"验收通过"/"没问题"且 `npm run build:web` 通过）：
 - 把 spec 内 `- [ ]` 替换为 `- [x]`
-- 移到 `docs/specs/completed/YYYY-MM/`（exec-plan 同理）
-- 汇报"已归档至 YYYY-MM"
+- 重命名并移到 `docs/specs/completed/YYYY-MM-DD-<name>.md`（exec-plan 同理）
+- 汇报"已归档至 completed/"
 
 **命名规范**：
 
 | 类型 | 文件名 |
 |------|--------|
-| feature spec（含 L1）| `feature-<kebab>.md` |
-| exec-plan | 与对应 spec 同名 |
-| 月份 | 用完成日（不是启动日） |
+| feature spec（含 L1）| `YYYY-MM-DD-feature-<kebab>.md` |
+| exec-plan | 与对应 spec 同名，日期前缀一致 |
+| 日期 | 用完成日（不是启动日），格式 `YYYY-MM-DD` |
 | L0 | 不归档（无产物） |
 
-例：`feature-realtime-datetime.md` + `docs/specs/completed/2026-08/`。
+例：`2026-08-25-feature-sidebar-conversation-history.md` 放在 `docs/specs/completed/` 下。
 
 ## 注意事项
 

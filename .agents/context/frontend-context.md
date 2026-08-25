@@ -55,17 +55,15 @@
 |`chatbot_conversations`|`Conversation[]`|所有历史会话|
 |`chatbot_active_id`|`string`|当前激活会话 ID|
 
-修改持久化结构时必须考虑向后兼容（`loadConversations` 已 try-catch 兜底）。
+修改持久化结构时必须考虑向后兼容（`loadConversations` 已 try-catch 兗底）。
 
 ## 关键约束
 
-- **React.memo + useCallback 强约束**：所有叶子组件 memo，父传给子的 callback 必须 useCallback，否则 memo 失效
-- **JSX 中禁止内联对象/函数**：同上原因
-- **props 必须解构**：禁止 `props.xxx`
-- **列表 key 稳定唯一**：禁止数组索引
+组件 / 状态 / CSS / 列表渲染红线见 `docs/harness/frontend-rules.md`。本文件补充项目特有约定：
+
 - **消息 ID 一律 `crypto.randomUUID()`**：与后端 / 滚动定位 / localStorage 一致
 - **响应式断点**：≤900px 隐藏 sidebar；≤480px 全宽 + 紧凑样式
-- **BEM 命名**：`.block__element--modifier`，但 **element 名禁止连字符**（如 `sidebar__section-title` 违规，Stylelint 会拦）—— 详见 [docs/reference/naming.md](../docs/reference/naming.md)
+- **BEM element 禁连字符**：详见 [docs/reference/naming.md](../docs/reference/naming.md)
 
 ## 已知技术债
 

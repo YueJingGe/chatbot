@@ -14,7 +14,7 @@
 
 |UI 库|antd（Ant Design）|用户指定，减少自建组件工作量|
 |数据存储|localStorage|无需后端，MVP 够用|
-|左侧边栏布局|flex 布局，sidebar + card 并排居中|与参考图一致，sidebar 贴 card 左边缘|
+|左侧边栏布局|CSS Grid 两栏布局（`260px 1fr`）|Grid 更适合固定侧边栏+弹性主内容的布局|
 |右侧面板交互|右边缘小横线标记，hover 展开面板|初始态不占空间，按需展开|
 |会话标题|取首条 user message 前 20 字符|简单可靠，无需 AI 调用|
 |消息 ID|统一使用 `crypto.randomUUID()`|与现有 user message 一致|
@@ -82,7 +82,7 @@ interface ConversationSidebarProps {
 
 **antd 组件使用**：
 
-- `Button` — 新建对话按钮（`type="default"`，带图标）
+- `Button` — 新建对话按钮（`type="default"`，带 `PlusOutlined` 图标，需 `@ant-design/icons`）
 - `List` — 最近对话列表（`size="small"`，自定义 renderItem）
 - 选中项样式通过 CSS Module 覆盖
 
@@ -139,6 +139,7 @@ web/src/hooks/useConversation.ts
   conversations: Conversation[];
   activeConversation: Conversation | null;
   messages: ConversationMessage[];
+  activeId: string; // 当前活跃会话 ID，供 Sidebar 使用
   createConversation: () => boolean; // true=成功新建, false=已是空会话
   switchConversation: (id: string) => void;
   updateMessages: (messages: ConversationMessage[]) => void;
@@ -150,13 +151,13 @@ web/src/hooks/useConversation.ts
 **布局变更**：
 
 ```
-<div className={styles["app-layout"]}>          // flex row, 居中
-  <ConversationSidebar ... />                    // 260px 固定宽
-  <div className={styles.container}>             // 820px（原 container）
+<div className={styles["app-layout"]}>          // CSS Grid, 260px 1fr
+  <ConversationSidebar ... />                    // Grid 第一列，260px
+  <div className={styles.container}>             // Grid 第二列，1fr 自适应
     <header>...</header>
     <main>
       <div className={styles["chat-history-wrapper"]}>
-        <MessageList ref=... />
+        <MessageList />                          // 无需 forwardRef
         <ScrollToBottomButton ... />
         <QuestionHistoryPanel ... />             // 绝对定位，右边缘
       </div>
@@ -170,13 +171,13 @@ web/src/hooks/useConversation.ts
 **新增逻辑**：
 
 - 使用 `useConversation` hook 替代原有 messages state
-- 「新建对话」按钮集成到 header 或 sidebar
-- `handleSelectQuestion` → 滚动到对应消息（data-message-id + scrollIntoView）
+- 「新建对话」按钮集成到 sidebar
+- `handleSelectQuestion` → 滚动到对应消息（`chatHistoryRef.querySelector` + `scrollIntoView`）
 
 ### 6. MessageList 改造
 
 - 每条消息 div 添加 `data-message-id={message.id}`
-- 支持外部滚动到指定消息
+- 滚动定位通过 App.tsx 的 `chatHistoryRef` + `querySelector('[data-message-id=...]')` 实现
 
 ## 样式变量新增
 
@@ -199,16 +200,16 @@ web/src/hooks/useConversation.ts
 
 ## 验收标准
 
-- [ ] 左侧边栏显示，包含「新建对话」按钮和「最近对话」列表
-- [ ] 点击「新建对话」：当前有消息则归档+新建空会话；已是空会话则 toast 提示「当前已是新对话」
-- [ ] 点击历史会话列表项，切换到对应会话，消息列表更新
-- [ ] 刷新页面后，当前会话的 Q&A 完整恢复
-- [ ] 右侧边缘显示小横线标记，hover 展开 question 面板
-- [ ] 面板内显示当前会话所有 user question，截断省略，hover 显示完整文字
-- [ ] 点击 question 列表项，聊天区域滚动到对应消息
-- [ ] 当前会话无 user 消息时，右侧面板显示「暂无提问」
-- [ ] 响应式：≤900px 隐藏 sidebar，恢复原布局
-- [ ] `npm run build:web` 通过
+- [x] 左侧边栏显示，包含「新建对话」按钮和「最近对话」列表
+- [x] 点击「新建对话」：当前有消息则归档+新建空会话；已是空会话则 toast 提示「当前已是新对话」
+- [x] 点击历史会话列表项，切换到对应会话，消息列表更新
+- [x] 刷新页面后，当前会话的 Q&A 完整恢复
+- [x] 右侧边缘显示小横线标记，hover 展开 question 面板
+- [x] 面板内显示当前会话所有 user question，截断省略，hover 显示完整文字
+- [x] 点击 question 列表项，聊天区域滚动到对应消息
+- [x] 当前会话无 user 消息时，右侧面板显示「暂无提问」
+- [x] 响应式：≤900px 隐藏 sidebar，恢复原布局
+- [x] `npm run build:web` 通过
 
 ## 涉及模块
 
@@ -220,7 +221,7 @@ web/src/hooks/useConversation.ts
 - 前端：web/src/App.module.less（新增 sidebar + layout 样式）
 - 前端：web/src/components/MessageList.tsx（添加 data-message-id）
 - 前端：web/src/index.css（新增 sidebar CSS 变量 + antd 样式覆盖）
-- 依赖：web/package.json 新增 `antd`
+- 依赖：web/package.json 新增 `antd` 和 `@ant-design/icons`
 
 ## 范围外
 
