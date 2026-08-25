@@ -85,3 +85,4 @@ coverage/
 .agents-cache/
 artifacts/
 skills-lock.json
+web/tsconfig.tsbuildinfo
