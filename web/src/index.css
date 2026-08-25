@@ -1,6 +1,6 @@
 /* ===== Design Tokens ===== */
 :root {
-  /* 配色 — 参考千问，干净清爽 */
+  /* 配色 */
   --color-primary: #c2785c;
   --color-primary-hover: #a8634a;
   --color-primary-active: #8f523d;
