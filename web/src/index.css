@@ -1,4 +1,4 @@
-/* ===== Design Tokens: Qianwen-inspired ===== */
+/* ===== Design Tokens ===== */
 :root {
   /* 配色 — 参考千问，干净清爽 */
   --color-primary: #c2785c;
@@ -62,10 +62,6 @@ body {
   font-family: Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
   background-color: var(--color-bg);
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: var(--space-lg);
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
