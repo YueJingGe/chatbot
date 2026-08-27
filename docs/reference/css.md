@@ -37,7 +37,7 @@
 
 ## BEM 命名
 
-格式：`.block__element--modifier`
+格式与约束见 [naming.md](naming.md) 的 BEM 三段式章节。本项目示例：
 
 ```less
 .message-list {

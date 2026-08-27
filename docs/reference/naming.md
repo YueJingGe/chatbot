@@ -96,9 +96,51 @@
 
 ## CSS
 
+### BEM 三段式
+
+格式：`.block__element--modifier`
+
+|部分|作用|约束|
+|-|-|-|
+|block|块名（组件或独立单元）|kebab-case：`scroll-to-bottom-button`|
+|element|块内子元素|仅小写字母+数字，无连字符。**错误**：`sidebar__section-title`；**正确**：`sidebar__sectiontitle` 或拆成 `sidebar__section`|
+|modifier|状态/变体|kebab-case：`--active`、`--loading`|
+
+**为什么 element 禁连字符**：项目 Stylelint 使用 pattern `^[a-z][a-z0-9]*(-[a-z0-9]+)*(__[a-z0-9]+)*(--[a-z0-9]+)*$`，`__` 后必须是纯字母数字。
+
+### 示例
+
+```less
+/* 块 */
+.input-area {
+  ...;
+}
+.sidebar {
+  ...;
+}
+
+/* 块 + 元素 */
+.input-area__wrapper {
+  ...;
+}
+.sidebar__item {
+  ...;
+}
+
+/* 块 + 元素 + 修饰符 */
+.send-button--loading {
+  ...;
+}
+.sidebar__item--active {
+  ...;
+}
+```
+
+### 其他 CSS 命名
+
 |类别|格式|示例|
 |-|-|-|
-|CSS 类|kebab-case + BEM|`.input-area`、`.send-button--loading`|
+|CSS 类|kebab-case + BEM（见上）|`.input-area`、`.send-button--loading`|
 |CSS 变量|`--kebab-case`|`--color-primary`、`--space-md`|
 
 ## Git
@@ -106,18 +148,7 @@
 |类别|格式|示例|
 |-|-|-|
 |分支|type/description|`feat/weather-api`、`fix/scroll-bug`|
-|提交|type: description|`feat: 添加天气查询`、`fix: 修复滚动问题`|
-
-### 提交类型
-
-|类型|说明|
-|-|-|
-|feat|新功能|
-|fix|修复 bug|
-|docs|文档更新|
-|style|代码格式|
-|refactor|重构|
-|chore|构建/依赖|
+|提交|见 `.agents/skills/git-commit/SKILL.md`|`feat(frontend): 添加天气查询`|
 
 ## 代码迁移命名
 
