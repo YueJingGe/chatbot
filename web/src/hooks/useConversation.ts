@@ -70,22 +70,30 @@ export function useConversation() {
   });
 
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingSaveRef = useRef<Conversation[] | null>(null);
 
   const activeConversation = conversations.find((c) => c.id === activeId) ?? null;
   const messages = activeConversation?.messages ?? [];
 
   // 防抖保存
   const persistConversations = useCallback((next: Conversation[]) => {
+    pendingSaveRef.current = next;
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
       saveConversations(next);
+      pendingSaveRef.current = null;
     }, 300);
   }, []);
 
-  // 组件卸载时清除定时器
+  // 组件卸载时：清除定时器，若有待写入数据则同步落盘
   useEffect(() => {
     return () => {
-      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current);
+        if (pendingSaveRef.current) {
+          saveConversations(pendingSaveRef.current);
+        }
+      }
     };
   }, []);
 
