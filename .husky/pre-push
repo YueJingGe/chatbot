@@ -2,6 +2,7 @@
 # 拦截直接向受保护分支推提交（绕过 PR）。真正的强制在 GitHub ruleset，本钩子是本地提醒。
 #   main：完全禁止直推
 #   release/*：允许创建/删除分支，仅拦截直接推提交（更新）
+#   feature/* fix/*：push 前自动同步 main，未同步则 rebase 后拒绝本次 push（需重新 push）
 
 zero="0000000000000000000000000000000000000000"
 
@@ -20,5 +21,20 @@ while read -r local_ref local_oid remote_ref remote_oid; do
       ;;
   esac
 done
+
+# feature/fix 分支：自动同步 main
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+case "$current_branch" in
+  feature/*|fix/*)
+    if git fetch origin main 2>/dev/null; then
+      if ! git merge-base --is-ancestor origin/main HEAD; then
+        echo "⚡ $current_branch 未同步 main，自动 rebase..."
+        git rebase origin/main
+        echo "✅ rebase 完成，请重新执行 git push"
+        exit 1
+      fi
+    fi
+    ;;
+esac
 
 exit 0
