@@ -5,11 +5,22 @@ import type { Conversation, ConversationMessage } from "../types/conversation";
 const STORAGE_KEY_CONVERSATIONS = "chatbot_conversations";
 const STORAGE_KEY_ACTIVE_ID = "chatbot_active_id";
 
-const DEFAULT_GREETING: ConversationMessage = {
-  id: crypto.randomUUID(),
-  role: "assistant",
-  content: "你好！我是你的AI助手。",
-};
+function createDefaultConversation(): Conversation {
+  const now = Date.now();
+  return {
+    id: crypto.randomUUID(),
+    title: "新对话",
+    messages: [
+      {
+        id: crypto.randomUUID(),
+        role: "assistant",
+        content: "你好！我是你的AI助手。",
+      },
+    ],
+    createdAt: now,
+    updatedAt: now,
+  };
+}
 
 function loadConversations(): Conversation[] {
   try {
@@ -31,17 +42,6 @@ function saveConversations(conversations: Conversation[]) {
 
 function saveActiveId(id: string) {
   localStorage.setItem(STORAGE_KEY_ACTIVE_ID, id);
-}
-
-function createDefaultConversation(): Conversation {
-  const now = Date.now();
-  return {
-    id: crypto.randomUUID(),
-    title: "新对话",
-    messages: [DEFAULT_GREETING],
-    createdAt: now,
-    updatedAt: now,
-  };
 }
 
 function getConversationTitle(messages: ConversationMessage[]): string {

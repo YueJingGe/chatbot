@@ -1,6 +1,6 @@
 ---
 name: frontend-visual-verification
-description: 前端布局/样式/响应式/交互改动的视觉验证流程，分 4 档执行。改 web/src/** 后必跑，check:all 通过 ≠ 视觉无 bug，本 skill 补齐视觉关卡。
+description: 前端布局/样式/响应式/交互改动的视觉验证流程，分 4 档执行。改 web/src/** 涉及视觉/布局/样式/交互后必跑，check:all 通过 ≠ 视觉无 bug，本 skill 补齐视觉关卡。
 ---
 
 # Frontend Visual Verification（4 档）
@@ -40,9 +40,13 @@ description: 前端布局/样式/响应式/交互改动的视觉验证流程，�
 
 **适用**：纯布局/尺寸验证，agent 推理可信
 
+**页面来源**：连接已运行的 dev server（`npm run dev:web`）或构建产物（`npm run build:web && npm run preview`），通过 `page.goto('http://localhost:5173/')` 加载页面后再 evaluate。
+
 ```js
-// 1. curl 确认 dev server 在跑（也可不跑，看是否需要）
-// 2. playwright evaluate 读关键元素的 boundingClientRect
+// 1. 确认 dev server 在跑（curl 或已启动）
+// 2. page.goto 加载页面
+await page.goto('http://localhost:5173/');
+// 3. playwright evaluate 读关键元素的 boundingClientRect
 const rects = await page.evaluate(() => ({
   sidebar: document.querySelector('aside')?.getBoundingClientRect(),
   container: document.querySelector('[class*="container"]')?.getBoundingClientRect(),
