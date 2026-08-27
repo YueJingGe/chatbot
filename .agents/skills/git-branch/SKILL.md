@@ -1,11 +1,11 @@
 ---
 name: git-branch
-description: 分支操作流程（开分支/合并/发布/解冲突/hotfix）。当用户说"开分支"、"新功能"、"合并"、"发布"、"解决冲突"、"hotfix"、"上线"时触发。分支规范见 docs/harness/git-branching.md；commit message 走 git-commit skill。
+description: 分支操作流程（开分支/合并/发布/解冲突/hotfix）。当用户说"开分支"、"新功能"、"合并"、"发布"、"解决冲突"、"hotfix"、"上线"时触发。分支规范见 docs/harness/git-workflow.md；commit message 走 git-commit skill。
 ---
 
 # Git Branch 操作流程
 
-> 分支规范见 `docs/harness/git-branching.md`。本文件只讲 AI 怎么执行。
+> 分支规范见 `docs/harness/git-workflow.md`。本文件只讲 AI 怎么执行。
 
 ## 意图识别原则
 
@@ -31,7 +31,7 @@ git push -u origin feature/xxx
 
 ## 发布
 
-执行前：读 `docs/harness/git-branching.md` 确认路径约束。
+执行前：读 `docs/harness/git-workflow.md` 确认路径约束。
 
 ### 判断紧急程度
 
@@ -42,6 +42,8 @@ git push -u origin feature/xxx
 不确定就问用户。
 
 ### release 流程
+
+**准备阶段**（本地执行）：
 
 ```bash
 # 1. 检查是否已有 release 分支
@@ -54,23 +56,24 @@ git checkout -b release/vX.Y.Z && git push -u origin release/vX.Y.Z
 # 2. PR: feature → release（CI + code-review）
 
 # 3. 预发布检查（执行前必须完成）
-# 列举当前 release 上所有已合入的 feature 分支
 git log main..release/vX.Y.Z --oneline
-# 检查各 PR 状态：CI 是否通过、review 是否完成
-# 向用户展示清单，用户确认后才继续
+# 向用户展示清单：各 feature 分支 + PR 状态（CI/review）
+# 用户确认后才继续
 
 # 4. PR: release → main（CI + CodeRabbit，网页合并）
-
-# 5. 发布后步骤（合并后依次执行）
-git checkout main && git pull
-git tag vX.Y.Z && git push origin vX.Y.Z
-git checkout develop && git pull --ff-only origin develop && git merge main && git push origin develop
-git push origin --delete release/vX.Y.Z
-# 如有后续功能待发布，新建下一 release：
-# git checkout main && git checkout -b release/vX.Y+1.0 && git push -u origin release/vX.Y+1.0
 ```
 
+**发布后步骤**（PR 合并后必须执行，不需要用户指示）：
+
+1. `git checkout main && git pull`
+2. `git tag vX.Y.Z && git push origin vX.Y.Z`
+3. `git checkout develop && git pull --ff-only origin develop && git merge main && git push origin develop`
+4. `git push origin --delete release/vX.Y.Z`
+5. 如有后续功能待发布：`git checkout main && git checkout -b release/vX.Y+1.0 && git push -u origin release/vX.Y+1.0`
+
 ### hotfix 流程
+
+**准备阶段**：
 
 ```bash
 git checkout main && git pull
@@ -78,11 +81,13 @@ git checkout -b hotfix/xxx
 # 修复 + 提交 + push
 git push -u origin hotfix/xxx
 # 开 PR: hotfix/xxx → main（快速 review，网页合并）
-# 合并后：
-git checkout main && git pull
-git tag vX.Y.Z && git push origin vX.Y.Z
-git checkout develop && git pull --ff-only origin develop && git merge main && git push origin develop
 ```
+
+**发布后步骤**（PR 合并后必须执行，不需要用户指示）：
+
+1. `git checkout main && git pull`
+2. `git tag vX.Y.Z && git push origin vX.Y.Z`
+3. `git checkout develop && git pull --ff-only origin develop && git merge main && git push origin develop`
 
 ## rebase（feature 落后 main 时）
 

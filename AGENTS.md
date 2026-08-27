@@ -34,7 +34,7 @@ AI 对话机器人 monorepo，npm workspaces 管理前端（web/）和后端（s
 |git 提交|`.agents/skills/git-commit/SKILL.md`（commit message + push）|
 |开分支/合并/发布/冲突/hotfix|`.agents/skills/git-branch/SKILL.md`（操作流程）|
 |分支模型/版本号规则|`.agents/context/git-workflow.md`|
-|分支路径规则/禁止项/发布流程|`docs/harness/git-branching.md`|
+|分支路径规则/禁止项/发布流程|`docs/harness/git-workflow.md`|
 
 ## Default Protocol
 
