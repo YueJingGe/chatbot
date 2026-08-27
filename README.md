@@ -69,7 +69,7 @@ chatbot/
 ├── .husky/                                   # Git hooks
 │   └── pre-commit                            # pre-commit hook（lint-staged）
 ├── ISSUES/                                   # 开发日志（按日期）
-├── 总结/                                     # 面试/项目总结
+├── 总结/                                     # 项目总结
 ├── image/                                    # 项目截图
 ├── AGENTS.md                                 # AI 规范入口
 ├── CLAUDE.md                                 # Claude Code 专用入口
@@ -216,7 +216,7 @@ npm run dev
 |**AI 独占**|让 AI 不犯错|表格、精简、无废话|`AGENTS.md`、`.agents/context/`、`.agents/skills/`、`docs/harness/`|
 |**人 AI 共读**|人维护、AI 也能查|详细、有例子|`README.md`、`llms.txt`、`docs/reference/`|
 |**人维护**|记录需求、计划、决策|段落、可讨论|`docs/specs/`、`docs/exec-plans/`|
-|**个人记录**|开发日志、面试、截图|自由格式|`ISSUES/`、`总结/`、`image/`|
+|**个人记录**|开发日志、截图|自由格式|`ISSUES/`、`总结/`、`image/`|
 
 **核心原则**：给 AI 读的文件每行都在消耗 token，能删就删；给人维护的文件不需要考虑 token。
 
