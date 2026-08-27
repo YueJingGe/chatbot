@@ -1,0 +1,83 @@
+/* ===== 侧边栏容器 ===== */
+.sidebar {
+  height: 100vh;
+  background-color: var(--color-sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-right: 1px solid var(--color-sidebar-border);
+}
+
+/* ===== 顶部按钮区 ===== */
+.sidebar__header {
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--color-sidebar-border);
+  flex-shrink: 0;
+}
+
+/* ===== 内容区 ===== */
+.sidebar__content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-sm) 0;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 2px;
+
+    &:hover {
+      background: var(--color-text-muted);
+    }
+  }
+}
+
+/* ===== 分组标题 ===== */
+.sidebar__sectiontitle {
+  padding: var(--space-xs) var(--space-md);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* ===== 列表项 ===== */
+.sidebar__item {
+  padding: var(--space-sm) var(--space-md) !important;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+
+  &:hover {
+    background-color: var(--color-sidebar-hover);
+  }
+}
+
+.sidebar__item--active {
+  background-color: var(--color-sidebar-active) !important;
+}
+
+.sidebar__itemtext {
+  font-size: 0.85rem;
+  color: var(--color-sidebar-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  width: 100%;
+}
+
+/* ===== 响应式：小屏隐藏 ===== */
+@media (width <= 900px) {
+  .sidebar {
+    display: none;
+  }
+}

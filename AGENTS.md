@@ -1,52 +1,50 @@
-# AGENTS.md — 通用的 Agent 规范
+# AGENTS.md — AI 协作入口
 
-## Project
-
-AI 对话机器人 monorepo，npm workspaces 管理前端（web/）和后端（server/）
+AI 对话机器人 monorepo，npm workspaces 管理前端（web/）和后端（server/）。
 
 ## Commands
 
-- `npm install` — 安装全部依赖
 - `npm run dev` — 并发启动前后端（端口 5173 / 3000）
-- `npm run dev:web` — 仅启动前端（端口 5173）
-- `npm run dev:server` — 仅启动后端（端口 3000）
-- `npm run build:web` — 构建前端生产包（输出到 `web/dist/`）
-- `npm run check:all` — 全量检查（Prettier + ESLint + Stylelint + Build）
-- `npm run format` — 自动格式化
-- `npm run lint` — 自动修复 ESLint 问题
-- `npm run stylelint` — 自动修复 Stylelint 问题
-- `npm run sync:ignore` — 同步 `.agents/ignore` 到各 AI 工具
-- `npm run sync:skills` — 同步 `.agents/skills/` 到各 AI agent
-- `npm run sync:agents` — 同时同步 ignore 和 skills
+- `npm run dev:web` / `dev:server` — 仅启动一端
+- `npm run build:web` — 构建前端到 `web/dist/`
+- `npm run check:all` — Prettier + ESLint + Stylelint + Build
+- `npm run sync:agents` — 同步 `.agents/` 到各 AI 工具
 
-## Map
+## Map（结构索引）
 
-|场景|读取文件|
+|路径|是什么|
 |-|-|
-|新需求|`.agents/skills/new-requirement/SKILL.md`（自动路由 L0/L1/L2）|
-|写前端代码|`.agents/context/frontend-context.md` + `docs/harness/frontend-rules.md`|
-|写后端代码|`.agents/context/backend-context.md` + `docs/harness/backend-rules.md`|
-|引入新依赖/改 workspace|`.agents/context/project-overview.md` + `docs/harness/architecture.md`|
-|需要详细写法参考|`docs/reference/` 下对应文件|
-|命名不确定|`docs/reference/naming.md`|
-|Markdown 格式不确定|`docs/reference/markdown.md`|
-|code review|`.agents/skills/code-review/SKILL.md`（IDE 内手动审查）|
-|git 提交|`.agents/skills/git-commit/SKILL.md`（commit message + push）|
-|开分支/合并/发布/冲突/hotfix|`.agents/skills/git-branch/SKILL.md`（操作流程）|
-|分支模型/版本号规则|`.agents/context/git-workflow.md`|
+|`.agents/context/`|稳定事实：技术栈、架构、工作流（含 harness-governance）|
+|`.agents/skills/`|任务 workflow（按需触发）|
+|`docs/harness/`|前后端架构规范|
+|`docs/reference/`|命名 / markdown / css / 组件写法|
+|`docs/specs/` / `docs/exec-plans/`|需求规格 / 执行计划（active + completed）|
 
-## Default Protocol
+## Guardrails（硬性红线）
 
-- 先读 Map，再读正文：根据任务场景读取对应文件
-- 根 AGENTS 不承载细节正文；架构、规范、技术栈详见 `.agents/` 下对应文件
-- 涉及架构或规范时，按 Map 跳转到对应文件
-- 涉及复杂任务 workflow 时，优先找对应 `SKILL.md`
-- 改完代码必须 `npm run build:web` 验证
-- 不确定就问，禁止捏造接口字段、环境变量名、业务规则
-- AI 启动时读 `.agents/ignore`，不检查列表中的文件
+- 只做用户明确要求的事。布局≠交互，样式≠逻辑，修 bug≠重构。
+- 禁止捏造接口字段、环境变量名、业务规则。
+- 以下情况必须停下来问用户：需求有歧义、多个方案有不同产品后果、范围超出原始需求。
 
-## Contributor Rules
+## Contributor Rules（harness 结构约定）
 
-- 给人和 AI 共读的入口放 `README.md`；给 AI 的导航放 `AGENTS.md`
-- 任务 workflow 放 `.agents/skills/*/SKILL.md`
-- 给 AI 读的内容若被 `<!-- -->` 注释，AI 不读、不引用（视为人工禁用）
+- `<!-- -->` 注释的内容 AI 不读、不引用（视为人工禁用）。
+- 改规则改 `.agents/`，不改 `.claude/` 等同步副本；改完跑 `npm run sync:agents`。
+
+## Default Protocol（动作触发）
+
+- AI 启动时读 `.agents/ignore`
+- 命名/格式/写法不确定：查 `docs/reference/`
+- 改 web/src/** 逻辑：读 `.agents/context/frontend-context.md` + `docs/harness/frontend-rules.md`
+- 改 server/**：读 `.agents/context/backend-context.md` + `docs/harness/backend-rules.md`
+- 加依赖/改 workspace：读 `.agents/context/project-overview.md` + `docs/harness/architecture.md`
+- 改 `.agents/**` 或 `AGENTS.md`：先读 `.agents/context/harness-governance.md`
+- 任何代码改动：先调 `.agents/skills/karpathy-guidelines/SKILL.md`（显式假设、最小改动、可验证标准）
+- 凡涉及用户可见行为/视觉/交互的改动（UI 组件、Hook、状态、API 契约、数据流），必须先走 superpowers 插件系统提供的 `brainstorming` SKILL
+- 接到新需求：走 `.agents/skills/new-requirement/SKILL.md` 路由
+- 改 web/src/** 涉及布局/样式/响应式/交互：调 `.agents/skills/frontend-visual-verification/SKILL.md`（4 档：T1 DOM 探针 / T2 单截图 / T3 多断点 / T4 含交互态）
+- 用户说 review/审查：走 `.agents/skills/code-review/SKILL.md`
+- 任务首次代码改动前：`git rev-parse --abbrev-ref HEAD` 确认分支；main / release/* 先按 `.agents/skills/git-branch/SKILL.md` 切 feature 分支
+- commit/push 走 `git-commit` SKILL；分支/合并/发布/冲突/hotfix 走 `git-branch` SKILL
+- 实现完成：`npm run check:all` 通过后主动询问是否需要 code review
+- 完成任务 / 声称修复：必须给可验证证据（命令输出 / 截图 / 数据），不是「应该好了」

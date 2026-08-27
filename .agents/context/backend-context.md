@@ -29,6 +29,4 @@ OpenAI 客户端为模块级单例。
 
 ## 工具调用（Function Calling）
 
-- 通过 OpenAI `tools` 参数定义工具 Schema
-- LLM 决策调用 → 后端执行 → 结果回传 → 进入下一轮（最多 `MAX_TOOL_ROUNDS` 轮）
-- 工具执行前发送 SSE status 事件通知前端
+规则见 `docs/harness/backend-rules.md` 的工具调用章节。
