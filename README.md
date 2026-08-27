@@ -35,7 +35,7 @@ chatbot/
 │   │   ├── frontend-context.md               # 前端架构、组件、状态管理
 │   │   └── project-overview.md               # 项目概览、技术栈、目录结构
 │   ├── ignore                                # 跨 AI agent ignore 规则
-│   └── skills/                               # 任务 workflow（5 个 skill）
+│   └── skills/                               # 任务 workflow（7 个 skill）
 ├── docs/                                     # harness 文档体系
 │   ├── harness/                              # 编码红线（必须遵守）
 │   ├── reference/                            # 详细写法参考
@@ -90,6 +90,8 @@ chatbot/
 |Skill|说明|路径|
 |-|-|-|
 |`code-review`|架构/规范/决策 review|`.agents/skills/code-review/`|
+|`frontend-visual-verification`|前端视觉验证（4 档）|`.agents/skills/frontend-visual-verification/`|
+|`git-branch`|分支/合并/发布/hotfix|`.agents/skills/git-branch/`|
 |`git-commit`|Git 提交流程|`.agents/skills/git-commit/`|
 |`karpathy-guidelines`|Karpathy 风格开发指南|`.agents/skills/karpathy-guidelines/`|
 |`new-requirement`|新需求路由（L0/L1/L2）|`.agents/skills/new-requirement/`|
