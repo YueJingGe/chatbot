@@ -1,7 +1,7 @@
 # Git 分支模型（参考事实）
 
 > 分支结构、版本号规则的稳定事实。
-> **路径规则、禁止项、发布流程**见 `docs/harness/git-branching.md`。
+> **路径规则、禁止项、发布流程**见 `docs/harness/git-workflow.md`。
 > **怎么操作**见 `.agents/skills/git-branch/SKILL.md`。
 
 ## 分支模型

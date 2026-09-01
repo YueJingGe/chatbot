@@ -47,11 +47,15 @@ git push -u origin feature/xxx
 
 ```bash
 # 1. 检查是否已有 release 分支
-git branch -r | grep release/
-# 有 → 切到该 release，合并当前 feature
-# 无 → 从 main 新建
-git checkout main && git pull
-git checkout -b release/vX.Y.Z && git push -u origin release/vX.Y.Z
+existing_release=$(git branch -r | grep 'release/' | head -1 | sed 's|.*origin/||')
+if [ -n "$existing_release" ]; then
+  echo "已有 release 分支: $existing_release，切到该分支合并当前 feature"
+  git checkout "$existing_release" && git pull
+else
+  echo "无 release 分支，从 main 新建"
+  git checkout main && git pull
+  git checkout -b release/vX.Y.Z && git push -u origin release/vX.Y.Z
+fi
 
 # 2. PR: feature → release（CI + code-review）
 
@@ -69,7 +73,7 @@ git log main..release/vX.Y.Z --oneline
 2. `git tag vX.Y.Z && git push origin vX.Y.Z`
 3. `git checkout develop && git pull --ff-only origin develop && git merge main && git push origin develop`
 4. `git push origin --delete release/vX.Y.Z`
-5. 如有后续功能待发布：`git checkout main && git checkout -b release/vX.Y+1.0 && git push -u origin release/vX.Y+1.0`
+5. 如有后续功能待发布：`git checkout main && git checkout -b release/v<next-version> && git push -u origin release/v<next-version>`（执行前确认完整版本号）
 
 ### hotfix 流程
 
