@@ -26,8 +26,8 @@ done
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 case "$current_branch" in
   feature/*|fix/*)
-    if ! git fetch origin main 2>/dev/null; then
-      echo "❌ 无法 fetch origin main，请检查网络连接后重试"
+    if ! git fetch origin main "$current_branch" 2>/dev/null; then
+      echo "❌ 无法 fetch origin，请检查网络连接后重试"
       exit 1
     fi
     if ! git merge-base --is-ancestor origin/main HEAD; then
