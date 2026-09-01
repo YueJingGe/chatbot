@@ -69,8 +69,9 @@ fi
 # 2. PR: feature → release（CI + code-review）
 
 # 3. 预发布检查（执行前必须完成）
-git log main..release/vX.Y.Z --oneline
-# 向用户展示清单：各 feature 分支 + PR 状态（CI/review）
+git checkout release/vX.Y.Z && git pull  # 先同步远端，确保本地是最新版本
+git log main..release/vX.Y.Z --oneline  # 展示已合入的 commit 清单
+# 向用户展示清单，PR 状态（CI/review）在 GitHub 网页确认
 # 用户确认后才继续
 
 # 4. PR: release → main（CI + CodeRabbit，网页合并）

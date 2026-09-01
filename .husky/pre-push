@@ -32,13 +32,16 @@ case "$current_branch" in
     fi
     if ! git merge-base --is-ancestor origin/main HEAD; then
       echo "⚡ $current_branch 未同步 main，自动 rebase..."
-      git rebase origin/main
-      # 判断是否已推送到远端：有 upstream 且与 origin 不同步则需要 force-with-lease
+      if ! git rebase origin/main; then
+        echo "❌ rebase 失败，请解决冲突后执行 git rebase --continue"
+        exit 1
+      fi
+      # 判断是否已推送到远端：有 upstream 则需要 force-with-lease，无 upstream 则需 -u
       upstream=$(git rev-parse --abbrev-ref --symbolic-full-name "@{upstream}" 2>/dev/null)
       if [ -n "$upstream" ]; then
         echo "✅ rebase 完成，该分支已推送过远端，请执行: git push --force-with-lease"
       else
-        echo "✅ rebase 完成，请重新执行 git push"
+        echo "✅ rebase 完成，请执行: git push -u origin $current_branch"
       fi
       exit 1
     fi

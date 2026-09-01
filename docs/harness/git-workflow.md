@@ -22,7 +22,7 @@ hotfix/*                   ← 从 main 切，紧急修复直达 main
 
 |分支|从哪切|去哪|门禁|
 |-|-|-|-|
-|feature/fix|main|develop → release|CI + code-review|
+|feature/fix|main|release|CI + code-review|
 |release/vX.Y.Z|main|main + tag|code-review 门禁|
 |hotfix|main|直达 main + tag|CI + 快速 review|
 
