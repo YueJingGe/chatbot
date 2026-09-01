@@ -26,9 +26,14 @@ done
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 case "$current_branch" in
   feature/*|fix/*)
-    if ! git fetch origin main "$current_branch" 2>/dev/null; then
-      echo "❌ 无法 fetch origin，请检查网络连接后重试"
+    # 必抓 main
+    if ! git fetch origin main 2>/dev/null; then
+      echo "❌ 无法 fetch origin main，请检查网络连接后重试"
       exit 1
+    fi
+    # 当前分支若已存在于远端，再抓一次更新 tracking ref（避免后续 --force-with-lease 因 stale info 失败）
+    if [ -n "$(git ls-remote --heads origin "$current_branch" 2>/dev/null)" ]; then
+      git fetch origin "$current_branch" 2>/dev/null || true
     fi
     if ! git merge-base --is-ancestor origin/main HEAD; then
       echo "⚡ $current_branch 未同步 main，自动 rebase..."
