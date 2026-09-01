@@ -47,10 +47,11 @@ git push -u origin feature/xxx
 
 ```bash
 # 1. 检查是否已有 release 分支
-existing_release=$(git branch -r | grep 'release/' | head -1 | sed 's|.*origin/||')
-if [ -n "$existing_release" ]; then
-  echo "已有 release 分支: $existing_release，切到该分支合并当前 feature"
-  git checkout "$existing_release" && git pull
+existing_releases=$(git branch -r | grep 'origin/release/' | sed 's|.*origin/||')
+if [ -n "$existing_releases" ]; then
+  echo "已有 release 分支:"
+  echo "$existing_releases"
+  echo "请用户确认目标版本后，再执行: git checkout <目标分支> && git pull"
 else
   echo "无 release 分支，从 main 新建"
   git checkout main && git pull

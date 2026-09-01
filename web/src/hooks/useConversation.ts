@@ -25,7 +25,10 @@ function createDefaultConversation(): Conversation {
 function loadConversations(): Conversation[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_CONVERSATIONS);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    }
   } catch {
     /* 解析失败，使用默认值 */
   }
