@@ -17,6 +17,14 @@ description: 分支操作流程（开分支/合并/发布/解冲突/hotfix）。
 
 禁止在多条匹配或低置信度时自行选择。
 
+## PR 操作规则
+
+凡涉及用户开 PR 的步骤，必须同时提供：
+- **PR 标题**：简洁描述改动范围
+- **PR 描述**：基于 `git log` 生成的改动说明，按 PR 模板格式输出
+
+禁止只说"去开 PR"而不给内容。
+
 ## 常规功能
 
 ```bash
@@ -47,10 +55,11 @@ git push -u origin feature/xxx
 
 ```bash
 # 1. 检查是否已有 release 分支
-existing_release=$(git branch -r | grep 'release/' | head -1 | sed 's|.*origin/||')
-if [ -n "$existing_release" ]; then
-  echo "已有 release 分支: $existing_release，切到该分支合并当前 feature"
-  git checkout "$existing_release" && git pull
+existing_releases=$(git branch -r | grep 'origin/release/' | sed 's|.*origin/||')
+if [ -n "$existing_releases" ]; then
+  echo "已有 release 分支:"
+  echo "$existing_releases"
+  echo "请用户确认目标版本后，再执行: git checkout <目标分支> && git pull"
 else
   echo "无 release 分支，从 main 新建"
   git checkout main && git pull
@@ -60,8 +69,9 @@ fi
 # 2. PR: feature → release（CI + code-review）
 
 # 3. 预发布检查（执行前必须完成）
-git log main..release/vX.Y.Z --oneline
-# 向用户展示清单：各 feature 分支 + PR 状态（CI/review）
+git checkout release/vX.Y.Z && git pull  # 先同步远端，确保本地是最新版本
+git log main..release/vX.Y.Z --oneline  # 展示已合入的 commit 清单
+# 向用户展示清单，PR 状态（CI/review）在 GitHub 网页确认
 # 用户确认后才继续
 
 # 4. PR: release → main（CI + CodeRabbit，网页合并）

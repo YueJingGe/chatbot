@@ -18,7 +18,7 @@ AI 对话机器人，前后端分离，通过 SSE 流式转发 LLM 响应。
 
 ## 目录结构
 
-见 `docs/harness/architecture.md`。
+见 [docs/harness/architecture.md](../../docs/harness/architecture.md)。
 
 **禁止随意新增顶级目录**：新增目录前评估是否应放入现有 workspace 或 docs/ 下。
 

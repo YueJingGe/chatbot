@@ -5,6 +5,7 @@ import ScrollToBottomButton from "./components/ScrollToBottomButton";
 import { ConversationSidebar } from "./components/ConversationSidebar";
 import { QuestionHistoryPanel } from "./components/QuestionHistoryPanel";
 import { useConversation } from "./hooks/useConversation";
+import type { ConversationMessage } from "./types/conversation";
 import styles from "./App.module.less";
 
 function App() {
@@ -120,6 +121,7 @@ function App() {
       const reader = response.body.getReader();
       const decoder = new TextDecoder("utf-8");
       let fullReply = "";
+      let currentStatus: string | undefined;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -136,38 +138,26 @@ function App() {
             }
             try {
               const data = JSON.parse(dataStr);
-              if (data.error) {
-                const errorMsg = [...messagesWithAssistant];
-                const idx = errorMsg.findIndex((m) => m.id === assistantMessageId);
+              // 始终从基础快照 + 累积值重建，避免后续事件覆盖先前内容
+              const buildMsg = (overrides: Partial<ConversationMessage>) => {
+                const msgs = [...messagesWithAssistant];
+                const idx = msgs.findIndex((m) => m.id === assistantMessageId);
                 if (idx !== -1) {
-                  errorMsg[idx] = {
-                    ...errorMsg[idx],
-                    content: `抱歉，服务端出错：${data.error}`,
-                  };
+                  msgs[idx] = { ...msgs[idx], ...overrides };
                 }
-                updateMessages(errorMsg);
+                return msgs;
+              };
+              if (data.error) {
+                updateMessages(buildMsg({ content: `抱歉，服务端出错：${data.error}` }));
                 break;
               }
               if (data.status) {
-                const statusMsg = [...messagesWithAssistant];
-                const idx = statusMsg.findIndex((m) => m.id === assistantMessageId);
-                if (idx !== -1) {
-                  statusMsg[idx] = { ...statusMsg[idx], statusMessage: data.message };
-                }
-                updateMessages(statusMsg);
+                currentStatus = data.message;
+                updateMessages(buildMsg({ content: fullReply, statusMessage: currentStatus }));
               }
               if (data.chunk) {
                 fullReply += data.chunk;
-                const chunkMsg = [...messagesWithAssistant];
-                const idx = chunkMsg.findIndex((m) => m.id === assistantMessageId);
-                if (idx !== -1) {
-                  chunkMsg[idx] = {
-                    ...chunkMsg[idx],
-                    content: fullReply,
-                    statusMessage: undefined,
-                  };
-                }
-                updateMessages(chunkMsg);
+                updateMessages(buildMsg({ content: fullReply, statusMessage: undefined }));
               }
             } catch {
               /* 忽略解析错误 */

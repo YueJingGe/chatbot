@@ -40,12 +40,13 @@ description: 前端布局/样式/响应式/交互改动的视觉验证流程，�
 
 **适用**：纯布局/尺寸验证，agent 推理可信
 
-**页面来源**：连接已运行的 dev server（`npm run dev:web`）或构建产物（`npm run build:web && npm run preview`），通过 `page.goto('http://localhost:5173/')` 加载页面后再 evaluate。
+**页面来源**：连接已运行的 dev server（`npm run dev:web`，端口 5173）或构建产物（`npm run build:web && npm run preview --workspace=web`，端口 4173）。
 
 ```js
-// 1. 确认 dev server 在跑（curl 或已启动）
-// 2. page.goto 加载页面
-await page.goto('http://localhost:5173/');
+// 1. 确认服务在跑（dev server 用 5173，preview 用 4173）
+// 2. page.goto 加载页面（按实际来源选端口）
+await page.goto('http://localhost:4173/');  // preview 产物
+// await page.goto('http://localhost:5173/');  // dev server
 // 3. playwright evaluate 读关键元素的 boundingClientRect
 const rects = await page.evaluate(() => ({
   sidebar: document.querySelector('aside')?.getBoundingClientRect(),
@@ -61,8 +62,8 @@ const rects = await page.evaluate(() => ({
 ## T2：单截图
 
 ```bash
-# 启动 dev server
-npm run dev:web  # 后台
+# 启动 dev server（后台运行）
+npm run dev:web &
 sleep 3
 
 # 单视口截图
@@ -71,7 +72,7 @@ node -e "
   (async () => {
     const browser = await chromium.launch();
     const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-    await page.goto('http://localhost:5173/');
+    await page.goto('http://localhost:4173/');
     await page.screenshot({ path: '/tmp/t2.png' });
     await browser.close();
   })();
@@ -86,10 +87,25 @@ node -e "
 
 1440 / 900 / 480 三断点各截一张：
 
-```js
-// 参考早期写好的 visual-verify.js 脚本模式
-// 三 context 串行，每个 waitForTimeout(2000) 后截图
-```
+```bash
+# 参考早期写好的 visual-verify.js 脚本模式
+# 脚本路径: scripts/visual-verify.js（如不存在则用下方内联命令）
+# 三 viewport 串行，每个 waitForTimeout(2000) 后截图
+node -e "
+  const { chromium } = require('playwright');
+  (async () => {
+    const browser = await chromium.launch();
+    const viewports = [{w:1440,h:900},{w:900,h:900},{w:480,h:900}];
+    for (const v of viewports) {
+      const page = await browser.newPage({ viewport: { width: v.w, height: v.h } });
+      await page.goto('http://localhost:4173/');
+      await page.waitForTimeout(2000);
+      await page.screenshot({ path: '/tmp/t3-' + v.w + '.png' });
+      await page.close();
+    }
+    await browser.close();
+  })();
+"
 
 对比三张图，按需调整。
 
@@ -110,7 +126,7 @@ T3 基础上加：
 
 ## 流程（按档执行）
 
-1. **确认 dev server**：`npm run dev:web` 后台运行；或确认是构建产物
+1. **确认 dev server**：`npm run dev:web &` 后台运行；或确认是构建产物
 2. **选档**：T1 默认；按需升级
 3. **执行**：跑对应档
 4. **判定**：与需求/原设计对比
@@ -127,7 +143,7 @@ T3 基础上加：
 | T4 交互异常 | 修事件/状态机，回到 T1 |
 | check:all 报错 | 先修静态，再回 T1 |
 | dev server 起不来 | 检查端口/依赖 |
-| playwright 不可用 | 降级：`curl localhost:5173` + 提示用户自查 |
+| playwright 不可用 | 降级：`curl localhost:4173`（preview）或 `curl localhost:5173`（dev）+ 提示用户自查 |
 
 ## 关键原则
 
