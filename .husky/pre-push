@@ -36,10 +36,11 @@ case "$current_branch" in
         echo "❌ rebase 失败，请解决冲突后执行 git rebase --continue"
         exit 1
       fi
-      # 判断是否已推送到远端：有 upstream 则需要 force-with-lease，无 upstream 则需 -u
+      # 判断推送策略：有 upstream 用 force-with-lease；无 upstream 但远端已存在也用 force-with-lease；远端不存在才用普通 push -u
       upstream=$(git rev-parse --abbrev-ref --symbolic-full-name "@{upstream}" 2>/dev/null)
-      if [ -n "$upstream" ]; then
-        echo "✅ rebase 完成，该分支已推送过远端，请执行: git push --force-with-lease"
+      remote_exists=$(git ls-remote --heads origin "$current_branch" 2>/dev/null)
+      if [ -n "$upstream" ] || [ -n "$remote_exists" ]; then
+        echo "✅ rebase 完成，请执行: git push --force-with-lease -u origin $current_branch"
       else
         echo "✅ rebase 完成，请执行: git push -u origin $current_branch"
       fi
