@@ -19,6 +19,11 @@ AI 对话机器人 monorepo，npm workspaces 管理前端（web/）和后端（s
 |`docs/harness/`|前后端架构规范|
 |`docs/reference/`|命名 / markdown / css / 组件写法|
 |`docs/specs/` / `docs/exec-plans/`|需求规格 / 执行计划（active + completed）|
+|`.agents/skills/code-review/SKILL.md`（IDE 内手动审查）|code review|
+|`.agents/skills/git-commit/SKILL.md`（commit message + push）|git 提交|
+|`.agents/skills/git-branch/SKILL.md`（操作流程）|开分支/合并/发布/冲突/hotfix|
+|`.agents/context/git-workflow.md`|分支模型/版本号规则|
+|`docs/harness/git-workflow.md`|分支路径规则/禁止项/发布流程|
 
 ## Guardrails（硬性红线）
 
