@@ -62,12 +62,15 @@ git push -u origin feature/xxx
 
 ```bash
 # 1. 刷新远端引用，再检查 release 分支（避免本地 refs 过期误报）
-git fetch --prune origin
+if ! git fetch --prune origin; then
+  echo "❌ 无法刷新远端引用，请检查网络连接后重试"
+  exit 1
+fi
 existing_releases=$(git branch -r | grep 'origin/release/' | sed 's|.*origin/||')
 if [ -n "$existing_releases" ]; then
   echo "已有 release 分支:"
   echo "$existing_releases"
-  echo "请用户确认目标版本后，再执行: git checkout <目标分支> && git pull"
+  echo "请用户确认目标版本后，再执行: git checkout <目标分支> && git pull --ff-only"
 else
   echo "无 release 分支，从 main 新建"
   git checkout main && git pull
