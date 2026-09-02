@@ -22,8 +22,15 @@ description: 分支操作流程（开分支/合并/发布/解冲突/hotfix）。
 凡涉及用户开 PR 的步骤，必须同时提供：
 - **PR 标题**：简洁描述改动范围
 - **PR 描述**：基于 `git log` 生成的改动说明，按 PR 模板格式输出
+- **索要 PR 链接**：提供标题和描述后，必须向用户索要 PR 链接（格式："PR 链接给我，我自己看 CodeRabbit 审查结果"）
 
 禁止只说"去开 PR"而不给内容。
+
+**PR 链接到手后的处理**：
+1. 用 WebFetch 抓取 PR 页面，提取所有 CodeRabbit 审查意见
+2. 逐条判断：真 bug / 文档一致性 / 边缘情况 / nitpick
+3. 给出分类清单 + 修复建议（哪些修、哪些进 ISSUES、哪些拆 feature 分支）
+4. 等用户确认后动手
 
 ## 常规功能
 
@@ -54,12 +61,16 @@ git push -u origin feature/xxx
 **准备阶段**（本地执行）：
 
 ```bash
-# 1. 检查是否已有 release 分支
+# 1. 刷新远端引用，再检查 release 分支（避免本地 refs 过期误报）
+if ! git fetch --prune origin; then
+  echo "❌ 无法刷新远端引用，请检查网络连接后重试"
+  exit 1
+fi
 existing_releases=$(git branch -r | grep 'origin/release/' | sed 's|.*origin/||')
 if [ -n "$existing_releases" ]; then
   echo "已有 release 分支:"
   echo "$existing_releases"
-  echo "请用户确认目标版本后，再执行: git checkout <目标分支> && git pull"
+  echo "请用户确认目标版本后，再执行: git checkout <目标分支> && git pull --ff-only"
 else
   echo "无 release 分支，从 main 新建"
   git checkout main && git pull
