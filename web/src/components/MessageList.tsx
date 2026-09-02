@@ -16,7 +16,11 @@ const MessageList = memo(({ messages }: MessageListProps) => {
   return (
     <>
       {messages.map((message) => (
-        <div key={message.id} className={`${styles.message} ${styles[message.role + "-message"]}`}>
+        <div
+          key={message.id}
+          data-message-id={message.id}
+          className={`${styles.message} ${styles[message.role + "-message"]}`}
+        >
           <div className={styles.bubble}>
             {message.statusMessage && !message.content ? (
               <span className={styles.status}>{message.statusMessage}</span>

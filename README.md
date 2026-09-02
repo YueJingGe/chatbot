@@ -35,7 +35,7 @@ chatbot/
 │   │   ├── frontend-context.md               # 前端架构、组件、状态管理
 │   │   └── project-overview.md               # 项目概览、技术栈、目录结构
 │   ├── ignore                                # 跨 AI agent ignore 规则
-│   └── skills/                               # 任务 workflow（5 个 skill）
+│   └── skills/                               # 任务 workflow（7 个 skill）
 ├── docs/                                     # harness 文档体系
 │   ├── harness/                              # 编码红线（必须遵守）
 │   ├── reference/                            # 详细写法参考
@@ -69,7 +69,7 @@ chatbot/
 ├── .husky/                                   # Git hooks
 │   └── pre-commit                            # pre-commit hook（lint-staged）
 ├── ISSUES/                                   # 开发日志（按日期）
-├── 总结/                                     # 面试/项目总结
+├── 总结/                                     # 项目总结
 ├── image/                                    # 项目截图
 ├── AGENTS.md                                 # AI 规范入口
 ├── CLAUDE.md                                 # Claude Code 专用入口
@@ -90,6 +90,8 @@ chatbot/
 |Skill|说明|路径|
 |-|-|-|
 |`code-review`|架构/规范/决策 review|`.agents/skills/code-review/`|
+|`frontend-visual-verification`|前端视觉验证（4 档）|`.agents/skills/frontend-visual-verification/`|
+|`git-branch`|分支/合并/发布/hotfix|`.agents/skills/git-branch/`|
 |`git-commit`|Git 提交流程|`.agents/skills/git-commit/`|
 |`karpathy-guidelines`|Karpathy 风格开发指南|`.agents/skills/karpathy-guidelines/`|
 |`new-requirement`|新需求路由（L0/L1/L2）|`.agents/skills/new-requirement/`|
@@ -216,7 +218,7 @@ npm run dev
 |**AI 独占**|让 AI 不犯错|表格、精简、无废话|`AGENTS.md`、`.agents/context/`、`.agents/skills/`、`docs/harness/`|
 |**人 AI 共读**|人维护、AI 也能查|详细、有例子|`README.md`、`llms.txt`、`docs/reference/`|
 |**人维护**|记录需求、计划、决策|段落、可讨论|`docs/specs/`、`docs/exec-plans/`|
-|**个人记录**|开发日志、面试、截图|自由格式|`ISSUES/`、`总结/`、`image/`|
+|**个人记录**|开发日志、截图|自由格式|`ISSUES/`、`总结/`、`image/`|
 
 **核心原则**：给 AI 读的文件每行都在消耗 token，能删就删；给人维护的文件不需要考虑 token。
 

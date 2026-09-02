@@ -2,19 +2,22 @@ import { useState, useRef, useEffect, useCallback, KeyboardEvent } from "react";
 import MessageList from "./components/MessageList";
 import InputArea from "./components/InputArea";
 import ScrollToBottomButton from "./components/ScrollToBottomButton";
+import { ConversationSidebar } from "./components/ConversationSidebar";
+import { QuestionHistoryPanel } from "./components/QuestionHistoryPanel";
+import { useConversation } from "./hooks/useConversation";
+import type { ConversationMessage } from "./types/conversation";
 import styles from "./App.module.less";
 
-interface Message {
-  id: string | number;
-  role: string;
-  content: string;
-  statusMessage?: string;
-}
-
 function App() {
-  const [messages, setMessages] = useState<Message[]>([
-    { id: 1, role: "assistant", content: "你好！我是你的AI助手。" },
-  ]);
+  const {
+    conversations,
+    messages,
+    activeId,
+    createConversation,
+    switchConversation,
+    updateMessages,
+  } = useConversation();
+
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isAtBottom, setIsAtBottom] = useState(true);
@@ -61,6 +64,15 @@ function App() {
     }
   }, [messages, isAtBottom, scrollToBottom]);
 
+  // 滚动到指定消息
+  const scrollToMessage = useCallback((messageId: string) => {
+    if (!chatHistoryRef.current) return;
+    const element = chatHistoryRef.current.querySelector(`[data-message-id="${messageId}"]`);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, []);
+
   const sendMessage = useCallback(async () => {
     const textToSend = inputTextRef.current.trim();
     if (!textToSend || isLoadingRef.current) return;
@@ -73,17 +85,21 @@ function App() {
 
     const newUserMessage = {
       id: crypto.randomUUID(),
-      role: "user",
+      role: "user" as const,
       content: textToSend,
     };
     const updatedMessages = [...messagesRef.current, newUserMessage];
-    setMessages((prev) => [...prev, newUserMessage]);
+    updateMessages(updatedMessages);
     setIsAtBottom(true);
     setInputText("");
     setIsLoading(true);
 
     const assistantMessageId = crypto.randomUUID();
-    setMessages((prev) => [...prev, { id: assistantMessageId, role: "assistant", content: "" }]);
+    const messagesWithAssistant = [
+      ...updatedMessages,
+      { id: assistantMessageId, role: "assistant" as const, content: "" },
+    ];
+    updateMessages(messagesWithAssistant);
 
     try {
       const response = await fetch("/api/chat", {
@@ -105,6 +121,7 @@ function App() {
       const reader = response.body.getReader();
       const decoder = new TextDecoder("utf-8");
       let fullReply = "";
+      let currentStatus: string | undefined;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -121,33 +138,26 @@ function App() {
             }
             try {
               const data = JSON.parse(dataStr);
+              // 始终从基础快照 + 累积值重建，避免后续事件覆盖先前内容
+              const buildMsg = (overrides: Partial<ConversationMessage>) => {
+                const msgs = [...messagesWithAssistant];
+                const idx = msgs.findIndex((m) => m.id === assistantMessageId);
+                if (idx !== -1) {
+                  msgs[idx] = { ...msgs[idx], ...overrides };
+                }
+                return msgs;
+              };
               if (data.error) {
-                setMessages((prev) =>
-                  prev.map((msg) =>
-                    msg.id === assistantMessageId
-                      ? { ...msg, content: `抱歉，服务端出错：${data.error}` }
-                      : msg
-                  )
-                );
+                updateMessages(buildMsg({ content: `抱歉，服务端出错：${data.error}` }));
                 break;
               }
               if (data.status) {
-                setMessages((prev) =>
-                  prev.map((msg) =>
-                    msg.id === assistantMessageId ? { ...msg, statusMessage: data.message } : msg
-                  )
-                );
+                currentStatus = data.message;
+                updateMessages(buildMsg({ content: fullReply, statusMessage: currentStatus }));
               }
               if (data.chunk) {
                 fullReply += data.chunk;
-                setMessages((prev) =>
-                  prev.map((msg) => {
-                    if (msg.id === assistantMessageId) {
-                      return { ...msg, content: fullReply, statusMessage: undefined };
-                    }
-                    return msg;
-                  })
-                );
+                updateMessages(buildMsg({ content: fullReply, statusMessage: undefined }));
               }
             } catch {
               /* 忽略解析错误 */
@@ -161,18 +171,16 @@ function App() {
       }
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.error("发送失败:", error);
-      setMessages((prev) =>
-        prev.map((msg) => {
-          if (msg.id === assistantMessageId) {
-            return { ...msg, content: `抱歉，出错了: ${errorMessage}` };
-          }
-          return msg;
-        })
-      );
+      const errorMsg = [...messagesWithAssistant];
+      const idx = errorMsg.findIndex((m) => m.id === assistantMessageId);
+      if (idx !== -1) {
+        errorMsg[idx] = { ...errorMsg[idx], content: `抱歉，出错了: ${errorMessage}` };
+      }
+      updateMessages(errorMsg);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [updateMessages]);
 
   const handleKeyPress = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
@@ -184,41 +192,74 @@ function App() {
     [sendMessage]
   );
 
+  const handleNewConversation = useCallback(() => {
+    createConversation();
+  }, [createConversation]);
+
+  const handleSelectConversation = useCallback(
+    (id: string) => {
+      switchConversation(id);
+    },
+    [switchConversation]
+  );
+
+  // 提取当前会话的 user questions
+  const questions = messages
+    .filter((m) => m.role === "user")
+    .map((m) => ({ id: m.id, content: m.content }));
+
+  const handleSelectQuestion = useCallback(
+    (messageId: string) => {
+      scrollToMessage(messageId);
+    },
+    [scrollToMessage]
+  );
+
   return (
-    <div className={styles.container}>
-      <header className={styles.header}>
-        <h1>AI 对话</h1>
-        <p className={styles.subtitle}>
-          <span className={styles["status-dot"]}></span>
-          在线
-        </p>
-      </header>
+    <div className={styles["app-layout"]}>
+      <ConversationSidebar
+        conversations={conversations}
+        activeId={activeId}
+        onNewConversation={handleNewConversation}
+        onSelectConversation={handleSelectConversation}
+      />
 
-      <main className={styles.main}>
-        <div className={styles["chat-history-wrapper"]}>
-          <div
-            ref={chatHistoryRef}
-            className={styles["chat-history"]}
-            role="log"
-            aria-label="聊天记录"
-            aria-live="polite"
-            onScroll={handleScroll}
-          >
-            <MessageList messages={messages} />
+      <div className={styles.container}>
+        <header className={styles.header}>
+          <h1>AI 对话</h1>
+          <p className={styles.subtitle}>
+            <span className={styles["status-dot"]}></span>
+            在线
+          </p>
+        </header>
+
+        <main className={styles.main}>
+          <div className={styles["chat-history-wrapper"]}>
+            <div
+              ref={chatHistoryRef}
+              className={styles["chat-history"]}
+              role="log"
+              aria-label="聊天记录"
+              aria-live="polite"
+              onScroll={handleScroll}
+            >
+              <MessageList messages={messages} />
+            </div>
+            <ScrollToBottomButton visible={!isAtBottom} onClick={handleScrollToBottomClick} />
+            <QuestionHistoryPanel questions={questions} onSelectQuestion={handleSelectQuestion} />
           </div>
-          <ScrollToBottomButton visible={!isAtBottom} onClick={handleScrollToBottomClick} />
-        </div>
 
-        <InputArea
-          inputText={inputText}
-          setInputText={setInputText}
-          isLoading={isLoading}
-          sendMessage={sendMessage}
-          handleKeyPress={handleKeyPress}
-        />
-      </main>
+          <InputArea
+            inputText={inputText}
+            setInputText={setInputText}
+            isLoading={isLoading}
+            sendMessage={sendMessage}
+            handleKeyPress={handleKeyPress}
+          />
+        </main>
 
-      <footer className={styles.footer}>Powered by 阿里云百炼</footer>
+        <footer className={styles.footer}>Powered by 阿里云百炼</footer>
+      </div>
     </div>
   );
 }

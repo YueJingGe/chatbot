@@ -12,6 +12,7 @@ description: Git 提交工作流（commit message + 推送）。代码质量 rev
 1. 跑 `npm run check:all`（含 build）
 2. 如失败：`npm run format` / `npm run lint` / `npm run stylelint` 修复后重跑
 3. `git add -A && git commit -m "<type>(<scope>): <描述>" && git push`
+4. 若 push 被 pre-push hook 拒绝（提示"自动 rebase"），说明 hook 已帮你同步 main，按提示执行推送命令即可（远端分支已存在用 `git push --force-with-lease -u origin <分支>`，远端不存在用 `git push -u origin <分支>`）
 
 > 工具检查（lint-staged）由 husky pre-commit 兜底。
 

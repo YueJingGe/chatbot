@@ -1,6 +1,6 @@
-/* ===== Design Tokens: Qianwen-inspired ===== */
+/* ===== Design Tokens ===== */
 :root {
-  /* 配色 — 参考千问，干净清爽 */
+  /* 配色 */
   --color-primary: #c2785c;
   --color-primary-hover: #a8634a;
   --color-primary-active: #8f523d;
@@ -17,6 +17,14 @@
   --color-text-muted: #999;
   --color-accent: #5ba89c;
   --color-input-bg: #f7f7f8;
+
+  /* 侧边栏 */
+  --color-sidebar-bg: #fafafa;
+  --color-sidebar-hover: #f0f0f0;
+  --color-sidebar-active: #ebf2ff;
+  --color-sidebar-text: #1a1a1a;
+  --color-sidebar-text-muted: #999;
+  --color-sidebar-border: #f0f0f0;
 
   /* 间距（8px 基准） */
   --space-xs: 4px;
@@ -54,10 +62,6 @@ body {
   font-family: Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
   background-color: var(--color-bg);
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: var(--space-lg);
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
