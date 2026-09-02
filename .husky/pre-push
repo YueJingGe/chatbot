@@ -32,8 +32,14 @@ case "$current_branch" in
       exit 1
     fi
     # 当前分支若已存在于远端，再抓一次更新 tracking ref（避免后续 --force-with-lease 因 stale info 失败）
-    if [ -n "$(git ls-remote --heads origin "$current_branch" 2>/dev/null)" ]; then
-      git fetch origin "$current_branch" 2>/dev/null || true
+    remote_branch_output=$(git ls-remote --heads origin "$current_branch" 2>/dev/null)
+    ls_remote_exit=$?
+    if [ $ls_remote_exit -eq 0 ] && [ -n "$remote_branch_output" ]; then
+      if ! git fetch origin "$current_branch" 2>/dev/null; then
+        echo "⚠️ 无法 fetch $current_branch 远端引用，--force-with-lease 可能因 stale info 失败"
+      fi
+    elif [ $ls_remote_exit -ne 0 ]; then
+      echo "⚠️ ls-remote 查询失败，请检查网络连接"
     fi
     if ! git merge-base --is-ancestor origin/main HEAD; then
       echo "⚡ $current_branch 未同步 main，自动 rebase..."
@@ -41,11 +47,14 @@ case "$current_branch" in
         echo "❌ rebase 失败，请解决冲突后执行 git rebase --continue"
         exit 1
       fi
-      # 判断推送策略：有 upstream 用 force-with-lease；无 upstream 但远端已存在也用 force-with-lease；远端不存在才用普通 push -u
-      upstream=$(git rev-parse --abbrev-ref --symbolic-full-name "@{upstream}" 2>/dev/null)
+      # 仅以 remote_exists 判断推送策略（upstream 配置可能残留，不可靠）
       remote_exists=$(git ls-remote --heads origin "$current_branch" 2>/dev/null)
-      if [ -n "$upstream" ] || [ -n "$remote_exists" ]; then
+      ls_remote_exit=$?
+      if [ $ls_remote_exit -eq 0 ] && [ -n "$remote_exists" ]; then
         echo "✅ rebase 完成，请执行: git push --force-with-lease -u origin $current_branch"
+      elif [ $ls_remote_exit -ne 0 ]; then
+        echo "⚠️ ls-remote 查询失败，请检查网络连接后手动推送"
+        exit 1
       else
         echo "✅ rebase 完成，请执行: git push -u origin $current_branch"
       fi

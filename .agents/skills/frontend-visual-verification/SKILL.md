@@ -72,7 +72,7 @@ node -e "
   (async () => {
     const browser = await chromium.launch();
     const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-    await page.goto('http://localhost:4173/');
+    await page.goto('http://localhost:5173/');
     await page.screenshot({ path: '/tmp/t2.png' });
     await browser.close();
   })();
@@ -98,7 +98,7 @@ node -e "
     const viewports = [{w:1440,h:900},{w:900,h:900},{w:480,h:900}];
     for (const v of viewports) {
       const page = await browser.newPage({ viewport: { width: v.w, height: v.h } });
-      await page.goto('http://localhost:4173/');
+      await page.goto('http://localhost:5173/');
       await page.waitForTimeout(2000);
       await page.screenshot({ path: '/tmp/t3-' + v.w + '.png' });
       await page.close();

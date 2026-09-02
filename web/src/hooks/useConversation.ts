@@ -49,15 +49,27 @@ function loadConversations(): Conversation[] {
 }
 
 function loadActiveId(): string | null {
-  return localStorage.getItem(STORAGE_KEY_ACTIVE_ID);
+  try {
+    return localStorage.getItem(STORAGE_KEY_ACTIVE_ID);
+  } catch {
+    return null;
+  }
 }
 
 function saveConversations(conversations: Conversation[]) {
-  localStorage.setItem(STORAGE_KEY_CONVERSATIONS, JSON.stringify(conversations));
+  try {
+    localStorage.setItem(STORAGE_KEY_CONVERSATIONS, JSON.stringify(conversations));
+  } catch {
+    /* 存储满或禁止访问，保留内存状态 */
+  }
 }
 
 function saveActiveId(id: string) {
-  localStorage.setItem(STORAGE_KEY_ACTIVE_ID, id);
+  try {
+    localStorage.setItem(STORAGE_KEY_ACTIVE_ID, id);
+  } catch {
+    /* 存储满或禁止访问，保留内存状态 */
+  }
 }
 
 function getConversationTitle(messages: ConversationMessage[]): string {

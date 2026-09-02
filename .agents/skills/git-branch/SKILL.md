@@ -61,7 +61,8 @@ git push -u origin feature/xxx
 **准备阶段**（本地执行）：
 
 ```bash
-# 1. 检查是否已有 release 分支
+# 1. 刷新远端引用，再检查 release 分支（避免本地 refs 过期误报）
+git fetch --prune origin
 existing_releases=$(git branch -r | grep 'origin/release/' | sed 's|.*origin/||')
 if [ -n "$existing_releases" ]; then
   echo "已有 release 分支:"
