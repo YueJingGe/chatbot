@@ -66,16 +66,18 @@ description: 新需求启动 + 自动路由。当用户描述新功能、新需�
 模板见 `docs/specs/active/TEMPLATE-L2.md`、`docs/specs/active/TEMPLATE-L1.md`、`docs/exec-plans/active/TEMPLATE.md`。
 
 ### 5. 归档
-验收通过后（用户明确说"验收通过"/"没问题"且 `npm run build:web` 通过）：
+验收通过后（用户明确说"验收通过"/"没问题"）：
 - 把 spec 内 `- [ ]` 替换为 `- [x]`
-- 重命名并移到 `docs/specs/completed/YYYY-MM-DD-<name>.md`（exec-plan 同理）
+- 运行对应范围的验证命令（Web 改动跑 `npm run build:web`，后端改动跑后端检查，纯文档跳过构建）
+- 重命名并移到 `docs/specs/completed/YYYY-MM-DD-<name>.md`（L1 加 `-L1` 后缀；exec-plan 同理）
 - 汇报"已归档至 completed/"
 
 **命名规范**：
 
 | 类型 | 文件名 |
 |------|--------|
-| feature spec（含 L1）| `YYYY-MM-DD-feature-<kebab>.md` |
+| feature spec（L2）| `YYYY-MM-DD-feature-<kebab>.md` |
+| feature spec（L1）| `YYYY-MM-DD-feature-<kebab>-L1.md` |
 | exec-plan | 与对应 spec 同名，日期前缀一致 |
 | 日期 | 用完成日（不是启动日），格式 `YYYY-MM-DD` |
 | L0 | 不归档（无产物） |

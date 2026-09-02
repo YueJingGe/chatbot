@@ -5,16 +5,43 @@ import type { Conversation, ConversationMessage } from "../types/conversation";
 const STORAGE_KEY_CONVERSATIONS = "chatbot_conversations";
 const STORAGE_KEY_ACTIVE_ID = "chatbot_active_id";
 
-const DEFAULT_GREETING: ConversationMessage = {
-  id: crypto.randomUUID(),
-  role: "assistant",
-  content: "你好！我是你的AI助手。",
-};
+function createDefaultConversation(): Conversation {
+  const now = Date.now();
+  return {
+    id: crypto.randomUUID(),
+    title: "新对话",
+    messages: [
+      {
+        id: crypto.randomUUID(),
+        role: "assistant",
+        content: "你好！我是你的AI助手。",
+      },
+    ],
+    createdAt: now,
+    updatedAt: now,
+  };
+}
 
 function loadConversations(): Conversation[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_CONVERSATIONS);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (
+        Array.isArray(parsed) &&
+        parsed.every(
+          (c) =>
+            c &&
+            typeof c.id === "string" &&
+            typeof c.title === "string" &&
+            Array.isArray(c.messages) &&
+            typeof c.createdAt === "number" &&
+            typeof c.updatedAt === "number"
+        )
+      ) {
+        return parsed;
+      }
+    }
   } catch {
     /* 解析失败，使用默认值 */
   }
@@ -22,26 +49,27 @@ function loadConversations(): Conversation[] {
 }
 
 function loadActiveId(): string | null {
-  return localStorage.getItem(STORAGE_KEY_ACTIVE_ID);
+  try {
+    return localStorage.getItem(STORAGE_KEY_ACTIVE_ID);
+  } catch {
+    return null;
+  }
 }
 
 function saveConversations(conversations: Conversation[]) {
-  localStorage.setItem(STORAGE_KEY_CONVERSATIONS, JSON.stringify(conversations));
+  try {
+    localStorage.setItem(STORAGE_KEY_CONVERSATIONS, JSON.stringify(conversations));
+  } catch {
+    /* 存储满或禁止访问，保留内存状态 */
+  }
 }
 
 function saveActiveId(id: string) {
-  localStorage.setItem(STORAGE_KEY_ACTIVE_ID, id);
-}
-
-function createDefaultConversation(): Conversation {
-  const now = Date.now();
-  return {
-    id: crypto.randomUUID(),
-    title: "新对话",
-    messages: [DEFAULT_GREETING],
-    createdAt: now,
-    updatedAt: now,
-  };
+  try {
+    localStorage.setItem(STORAGE_KEY_ACTIVE_ID, id);
+  } catch {
+    /* 存储满或禁止访问，保留内存状态 */
+  }
 }
 
 function getConversationTitle(messages: ConversationMessage[]): string {

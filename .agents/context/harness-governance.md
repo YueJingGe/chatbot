@@ -29,7 +29,7 @@
 ## 改之后
 
 1. `npm run check:all` — 静态检查
-2. `npm run sync:agents` — 同步到 `.claude/` 等副本
+2. `npm run sync:agents` — 同步 `.agents/ignore` 和 `.agents/skills/` 到 `.claude/` 等副本（注：`.agents/context/` 不在 sync 范围内，需手动分发）
 3. **meta-验证** — 用一个真 prompt 验证规则真的被触发（不验证 = 实施失败）
 4. 改完告诉用户改了什么、为什么
 

@@ -2,6 +2,7 @@
 # 拦截直接向受保护分支推提交（绕过 PR）。真正的强制在 GitHub ruleset，本钩子是本地提醒。
 #   main：完全禁止直推
 #   release/*：允许创建/删除分支，仅拦截直接推提交（更新）
+#   feature/* fix/*：push 前自动同步 main，未同步则 rebase 后拒绝本次 push（需重新 push）
 
 zero="0000000000000000000000000000000000000000"
 
@@ -20,5 +21,46 @@ while read -r local_ref local_oid remote_ref remote_oid; do
       ;;
   esac
 done
+
+# feature/fix 分支：自动同步 main
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+case "$current_branch" in
+  feature/*|fix/*)
+    # 必抓 main
+    if ! git fetch origin main 2>/dev/null; then
+      echo "❌ 无法 fetch origin main，请检查网络连接后重试"
+      exit 1
+    fi
+    # 当前分支若已存在于远端，再抓一次更新 tracking ref（避免后续 --force-with-lease 因 stale info 失败）
+    remote_branch_output=$(git ls-remote --heads origin "$current_branch" 2>/dev/null)
+    ls_remote_exit=$?
+    if [ $ls_remote_exit -eq 0 ] && [ -n "$remote_branch_output" ]; then
+      if ! git fetch origin "$current_branch" 2>/dev/null; then
+        echo "⚠️ 无法 fetch $current_branch 远端引用，--force-with-lease 可能因 stale info 失败"
+      fi
+    elif [ $ls_remote_exit -ne 0 ]; then
+      echo "⚠️ ls-remote 查询失败，请检查网络连接"
+    fi
+    if ! git merge-base --is-ancestor origin/main HEAD; then
+      echo "⚡ $current_branch 未同步 main，自动 rebase..."
+      if ! git rebase origin/main; then
+        echo "❌ rebase 失败，请解决冲突后执行 git rebase --continue"
+        exit 1
+      fi
+      # 仅以 remote_exists 判断推送策略（upstream 配置可能残留，不可靠）
+      remote_exists=$(git ls-remote --heads origin "$current_branch" 2>/dev/null)
+      ls_remote_exit=$?
+      if [ $ls_remote_exit -eq 0 ] && [ -n "$remote_exists" ]; then
+        echo "✅ rebase 完成，请执行: git push --force-with-lease -u origin $current_branch"
+      elif [ $ls_remote_exit -ne 0 ]; then
+        echo "⚠️ ls-remote 查询失败，请检查网络连接后手动推送"
+        exit 1
+      else
+        echo "✅ rebase 完成，请执行: git push -u origin $current_branch"
+      fi
+      exit 1
+    fi
+    ;;
+esac
 
 exit 0

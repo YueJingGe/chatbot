@@ -13,7 +13,7 @@
 
 ## 数据流
 
-```
+```text
 用户输入 → InputArea → App.sendMessage()
   → POST /api/chat（SSE 流）
   → fetch + ReadableStream 逐 chunk 解析
@@ -29,13 +29,13 @@
 
 |组件|职责|关键 props / state|备注|
 |-|-|-|-|
-|[App.tsx](../web/src/App.tsx)|顶层容器，集成所有子组件，管理全局状态|messages / inputText / isLoading / isAtBottom|流式 SSE 在此消费|
-|[MessageList](../web/src/components/MessageList.tsx)|渲染消息列表|messages|必须 `memo`；每条带 `data-message-id` 用于滚动定位|
-|[InputArea](../web/src/components/InputArea.tsx)|输入框 + 发送按钮|inputText / setInputText / isLoading / sendMessage|必须 `memo`|
-|[ScrollToBottomButton](../web/src/components/ScrollToBottomButton.tsx)|滚到底部悬浮按钮|visible / onClick|必须 `memo`|
-|[ConversationSidebar](../web/src/components/ConversationSidebar.tsx)|左侧历史会话栏|conversations / activeId / onNewConversation / onSelectConversation|必须 `memo`；≤900px 隐藏|
-|[QuestionHistoryPanel](../web/src/components/QuestionHistoryPanel.tsx)|右侧当前会话 question 列表|questions / onSelectQuestion|必须 `memo`；hover 展开|
-|[useConversation](../web/src/hooks/useConversation.ts)|会话管理 hook|见返回值|localStorage 持久化 + debounce 300ms|
+|[App.tsx](../../web/src/App.tsx)|顶层容器，集成所有子组件，管理全局状态|messages / inputText / isLoading / isAtBottom|流式 SSE 在此消费|
+|[MessageList](../../web/src/components/MessageList.tsx)|渲染消息列表|messages|必须 `memo`；每条带 `data-message-id` 用于滚动定位|
+|[InputArea](../../web/src/components/InputArea.tsx)|输入框 + 发送按钮|inputText / setInputText / isLoading / sendMessage|必须 `memo`|
+|[ScrollToBottomButton](../../web/src/components/ScrollToBottomButton.tsx)|滚到底部悬浮按钮|visible / onClick|必须 `memo`|
+|[ConversationSidebar](../../web/src/components/ConversationSidebar.tsx)|左侧历史会话栏|conversations / activeId / onNewConversation / onSelectConversation|必须 `memo`；≤900px 隐藏|
+|[QuestionHistoryPanel](../../web/src/components/QuestionHistoryPanel.tsx)|右侧当前会话 question 列表|questions / onSelectQuestion|必须 `memo`；hover 展开|
+|[useConversation](../../web/src/hooks/useConversation.ts)|会话管理 hook|见返回值|localStorage 持久化 + debounce 300ms|
 
 ## 状态归属
 
@@ -63,7 +63,7 @@
 
 - **消息 ID 一律 `crypto.randomUUID()`**：与后端 / 滚动定位 / localStorage 一致
 - **响应式断点**：≤900px 隐藏 sidebar；≤480px 全宽 + 紧凑样式
-- **BEM element 禁连字符**：详见 [docs/reference/naming.md](../docs/reference/naming.md)
+- **BEM element 禁连字符**：详见 [docs/reference/naming.md](../../docs/reference/naming.md)
 
 ## 已知技术债
 

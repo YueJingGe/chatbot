@@ -19,6 +19,11 @@ AI 对话机器人 monorepo，npm workspaces 管理前端（web/）和后端（s
 |`docs/harness/`|前后端架构规范|
 |`docs/reference/`|命名 / markdown / css / 组件写法|
 |`docs/specs/` / `docs/exec-plans/`|需求规格 / 执行计划（active + completed）|
+|`.agents/skills/code-review/SKILL.md`（IDE 内手动审查）|code review|
+|`.agents/skills/git-commit/SKILL.md`（commit message + push）|git 提交|
+|`.agents/skills/git-branch/SKILL.md`（操作流程）|开分支/合并/发布/冲突/hotfix|
+|`.agents/context/git-workflow.md`|分支模型/版本号规则|
+|`docs/harness/git-workflow.md`|分支路径规则/禁止项/发布流程|
 
 ## Guardrails（硬性红线）
 
@@ -38,7 +43,7 @@ AI 对话机器人 monorepo，npm workspaces 管理前端（web/）和后端（s
 - 改 web/src/** 逻辑：读 `.agents/context/frontend-context.md` + `docs/harness/frontend-rules.md`
 - 改 server/**：读 `.agents/context/backend-context.md` + `docs/harness/backend-rules.md`
 - 加依赖/改 workspace：读 `.agents/context/project-overview.md` + `docs/harness/architecture.md`
-- 改 `.agents/**` 或 `AGENTS.md`：先读 `.agents/context/harness-governance.md`
+- 改 `.agents/**`、`AGENTS.md`、`docs/harness/**`、`package.json` harness script、`.husky/**`：先读 `.agents/context/harness-governance.md`
 - 任何代码改动：先调 `.agents/skills/karpathy-guidelines/SKILL.md`（显式假设、最小改动、可验证标准）
 - 凡涉及用户可见行为/视觉/交互的改动（UI 组件、Hook、状态、API 契约、数据流），必须先走 superpowers 插件系统提供的 `brainstorming` SKILL
 - 接到新需求：走 `.agents/skills/new-requirement/SKILL.md` 路由
