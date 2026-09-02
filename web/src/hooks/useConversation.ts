@@ -35,6 +35,15 @@ function loadConversations(): Conversation[] {
             typeof c.id === "string" &&
             typeof c.title === "string" &&
             Array.isArray(c.messages) &&
+            c.messages.every(
+              (m: unknown) =>
+                m &&
+                typeof m === "object" &&
+                typeof (m as Record<string, unknown>).id === "string" &&
+                ((m as Record<string, unknown>).role === "user" ||
+                  (m as Record<string, unknown>).role === "assistant") &&
+                typeof (m as Record<string, unknown>).content === "string"
+            ) &&
             typeof c.createdAt === "number" &&
             typeof c.updatedAt === "number"
         )
@@ -113,15 +122,24 @@ export function useConversation() {
     }, 300);
   }, []);
 
-  // 组件卸载时：清除定时器，若有待写入数据则同步落盘
+  // 组件卸载 / 页面关闭时：清除定时器，若有待写入数据则同步落盘
   useEffect(() => {
-    return () => {
+    const flushPendingSave = () => {
       if (saveTimerRef.current) {
         clearTimeout(saveTimerRef.current);
-        if (pendingSaveRef.current) {
-          saveConversations(pendingSaveRef.current);
-        }
+        saveTimerRef.current = null;
       }
+      if (pendingSaveRef.current) {
+        saveConversations(pendingSaveRef.current);
+        pendingSaveRef.current = null;
+      }
+    };
+
+    window.addEventListener("pagehide", flushPendingSave);
+
+    return () => {
+      window.removeEventListener("pagehide", flushPendingSave);
+      flushPendingSave();
     };
   }, []);
 
@@ -134,6 +152,22 @@ export function useConversation() {
             ? c.title
             : getConversationTitle(newMessages);
           return { ...c, messages: newMessages, title, updatedAt: Date.now() };
+        });
+        persistConversations(next);
+        return next;
+      });
+    },
+    [activeId, persistConversations]
+  );
+
+  // 基于 state 最新值，局部更新 assistant 消息（避免闭包快照覆盖）
+  const updateAssistantMessage = useCallback(
+    (assistantId: string, patch: Partial<ConversationMessage>) => {
+      setConversations((prev) => {
+        const next = prev.map((c) => {
+          if (c.id !== activeId) return c;
+          const msgs = c.messages.map((m) => (m.id === assistantId ? { ...m, ...patch } : m));
+          return { ...c, messages: msgs, updatedAt: Date.now() };
         });
         persistConversations(next);
         return next;
@@ -179,5 +213,6 @@ export function useConversation() {
     createConversation,
     switchConversation,
     updateMessages,
+    updateAssistantMessage,
   };
 }

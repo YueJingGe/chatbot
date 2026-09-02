@@ -5,7 +5,6 @@ import ScrollToBottomButton from "./components/ScrollToBottomButton";
 import { ConversationSidebar } from "./components/ConversationSidebar";
 import { QuestionHistoryPanel } from "./components/QuestionHistoryPanel";
 import { useConversation } from "./hooks/useConversation";
-import type { ConversationMessage } from "./types/conversation";
 import styles from "./App.module.less";
 
 function App() {
@@ -16,6 +15,7 @@ function App() {
     createConversation,
     switchConversation,
     updateMessages,
+    updateAssistantMessage,
   } = useConversation();
 
   const [inputText, setInputText] = useState("");
@@ -121,7 +121,6 @@ function App() {
       const reader = response.body.getReader();
       const decoder = new TextDecoder("utf-8");
       let fullReply = "";
-      let currentStatus: string | undefined;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -138,26 +137,23 @@ function App() {
             }
             try {
               const data = JSON.parse(dataStr);
-              // 始终从基础快照 + 累积值重建，避免后续事件覆盖先前内容
-              const buildMsg = (overrides: Partial<ConversationMessage>) => {
-                const msgs = [...messagesWithAssistant];
-                const idx = msgs.findIndex((m) => m.id === assistantMessageId);
-                if (idx !== -1) {
-                  msgs[idx] = { ...msgs[idx], ...overrides };
-                }
-                return msgs;
-              };
               if (data.error) {
-                updateMessages(buildMsg({ content: `抱歉，服务端出错：${data.error}` }));
+                updateAssistantMessage(assistantMessageId, {
+                  content: `抱歉，服务端出错：${data.error}`,
+                });
                 break;
               }
               if (data.status) {
-                currentStatus = data.message;
-                updateMessages(buildMsg({ content: fullReply, statusMessage: currentStatus }));
+                updateAssistantMessage(assistantMessageId, {
+                  statusMessage: data.message,
+                });
               }
               if (data.chunk) {
                 fullReply += data.chunk;
-                updateMessages(buildMsg({ content: fullReply, statusMessage: undefined }));
+                updateAssistantMessage(assistantMessageId, {
+                  content: fullReply,
+                  statusMessage: undefined,
+                });
               }
             } catch {
               /* 忽略解析错误 */
@@ -171,16 +167,13 @@ function App() {
       }
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.error("发送失败:", error);
-      const errorMsg = [...messagesWithAssistant];
-      const idx = errorMsg.findIndex((m) => m.id === assistantMessageId);
-      if (idx !== -1) {
-        errorMsg[idx] = { ...errorMsg[idx], content: `抱歉，出错了: ${errorMessage}` };
-      }
-      updateMessages(errorMsg);
+      updateAssistantMessage(assistantMessageId, {
+        content: `抱歉，出错了: ${errorMessage}`,
+      });
     } finally {
       setIsLoading(false);
     }
-  }, [updateMessages]);
+  }, [updateMessages, updateAssistantMessage]);
 
   const handleKeyPress = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
