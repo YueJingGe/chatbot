@@ -1,15 +1,19 @@
 #!/usr/bin/env sh
 # 拦截直接向受保护分支推提交（绕过 PR）。真正的强制在 GitHub ruleset，本钩子是本地提醒。
-#   main：完全禁止直推
+#   main：完全禁止直推（含 develop → main、feature → main，均禁止）
 #   release/*：允许创建/删除分支，仅拦截直接推提交（更新）
 #   feature/* fix/*：push 前自动同步 main，未同步则 rebase 后拒绝本次 push（需重新 push）
+#   develop：不设本地拦截（沙箱，允许快速迭代），保护依赖 GitHub ruleset
 
 zero="0000000000000000000000000000000000000000"
 
 while read -r local_ref local_oid remote_ref remote_oid; do
   case "$remote_ref" in
     refs/heads/main)
-      echo "❌ 禁止直接 push 到 main，请走 PR：feature/* → develop → release → main"
+      echo "❌ 禁止直接 push 到 main"
+      echo "   合法路径：feature/* → release/vX.Y.Z → main（常规发布）"
+      echo "            hotfix/* → main（紧急修复）"
+      echo "   develop → main 也禁止，develop 是集成沙箱，不作为发布源"
       exit 1
       ;;
     refs/heads/release/*)
@@ -39,7 +43,8 @@ case "$current_branch" in
         echo "⚠️ 无法 fetch $current_branch 远端引用，--force-with-lease 可能因 stale info 失败"
       fi
     elif [ $ls_remote_exit -ne 0 ]; then
-      echo "⚠️ ls-remote 查询失败，请检查网络连接"
+      echo "❌ ls-remote 查询失败，请检查网络连接后重试"
+      exit 1
     fi
     if ! git merge-base --is-ancestor origin/main HEAD; then
       echo "⚡ $current_branch 未同步 main，自动 rebase..."
