@@ -5,20 +5,35 @@ description: 分支操作流程（开分支/合并/发布/解冲突/hotfix）。
 
 # Git Branch 操作流程
 
-> 分支规范见 `docs/harness/git-workflow.md`。本文件只讲 AI 怎么执行。
+> 执行之前先阅读 `docs/harness/git-workflow.md` 规范
 
-## 意图识别原则
+## 红线（不可违反）
+1. 不在 `main` / `release/*` 上直接 commit
+2. 不 force-push，除非 `--force-with-lease`
+3. 不修改发布分支历史（`pull --ff-only`，分叉则停止）
+4. commit message 走 `git-commit` skill，不在本 skill 里写
 
-执行分支操作前，先识别用户意图：
-- **唯一匹配**：只有一条合法路径 → 说明理解，直接执行
-- **多条匹配**：多条路径都合法 → 列出选项及各自后果，让用户选
-- **无法匹配**：无法判断意图 → 说明困惑点，让用户澄清
-- **低置信度**：有猜测但不确定 → 说明猜测和依据，让用户确认或纠正
-- **完成态告知**：用户告知某阶段已完成（如"已经发布了"）→ 视为触发信号，自动执行该阶段的后续步骤，不需要用户指示
+## 通用规则
 
-禁止在多条匹配或低置信度时自行选择。
+### 目标分支不明确时的处理（如"合并"、"合代码"、"push"）：
 
-## PR 操作规则
+1. 获取所有远程分支：`git branch -r | grep -v 'HEAD' | sed 's|origin/||'`
+2. 按类型分组展示给用户，**标注推荐项**（与本分支同名的远程分支），示例：
+```
+当前分支：xxx
+请选择目标分支：
+1. 推荐（与本分支同名远程分支）：xxx
+2. xxx
+...
+```
+
+### 关键信息缺失时追问
+
+- 开分支但未提供分支名 → 询问分支名
+- 发布但未提供版本号 → 询问版本号（或从分支名提取）
+- 回滚但未指定范围 → 询问回滚范围
+
+### 开 PR 
 
 凡涉及用户开 PR 的步骤，必须同时提供：
 - **PR 标题**：简洁描述改动范围
@@ -33,31 +48,65 @@ description: 分支操作流程（开分支/合并/发布/解冲突/hotfix）。
 3. 给出分类清单 + 修复建议（哪些修、哪些进 ISSUES、哪些拆 feature 分支）
 4. 等用户确认后动手
 
-## 常规功能
+### 冲突处理
+
+> 冲突分级规则见 `git-workflow.md` §9。
+
+
+## 意图识别
+
+将用户意图 + 当前分支名 + 目标分支 → 对照 `docs/harness/git-workflow.md` 第 2 节路径约束表查询：
+
+| 匹配结果 | AI 行为 |
+|---------|--------|
+| **唯一匹配**（路径表中只有一条合法路径） | 直接执行，不问用户 |
+| **多条匹配**（路径表中多条路径都符合） | 列出选项及后果，让用户选 |
+| **无匹配**（路径表中无此路径） | 说明困惑点，请用户澄清 |
+| **低置信度**（有猜测但不确定） | 说明猜测和依据，让用户确认或纠正 |
+| **完成态告知**（"已发布"等） | 自动触发 `## 发布后步骤` 中对应流程的步骤，不需要用户指示 |
+
+
+## 操作流程
+
+### 开分支
 
 ```bash
-# 从 main 切
 git checkout main && git pull
-git checkout -b feature/xxx
-# 开发 + 提交（走 git-commit skill）
-git push -u origin feature/xxx
-# 开 PR: feature/xxx → develop（CI + 测试）
-# 测过后开 PR: feature/xxx → release/vX.Y.Z（code-review 门禁，人定这轮发哪些）
+git checkout -b <分支名>
 ```
 
-## 发布
+> 分支名格式参考 `git-workflow.md` 中的分支命名规范
 
-执行前：读 `docs/harness/git-workflow.md` 确认路径约束。
+### commit
 
-### 判断紧急程度
+走 `git-commit` skill
 
-用户说「发布/上线/发版」时，先判断是否紧急：
-- 紧急 → hotfix 流程（直达 main）
-- 非紧急 → release 流程
+### push
 
-不确定就问用户。
+1. 检查当前分支是否落后 main，落后则 `git rebase main`（见 `git-workflow.md` §8），否则跳过。
 
-### release 流程
+2. push 之前确定目标分支，然后执行
+```bash
+git push -u origin <目标分支>
+```
+
+### 发布
+
+执行前：
+
+1. 读 `docs/harness/git-workflow.md` 确认路径约束。
+2. 做发布路径判断
+| 条件 | 路径 |
+|------|------|
+| 当前分支是 `hotfix/` 前缀 | 发布 hotfix 流程（直达 main） |
+| 当前分支是 `feature/` 或 `fix/` 前缀 | 发布 release 流程 |
+| 用户明确说了"hotfix"或"紧急修复" | 发布 hotfix 流程 |
+| 当前分支是 `release/` 前缀，用户说"发布" | 将 release 分支发布到 main |
+
+判断出来之后跟用户确认发布路径，用户确认通过后走相应的流程
+
+### 发布 release 流程
+
 
 **准备阶段**（本地执行）：
 
@@ -92,15 +141,7 @@ git log main..release/vX.Y.Z --oneline  # 展示已合入的 commit 清单
 # 4. PR: release → main（CI + CodeRabbit，网页合并）
 ```
 
-**发布后步骤**（PR 合并后必须执行，不需要用户指示。用户说"已经发布了"、"发布完了"等完成态表述时，立即告知用户将会执行以下步骤，用户确认完之后执行）：
-
-1. `git checkout main && git pull`
-2. `git tag vX.Y.Z && git push origin vX.Y.Z`
-3. `git checkout develop && git pull --ff-only origin develop && git merge main && git push origin develop`
-4. `git push origin --delete release/vX.Y.Z`
-5. 如有后续功能待发布：`git checkout main && git checkout -b release/v<next-version> && git push -u origin release/v<next-version>`（执行前确认完整版本号）
-
-### hotfix 流程
+### 发布 hotfix 流程
 
 **准备阶段**：
 
@@ -112,56 +153,44 @@ git push -u origin hotfix/xxx
 # 开 PR: hotfix/xxx → main（快速 review，网页合并）
 ```
 
-**发布后步骤**（PR 合并后必须执行，不需要用户指示。用户说"已经发布了"、"发布完了"等完成态表述时，立即执行以下步骤）：
+### 将 release 分支发布到 main
+
+> 触发条件：当前分支是 `release/vX.Y.Z`，用户说"发布"。
+
+**执行步骤**：
+
+1. 预发布检查：
+```bash
+git checkout release/vX.Y.Z && git pull --ff-only
+git log main..release/vX.Y.Z --oneline  # 展示 commit 清单
+```
+
+2. 向用户展示 commit 清单，确认以下检查项（参照 `git-workflow.md` §4）：
+   - 每个 feature PR 的 CI 状态（GitHub Actions 全绿）
+   - CodeRabbit 审查结果均已解决或可忽略
+
+3. 用户确认后，开 PR：`release/vX.Y.Z` → `main`（CI + CodeRabbit）
+   - **PR 由用户在 GitHub 网页操作合并**，AI 不自动合并
+
+4. 用户确认合并完成后，触发 `## 发布后步骤`
+
+## 发布后步骤
+
+> **触发时机**：PR 合并到 main 后自动执行，不需要用户指示。用户说"已经发布了"、"发布完了"、"已发布"等完成态表述时，立即告知用户将要执行以下步骤，用户确认后执行。
 
 1. `git checkout main && git pull`
 2. `git tag vX.Y.Z && git push origin vX.Y.Z`
 3. `git checkout develop && git pull --ff-only origin develop && git merge main && git push origin develop`
 
-## rebase（feature 落后 main 时）
-
-```bash
-git checkout feature/xxx
-git rebase main   # 保持线性历史，不要 git merge main
-```
-
-## 冲突分级处理
-
-| 冲突类型 | 处理方 | 做法 |
-|---------|-------|------|
-| `package-lock.json` | AI | 删掉重跑 `npm install` |
-| 同步产物（`.claude/skills/`、`.cursorignore`） | AI | 重跑 `npm run sync:agents` |
-| 不同文件的改动 | Git 自动 | 无需干预 |
-| 同文件不同区域 | AI | 保留双方 |
-| **同一函数双方都改** | **人** | AI 停下，列出双方意图，等人决策 |
-| **语义冲突**（无文本冲突但逻辑打架） | **人** | AI 只提示风险，不自作主张 |
-
-## develop 退出某功能
-
-- `git revert -m 1 <merge-commit>`（可逆），或从 main 重建 develop 后 re-merge 要留的 feature
+如果是 release 分支发布，则额外执行：
+4. `git push origin --delete release/vX.Y.Z`
+5. 跟用户确认后续是否还有功能待发布，如确定有，则执行：
+`git checkout main && git checkout -b release/v<next-version> && git push -u origin release/v<next-version>`（执行前确认完整版本号）
+如没有，则跳过。
 
 ## 多 agent 并行（worktree）
 
-> 行业标准：每个 agent 一个 worktree（独立目录 + 独立分支），共享同一 `.git` 历史，互不干扰。
-> 来源：Superset、Nx、Augment Code 等多 agent 工作流的通用实践。
-
-### 核心原则
-
-1. **一任务一 worktree**：每个 agent / 每个功能一个独立工作目录，不在同一目录切换分支
-2. **任务必须独立**：不同 worktree 不应大量修改同一文件，否则合并时冲突无法自动解决
-3. **独立依赖**：每个 worktree 有自己的 `node_modules`，需单独 `npm install`
-4. **独立端口**：dev server 端口不能冲突（如 5173 / 5174 / 5175...）
-5. **独立 review**：每个 worktree 产出独立 diff，各自开 PR 各自审查
-
-### 目录结构
-
-```text
-Desktop/ai/
-├── chatbot/              ← 主仓库（main / develop）
-├── chatbot-featA/        ← worktree：feature/a
-├── chatbot-featB/        ← worktree：feature/b
-└── chatbot-hotfix/       ← worktree：hotfix/xxx
-```
+> 核心原则、注意事项见 `git-workflow.md` §10-11。以下仅列操作命令。
 
 ### 操作命令
 
@@ -181,18 +210,6 @@ git worktree remove ../chatbot-featA
 # 清理已删除目录的 worktree 引用
 git worktree prune
 ```
-
-### 注意事项
-
-| 项目 | 说明 |
-|------|------|
-| `node_modules` | 不共享，每个 worktree 独立 `npm install` |
-| 端口冲突 | 主仓库用 5173/3000，其他 worktree 需改端口（`vite --port 5174`） |
-| 内存占用 | 每个 worktree + dev server 约 500MB-1GB，建议不超过 3-4 个并行 |
-| `.env` | 每个 worktree 独立，需各自配置 `server/.env` |
-| Git hook | 共享 `.husky/`，hook 行为一致 |
-| 合并顺序 | 先合的 PR 可能影响后合的——后合的需 rebase main |
-| 清理 | 功能合并后及时 `git worktree remove`，避免目录堆积 |
 
 ### 本项目的 worktree 流程
 
