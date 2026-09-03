@@ -4,7 +4,7 @@
 
 用户说`提交`
 
-agent执行 `git commit  skill`，按照 git-commit 工作流开始执行：
+agent 执行 `git commit  skill`，按照 git-commit 工作流开始执行：
 
 1、先并行跑质量检查和查看当前变更状态
 2、然后 `check:all` 全部通过之后查看当前分支具体改动
