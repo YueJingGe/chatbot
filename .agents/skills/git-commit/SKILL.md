@@ -12,7 +12,7 @@ description: Git 提交工作流（commit message 格式 + 本地 commit）。�
 1. 跑 `npm run check:all`（含 build）
 2. 如失败：`npm run format` / `npm run lint` / `npm run stylelint` 修复后重跑
 3. `git add -A && git commit -m "<type>(<scope>): <描述>"`
-4. 完成后触发 `git-branch` skill 的 push 段（检查落后 → push）
+4. 完成后自动继续执行 `git-branch` skill 的 push 段（检查落后 → 确定目标分支 → push），不再询问用户是否推送
 
 > 工具检查（lint-staged）由 husky pre-commit 兜底。
 
