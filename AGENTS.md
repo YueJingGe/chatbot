@@ -20,7 +20,7 @@ AI 对话机器人 monorepo，npm workspaces 管理前端（web/）和后端（s
 |`docs/reference/`|命名 / markdown / css / 组件写法|
 |`docs/specs/` / `docs/exec-plans/`|需求规格 / 执行计划（active + completed）|
 |`.agents/skills/code-review/SKILL.md`（IDE 内手动审查）|code review|
-|`.agents/skills/git-commit/SKILL.md`（commit message + push）|git 提交|
+|`.agents/skills/git-commit/SKILL.md`（commit message）|git 提交|
 |`.agents/skills/git-branch/SKILL.md`（操作流程）|开分支/合并/发布/冲突/hotfix|
 |`docs/harness/git-workflow.md`|分支模型/路径约束/版本号/禁止项/发布流程/冲突处理/worktree|
 
@@ -49,6 +49,6 @@ AI 对话机器人 monorepo，npm workspaces 管理前端（web/）和后端（s
 - 改 web/src/** 涉及布局/样式/响应式/交互：调 `.agents/skills/frontend-visual-verification/SKILL.md`（4 档：T1 DOM 探针 / T2 单截图 / T3 多断点 / T4 含交互态）
 - 用户说 review/审查：走 `.agents/skills/code-review/SKILL.md`
 - 任务首次代码改动前：`git rev-parse --abbrev-ref HEAD` 确认分支；main / release/* 先按 `.agents/skills/git-branch/SKILL.md` 切 feature 分支
-- commit/push 走 `git-commit` SKILL；分支/合并/发布/冲突/hotfix 走 `git-branch` SKILL
+- commit 走 `git-commit` SKILL（本地 commit）；push 走 `git-branch` SKILL（检查落后 → push）；分支/合并/发布/冲突/hotfix 也走 `git-branch` SKILL
 - 实现完成：`npm run check:all` 通过后主动询问是否需要 code review
 - 完成任务 / 声称修复：必须给可验证证据（命令输出 / 截图 / 数据），不是「应该好了」

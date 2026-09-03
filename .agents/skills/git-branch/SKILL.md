@@ -11,7 +11,7 @@ description: 分支操作流程（开分支/合并/发布/解冲突/hotfix）。
 1. 不在 `main` / `release/*` 上直接 commit
 2. 不 force-push，除非 `--force-with-lease`
 3. 不修改发布分支历史（`pull --ff-only`，分叉则停止）
-4. commit message 走 `git-commit` skill，不在本 skill 里写
+4. commit 走 `git-commit` skill（含 message 格式），本 skill 只管 push 及分支操作
 
 ## 通用规则
 
@@ -76,10 +76,6 @@ git checkout -b <分支名>
 ```
 
 > 分支名格式参考 `git-workflow.md` 中的分支命名规范
-
-### commit
-
-走 `git-commit` skill
 
 ### push
 
