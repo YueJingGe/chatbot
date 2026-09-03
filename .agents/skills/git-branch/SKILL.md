@@ -107,6 +107,13 @@ git push -u origin <目标分支>
 **准备阶段**（本地执行）：
 
 ```bash
+# 0. 检查当前分支是否落后 main，落后则先 rebase（与 push 段规则一致）
+git fetch origin main
+if [ -n "$(git log HEAD..origin/main --oneline)" ]; then
+  echo "⚠️ 当前分支落后 main，先执行 git rebase origin/main"
+  git rebase origin/main || { echo "❌ rebase 冲突，请人工解决后重试"; exit 1; }
+fi
+
 # 1. 刷新远端引用，再检查 release 分支（避免本地 refs 过期误报）
 if ! git fetch --prune origin; then
   echo "❌ 无法刷新远端引用，请检查网络连接后重试"
