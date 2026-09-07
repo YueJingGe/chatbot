@@ -55,7 +55,7 @@ hotfix/*                   ← 从 main 切，紧急修复，绕过 release，�
 
 `release/*` 或 `hotfix/*` 合入 `main` 后，**必须按顺序**执行：
 
-1. 本地同步 main：`git checkout main && git pull`
+1. 本地同步 main：`git checkout main && git pull --ff-only origin main`
 2. 打 tag：`git tag vX.Y.Z && git push origin vX.Y.Z`（只推 tag）
 3. 同步 develop：`git checkout develop && git pull --ff-only origin develop && git merge main && git push origin develop`
 4. 询问是否清理当前 release：若是，则`git push origin --delete release/vX.Y.Z`，如不是，则跳过此步骤。

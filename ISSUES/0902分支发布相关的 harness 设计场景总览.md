@@ -70,7 +70,7 @@
 **发布后步骤（告知用户后面步骤，用户确认后开始执行）：**
 
 ```bash
-git checkout main && git pull # 1. 更新本地 main 保持和远程一致
+git checkout main && git pull --ff-only origin main # 1. 更新本地 main 保持和远程一致
 git tag vX.Y.Z && git push origin vX.Y.Z # 2. 打tag
 git checkout develop && git pull --ff-only origin develop && git merge main && git push origin develop # 3. 确保 develop 同步 main 代码
 git push origin --delete release/vX.Y.Z # 4. 删除 release 分支
@@ -93,7 +93,7 @@ git push origin --delete release/vX.Y.Z # 4. 删除 release 分支
 
 **流程：**
 
-1. `git checkout main && git pull`
+1. `git checkout main && git pull --ff-only`
 2. `git checkout -b hotfix/xxx`
 3. 修复 + 提交 + push（push 时 pre-push hook 自动同步 main）
 4. 在 GitHub 网页创建 PR：`hotfix/xxx → main`（快速 review） ⚠️需要手动创建，AI不会自动创建
@@ -101,7 +101,7 @@ git push origin --delete release/vX.Y.Z # 4. 删除 release 分支
 
 **发布后步骤（告知用户后面步骤，用户确认后开始执行）：**
 
-1. `git checkout main && git pull`
+1. `git checkout main && git pull --ff-only`
 2. `git tag vX.Y.Z && git push origin vX.Y.Z`
 3. `git checkout develop && git pull --ff-only origin develop && git merge main && git push origin develop`
 
@@ -123,7 +123,7 @@ git push origin --delete release/vX.Y.Z # 4. 删除 release 分支
 
 **规范：** 禁止。必须经 release 或 hotfix 路径。
 
-**harness 支持度：** 本地 hook 拦截所有对 main 的直接 push（不管当前在哪个分支）；但 **PR 合并**是 GitHub 服务器端操作，不走本地 hook，需依赖 GitHub ruleset（要求 PR 审查）来保证 feature/fix 不能绕过 release/hotfix 路径直接合入 main。
+**harness 支持度：** 本地 hook 拦截所有对 main 的直接 push（不管当前在哪个分支）；但 **PR 合并**是 GitHub 服务器端操作，不走本地 hook。当前 main ruleset 未限制 PR 来源分支且 `required_approving_review_count` 为 0，因此 feature/fix 技术上可直接 PR 合入 main（违反规范但 hook 无法拦截）。需后续在 ruleset 添加来源分支校验或提升审批数。
 
 ---
 
