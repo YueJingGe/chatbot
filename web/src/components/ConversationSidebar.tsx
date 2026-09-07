@@ -1,4 +1,4 @@
-import { memo, useCallback } from "react";
+import { memo, useCallback, KeyboardEvent } from "react";
 import { Button, List } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import type { Conversation } from "../types/conversation";
@@ -29,6 +29,16 @@ const ConversationSidebar = memo(
       [onSelectConversation]
     );
 
+    const handleItemKeyDown = useCallback(
+      (e: KeyboardEvent, id: string) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onSelectConversation(id);
+        }
+      },
+      [onSelectConversation]
+    );
+
     return (
       <aside className={styles.sidebar}>
         <div className={styles["sidebar__header"]}>
@@ -46,6 +56,9 @@ const ConversationSidebar = memo(
               <List.Item
                 className={`${styles["sidebar__item"]} ${item.id === activeId ? styles["sidebar__item--active"] : ""}`}
                 onClick={() => handleSelect(item.id)}
+                onKeyDown={(e) => handleItemKeyDown(e, item.id)}
+                role="button"
+                tabIndex={0}
               >
                 <span className={styles["sidebar__itemtext"]}>{item.title}</span>
               </List.Item>
