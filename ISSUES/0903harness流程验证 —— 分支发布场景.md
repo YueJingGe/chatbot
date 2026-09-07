@@ -4,7 +4,7 @@
 
 用户说 `发布`
 
-agent 执行 `git branch  skill`：
+agent 执行 `git-branch skill`：
 
 1. 先确认当前分支状态和规范
 2. 然后查看 `git-workflow.md` 文件，按路径约束，确认当前分支走什么发布流程
@@ -50,7 +50,14 @@ agent 执行 `git branch  skill`：
 agent 开始执行：
 
 1. 先检查是否落后 main。不落后 main，直接 push。
-2. 按照计划路径开始执行
+2. 按照计划路径开始执行：先从 main 创建 release 分支并推送
+
+```bash
+git checkout main && git pull --ff-only
+git checkout -b release/v1.1.1
+git push -u origin release/v1.1.1
+```
+
 3. 开 PR，给出 PR 标题、描述
 
 ```md

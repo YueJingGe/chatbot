@@ -79,7 +79,7 @@ git checkout -b <分支名>
 
 ### push
 
-1. 检查当前分支是否落后 main，落后则 `git rebase main`（见 `git-workflow.md` §8），否则跳过。
+1. 仅 `feature/*` 或 `fix/*` 分支检查是否落后 main，落后则 `git rebase main`（见 `git-workflow.md` §8），否则跳过。`release/*` 等禁止改写历史的分支不执行 rebase。
 
 2. push 之前确定目标分支，然后执行
 ```bash
@@ -108,7 +108,10 @@ git push -u origin <目标分支>
 
 ```bash
 # 0. 检查当前分支是否落后 main，落后则先 rebase（与 push 段规则一致）
-git fetch origin main
+if ! git fetch origin main; then
+  echo "❌ 无法 fetch origin main，请检查网络连接后重试"
+  exit 1
+fi
 if [ -n "$(git log HEAD..origin/main --oneline)" ]; then
   echo "⚠️ 当前分支落后 main，先执行 git rebase origin/main"
   git rebase origin/main || { echo "❌ rebase 冲突，请人工解决后重试"; exit 1; }
@@ -125,11 +128,11 @@ if [ -n "$existing_releases" ]; then
   echo "$existing_releases"
   echo ""
   echo "选项 A：复用已有分支 → git checkout <目标分支> && git pull --ff-only"
-  echo "选项 B：从 main 创建新版本 → git checkout main && git pull && git checkout -b release/v<新版本>"
+  echo "选项 B：从 main 创建新版本 → git checkout main && git pull --ff-only && git checkout -b release/v<新版本>"
   echo "请用户选择"
 else
   echo "无 release 分支，从 main 新建"
-  git checkout main && git pull
+  git checkout main && git pull --ff-only
   git checkout -b release/vX.Y.Z && git push -u origin release/vX.Y.Z
 fi
 
@@ -149,7 +152,7 @@ git log main..release/vX.Y.Z --oneline  # 展示已合入的 commit 清单
 **准备阶段**：
 
 ```bash
-git checkout main && git pull
+git checkout main && git pull --ff-only
 git checkout -b hotfix/xxx
 # 修复 + 提交 + push
 git push -u origin hotfix/xxx
@@ -181,7 +184,7 @@ git log main..release/vX.Y.Z --oneline  # 展示 commit 清单
 
 > **触发时机**：PR 合并到 main 后自动执行，不需要用户指示。用户说"已经发布了"、"发布完了"、"已发布"等完成态表述时，立即告知用户将要执行以下步骤，用户确认后执行。
 
-1. `git checkout main && git pull`
+1. `git checkout main && git pull --ff-only`
 2. `git tag vX.Y.Z && git push origin vX.Y.Z`
 3. `git checkout develop && git pull --ff-only origin develop && git merge main && git push origin develop`
 

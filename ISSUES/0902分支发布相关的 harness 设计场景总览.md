@@ -13,7 +13,7 @@
 5. rebase 后的推送策略：远端分支已存在 → `git push --force-with-lease`；远端不存在 → `git push -u origin`
 6. `pre-commit` hook 在 commit 时自动跑 `lint-staged` 代码质量检查
 
-**harness 支持度：** 完整覆盖。[pre-push](../.husky/pre-push) 实现了自动同步机制，[git-commit SKILL.md](../.agents/skills/git-commit/SKILL.md) 覆盖了 commit + push 全流程。
+**harness 支持度：** 完整覆盖。[pre-push](../.husky/pre-push) 实现了自动同步机制，[git-commit SKILL.md](../.agents/skills/git-commit/SKILL.md) 覆盖了本地 commit 流程，push 由 [git-branch SKILL.md](../.agents/skills/git-branch/SKILL.md) 负责。
 
 ---
 
@@ -77,7 +77,7 @@ git push origin --delete release/vX.Y.Z # 4. 删除 release 分支
 # 5. 如有后续功能待发布（执行前确认完整版本号）：从 main 切出新 release 分支
 ```
 
-**harness 支持度：** 完整覆盖。[git-branch SKILL.md](../.agents/skills/git-branch/SKILL.md#L108-L142) 有完整的 release 流程和发布后步骤，[docs/harness/git-workflow.md](../docs/harness/git-workflow.md#L35-L50) 有预发布规则和发布后步骤。
+**harness 支持度：** 完整覆盖。[git-branch SKILL.md](../.agents/skills/git-branch/SKILL.md#发布-release-流程) 有完整的 release 流程和发布后步骤，[docs/harness/git-workflow.md](../docs/harness/git-workflow.md#4-发布-main-前检查清单强制人工确认) 有预发布规则和发布后步骤。
 
 ---
 
