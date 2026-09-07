@@ -79,7 +79,7 @@ git checkout -b <分支名>
 
 ### push
 
-1. 仅 `feature/*` 或 `fix/*` 分支检查是否落后 main，落后则 `git rebase main`（见 `git-workflow.md` §8），否则跳过。`release/*` 等禁止改写历史的分支不执行 rebase。
+1. `feature/*`、`fix/*`、`hotfix/*` 分支检查是否落后 main，落后则 `git rebase main`（见 `git-workflow.md` §8），否则跳过。`release/*` 等禁止改写历史的分支不执行 rebase。
 
 2. push 之前确定目标分支，然后执行
 ```bash
@@ -221,7 +221,8 @@ git worktree prune
 
 ```bash
 # 1. 主仓库保持 main 分支
-cd /Users/a211026/Desktop/ai/chatbot
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
 
 # 2. 为每个功能创建 worktree
 git worktree add ../chatbot-featA -b feature/a main
@@ -234,6 +235,6 @@ npm install
 # 开 PR: feature/a → release/vX.Y.Z
 
 # 4. 完成后清理
-cd /Users/a211026/Desktop/ai/chatbot
+cd "$REPO_ROOT"
 git worktree remove ../chatbot-featA
 ```

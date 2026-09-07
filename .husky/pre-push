@@ -2,7 +2,7 @@
 # 拦截直接向受保护分支推提交（绕过 PR）。真正的强制在 GitHub ruleset，本钩子是本地提醒。
 #   main：完全禁止直推（含 develop → main、feature → main，均禁止）
 #   release/*：允许创建/删除分支，仅拦截直接推提交（更新）
-#   feature/* fix/*：push 前自动同步 main，未同步则 rebase 后拒绝本次 push（需重新 push）
+#   feature/* fix/* hotfix/*：push 前自动同步 main，未同步则 rebase 后拒绝本次 push（需重新 push）
 #   develop：不设本地拦截（沙箱，允许快速迭代），保护依赖 GitHub ruleset
 
 zero="0000000000000000000000000000000000000000"
@@ -26,10 +26,10 @@ while read -r local_ref local_oid remote_ref remote_oid; do
   esac
 done
 
-# feature/fix 分支：自动同步 main
+# feature/fix/hotfix 分支：自动同步 main
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 case "$current_branch" in
-  feature/*|fix/*)
+  feature/*|fix/*|hotfix/*)
     # 必抓 main
     if ! git fetch origin main 2>/dev/null; then
       echo "❌ 无法 fetch origin main，请检查网络连接后重试"
