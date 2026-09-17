@@ -14,5 +14,5 @@
 - header 长度`120`|中文描述比英文短，120 足够；
 - body 长度 `200`，项目当前不写长 body，设 200 防止自动换行过长
 
-> 需求归档在 `docs/specs/active/2026-09-17-feature-commitlint-and-czg.md`
-> 执行计划归档在`docs/exec-plans/active/2026-09-17-feature-commitlint-and-czg.md`
+> 需求归档在 `docs/specs/completed/2026-09-17-feature-commitlint-and-czg.md`
+> 执行计划归档在`docs/exec-plans/completed/2026-09-17-feature-commitlint-and-czg.md`

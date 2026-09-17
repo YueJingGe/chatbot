@@ -1,6 +1,6 @@
 # Plan: 接入 commitlint + czg 统一提交信息规范
 
-> 对应 spec：`docs/specs/active/2026-09-17-feature-commitlint-and-czg.md` | 启动 2026-09-17
+> 对应 spec：`docs/specs/completed/2026-09-17-feature-commitlint-and-czg.md` | 启动 2026-09-17
 
 ## 任务分解
 
@@ -21,7 +21,7 @@
 
 ## 验证方式
 
-- [ ] `npm run check:all` 通过
-- [ ] `npx commitlint --from=HEAD~1 --to=HEAD` 对最近一次提交不报错
-- [ ] `echo "bad message" | npx commitlint` 返回非零退出码
-- [ ] `npx czg --help`（或启动一次交互流程）无报错
+- [x] `npm run check:all` 通过
+- [x] `npx commitlint --from=HEAD~1 --to=HEAD` 对最近一次提交不报错
+- [x] `echo "bad message" | npx commitlint` 返回非零退出码
+- [x] `npx czg --help`（或启动一次交互流程）无报错
