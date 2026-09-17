@@ -50,9 +50,9 @@
 
 ## 设计约束
 
-### AGENTS.md 行数硬上限
+### AGENTS.md 行数预算
 
-**60 行**。超过即违反 harness 设计。任何 ≥ 3 步的规则必须外移到 `.agents/skills/` 或 `.agents/context/`。每加一条 Protocol 规则自检：
+**60 行为常态预算**；确有必要时可适度超出，需给出必要性理由。任何 ≥ 3 步的规则必须外移到 `.agents/skills/` 或 `.agents/context/`。每加一条 Protocol 规则自检：
 
 > 这能压成 1 行吗？压不成 → 外移。
 
@@ -61,7 +61,7 @@
 |文件|职责|不放什么|
 |-|-|-|
 |`README.md`|给人和 AI 共读的入口|详细规范|
-|`AGENTS.md`|给 AI 的导航入口（< 60 行）|细节正文|
+|`AGENTS.md`|给 AI 的导航入口（60 行为常态预算）|细节正文|
 |`.agents/context/`|稳定事实：技术栈、架构、工作流|任务 workflow|
 |`.agents/skills/`|任务 workflow（按需触发）|稳定事实|
 |`docs/harness/`|前后端架构规范|AI 入口|

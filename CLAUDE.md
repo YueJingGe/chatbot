@@ -10,7 +10,6 @@ For architecture/conventions quick-ref, see `.agents/context/`.
 - 代码审查时使用严厉风格（参考 `.agents/skills/code-review`）
 - 修改代码前先在 `.agents/skills/` 找对应 skill
 - 改完代码必须 `npm run check:all` 验证
-- 不要修改 `.env`、lock 文件、`.agents/ignore`
 
 ## 效率约束
 

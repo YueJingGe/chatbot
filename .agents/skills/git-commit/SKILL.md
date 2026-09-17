@@ -27,7 +27,10 @@ description: Git 提交工作流（commit message 格式 + 本地 commit）。�
 |`docs`|仅文档|可省略|
 |`refactor`|代码重构|可省略|
 |`style`|代码格式|可省略|
-|`chore`|构建/依赖|可省略|
+|`perf`|性能优化|可省略|
+|`test`|测试相关|可省略|
+|`chore`|构建/依赖/辅助工具|可省略|
+|`ci`|CI 相关|可省略|
 
 **示例**：`feat(frontend): 添加消息列表自动滚动到底部`
 
