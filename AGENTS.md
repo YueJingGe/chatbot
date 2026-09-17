@@ -49,6 +49,6 @@ AI 对话机器人 monorepo，npm workspaces 管理前端（web/）和后端（s
 - 改 web/src/** 涉及布局/样式/响应式/交互：调 `.agents/skills/frontend-visual-verification/SKILL.md`（4 档：T1 DOM 探针 / T2 单截图 / T3 多断点 / T4 含交互态）
 - 用户说 review/审查：走 `.agents/skills/code-review/SKILL.md`
 - 任务首次代码改动前：`git rev-parse --abbrev-ref HEAD` 确认分支；main / release/* 先按 `.agents/skills/git-branch/SKILL.md` 切 feature 分支
-- commit 走 `git-commit` SKILL（本地 commit）；push 走 `git-branch` SKILL（检查落后 → push）；分支/合并/发布/冲突/hotfix 也走 `git-branch` SKILL
+- commit 走 `git-commit` SKILL（本地 commit），message 规则以 `.commitlintrc.cjs` 为准；push 走 `git-branch` SKILL（检查落后 → push）；分支/合并/发布/冲突/hotfix 也走 `git-branch` SKILL
 - 实现完成：`npm run check:all` 通过后主动询问是否需要 code review
 - 完成任务 / 声称修复：必须给可验证证据（命令输出 / 截图 / 数据），不是「应该好了」
