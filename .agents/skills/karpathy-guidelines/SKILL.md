@@ -64,6 +64,8 @@ The test: Every changed line should trace directly to the user's request.
 
 **Define success criteria. Loop until verified.**
 
+**Failures must stay visible: never silently swallow errors** (empty catch, ignored rejection, fake success).
+
 Transform tasks into verifiable goals:
 
 - "Add validation" → "Write tests for invalid inputs, then make them pass"

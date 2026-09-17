@@ -28,16 +28,20 @@ AI 对话机器人 monorepo，npm workspaces 管理前端（web/）和后端（s
 
 - 只做用户明确要求的事。布局≠交互，样式≠逻辑，修 bug≠重构。
 - 禁止捏造接口字段、环境变量名、业务规则。
+- 不修改 `server/.env` 等环境文件；不把 secrets / API key / token 写入会提交的文件（含 `.env.example`）。
+- 不手改 lock 文件（由 npm install 更新）。
 - 以下情况必须停下来问用户：需求有歧义、多个方案有不同产品后果、范围超出原始需求。
 
 ## Contributor Rules（harness 结构约定）
 
 - `<!-- -->` 注释的内容 AI 不读、不引用（视为人工禁用）。
+- `ISSUES/`、`总结/`、`docs/**/completed/` 为历史记录，不作为现行规则依据。
 - 改规则改 `.agents/`，不改 `.claude/` 等同步副本；改完跑 `npm run sync:agents`。
 
 ## Default Protocol（动作触发）
 
 - AI 启动时读 `.agents/ignore`
+- 只读事实查询（≤3 文件 & ≤1 命令可答）：直接执行并回答，不建 Todo、不扩张阅读。
 - 命名/格式/写法不确定：查 `docs/reference/`
 - 改 web/src/** 逻辑：读 `.agents/context/frontend-context.md` + `docs/harness/frontend-rules.md`
 - 改 server/**：读 `.agents/context/backend-context.md` + `docs/harness/backend-rules.md`
