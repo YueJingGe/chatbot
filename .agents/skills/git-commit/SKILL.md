@@ -11,8 +11,9 @@ description: Git 提交工作流（commit message 格式 + 本地 commit）。�
 ## 流程
 1. 跑 `npm run check:all`（含 build）
 2. 如失败：`npm run format` / `npm run lint` / `npm run stylelint` 修复后重跑
-3. `git add -A && git commit -m "<type>(<scope>): <描述>"`
-4. 完成后自动继续执行 `git-branch` skill 的 push 段（检查落后 → 确定目标分支 → push），不再询问用户是否推送
+3. 如改动涉及核心路径（`web/src/hooks/`、`web/src/types/`、`server/`、`.agents/`、`docs/harness/`），提醒用户检查或填写 `docs/ledger/CORE-LEDGER.md`
+4. `git add -A && git commit -m "<type>(<scope>): <描述>"`
+5. 完成后自动继续执行 `git-branch` skill 的 push 段（检查落后 → 确定目标分支 → push），不再询问用户是否推送
 
 > 工具检查（lint-staged）由 husky pre-commit 兜底。
 
@@ -27,7 +28,10 @@ description: Git 提交工作流（commit message 格式 + 本地 commit）。�
 |`docs`|仅文档|可省略|
 |`refactor`|代码重构|可省略|
 |`style`|代码格式|可省略|
-|`chore`|构建/依赖|可省略|
+|`perf`|性能优化|可省略|
+|`test`|测试相关|可省略|
+|`chore`|构建/依赖/辅助工具|可省略|
+|`ci`|CI 相关|可省略|
 
 **示例**：`feat(frontend): 添加消息列表自动滚动到底部`
 

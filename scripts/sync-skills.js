@@ -137,6 +137,22 @@ function syncSkill(skillName, targetDir) {
 }
 
 /**
+ * 清理目标目录中源已不存在的孤儿 skill（删除/重命名后的残留）
+ */
+function cleanOrphans(targetDir, skillNames) {
+  const targetPath = path.join(ROOT, targetDir);
+  if (!fs.existsSync(targetPath)) return [];
+
+  const orphans = fs.readdirSync(targetPath).filter((name) => !skillNames.includes(name));
+
+  for (const name of orphans) {
+    fs.rmSync(path.join(targetPath, name), { recursive: true, force: true });
+  }
+
+  return orphans;
+}
+
+/**
  * 主函数
  */
 function main() {
@@ -161,10 +177,19 @@ function main() {
       if (changed) syncedCount++;
     }
 
-    if (syncedCount === 0) {
+    const removed = cleanOrphans(targetDir, skills);
+
+    if (syncedCount === 0 && removed.length === 0) {
       console.log(`⏭️  ${targetDir} is already up-to-date (${skills.length} skills)`);
     } else {
-      console.log(`✅ Synced ${syncedCount} skill(s) to ${targetDir}`);
+      if (syncedCount > 0) {
+        console.log(`✅ Synced ${syncedCount} skill(s) to ${targetDir}`);
+      }
+      if (removed.length > 0) {
+        console.log(
+          `🧹 Removed ${removed.length} orphan(s) from ${targetDir}: ${removed.join(", ")}`
+        );
+      }
     }
   }
 

@@ -81,6 +81,37 @@ hotfix/*                   ← 从 main 切，紧急修复，绕过 release，�
 - `main` 和 `release/*` 禁止直接 push，仅允许通过 PR 合入。
 - `feature/*`、`fix/*`、`hotfix/*` push 前自动执行 `git rebase main`（hook 实现），若落后则拒绝 push，提示重新推送。
 
+### 8.1 核心路径变更治理
+
+为控制核心模块（数据流、类型契约、后端 API、协作规范、架构规则）的变更质量，pre-push hook 对以下路径启用 ledger 检查：
+
+- `web/src/hooks/**`
+- `web/src/types/**`
+- `server/**`
+- `.agents/**`
+- `docs/harness/**`
+
+**Ledger 文档**：`docs/ledger/CORE-LEDGER.md`
+
+**检查模式**：
+
+|模式|触发方式|行为|
+|-|-|-|
+|轻量模式|默认|缺少 ledger 时打印黄色警告，不阻塞 push|
+|严格模式|`CHATBOT_PUSH_STRICT=1` 或 `git config --local chatbot.pushStrict 1`|缺少 ledger 或命中复杂度敏感文件时阻塞 push|
+
+**首次命中核心路径**会交互式询问是否启用严格模式，回答结果写入本地 git config。
+
+**合理绕过**：
+
+- `CHATBOT_LEDGER_SKIP=1 git push`（merge/rebase/integration push 等场景）
+- `CHATBOT_LEDGER_BASE_REF=<branch> git push`（指定对比基础分支）
+
+**复杂度敏感文件**（命中时需在 ledger 中说明理由）：
+
+- `protocol/index.tsx`、`module.tsx` 等入口/注册文件
+- 文件名或路径含 `store`、`mode` 的状态/模式相关代码
+
 ## 9. 冲突处理规则
 
 |冲突类型|处理方|做法|

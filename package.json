@@ -19,6 +19,8 @@
     "stylelint": "stylelint \"web/src/**/*.less\" --fix",
     "stylelint:check": "stylelint \"web/src/**/*.less\"",
     "check:all": "npm run format:check && npm run lint:check && npm run stylelint:check && npm run build:web",
+    "type-check": "npm run type-check --workspace=web",
+    "check:strict": "npm run format:check && npm run lint:check && npm run stylelint:check && npm run type-check",
     "prepare": "husky",
     "postinstall": "node scripts/sync-ignore.js && node scripts/sync-skills.js",
     "sync:ignore": "node scripts/sync-ignore.js",
@@ -45,9 +47,18 @@
       "prettier --write"
     ]
   },
+  "config": {
+    "commitizen": {
+      "path": "@commitlint/cz-commitlint"
+    }
+  },
   "devDependencies": {
+    "@commitlint/cli": "^18.6.1",
+    "@commitlint/config-conventional": "^18.6.1",
+    "@commitlint/cz-commitlint": "^18.6.1",
     "@eslint/js": "10.0.1",
     "concurrently": "^9.1.2",
+    "czg": "^1.14.0",
     "eslint": "10.8.1",
     "eslint-plugin-react-hooks": "7.1.1",
     "eslint-plugin-react-refresh": "0.5.4",

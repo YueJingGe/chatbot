@@ -33,6 +33,7 @@ chatbot/
 │   ├── context/                              # 项目上下文（机器友好）
 │   │   ├── backend-context.md                # 后端架构、SSE、Function Calling
 │   │   ├── frontend-context.md               # 前端架构、组件、状态管理
+│   │   ├── harness-governance.md             # harness 改动协议、设计约束
 │   │   └── project-overview.md               # 项目概览、技术栈、目录结构
 │   ├── ignore                                # 跨 AI agent ignore 规则
 │   └── skills/                               # 任务 workflow（7 个 skill）
