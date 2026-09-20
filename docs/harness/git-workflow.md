@@ -59,7 +59,8 @@ hotfix/*                   ← 从 main 切，紧急修复，绕过 release，�
 2. 打 tag：`git tag vX.Y.Z && git push origin vX.Y.Z`（只推 tag）
 3. 同步 develop：`git checkout develop && git pull --ff-only origin develop && git merge main && git push origin develop`
 4. 询问是否清理当前 release：若是，则`git push origin --delete release/vX.Y.Z`，如不是，则跳过此步骤。
-5. 询问是否需要新建一个 release 分支：若有，则从当前 `main` 下新建一个 `release/*` 分支（版本号由人确定）；若没有或暂不确定，则跳过此步骤。
+5. 清理已发布的开发分支：删除已合入 `main` 的 `feature/*`、`fix/*`、`hotfix/*` 分支（本地 + 远端）。
+6. 询问是否需要新建一个 release 分支：若有，则从当前 `main` 下新建一个 `release/*` 分支（版本号由人确定）；若没有或暂不确定，则跳过此步骤。
 
 > 若 `develop` 与 `main` 有冲突，须由人工解决（禁止 AI 自动合并）。
 
