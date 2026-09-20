@@ -26,15 +26,15 @@
 
 ## 验收标准
 
-- [ ] 新增 `docs/ledger/CORE-LEDGER.md` 模板，结构清晰可直接填写。
-- [ ] `.husky/pre-push` 能识别核心路径变更，轻量模式下打印黄色警告与修复命令。
-- [ ] `.husky/pre-push` 支持交互式 strict 模式询问，用户选择后写入本地 git config。
-- [ ] 严格模式下，核心路径变更若未填写 ledger 或命中复杂度敏感文件无 ledger，则阻塞 push。
-- [ ] 新增 `scripts/push-gate.mjs` 承载主要检测逻辑，便于本地手动运行与测试。
-- [ ] `.agents/skills/git-commit/SKILL.md` 更新：提醒改动核心文件时填写 ledger。
-- [ ] `docs/harness/git-workflow.md` 更新：补充 ledger、strict 模式、bypass 环境变量说明。
-- [ ] `package.json` 新增 `check:strict` 脚本（严格模式完整检查）。
-- [ ] `npm run check:all` 通过，且 hook 脚本可手动验证。
+- [x] 新增 `docs/ledger/CORE-LEDGER.md` 模板，结构清晰可直接填写。
+- [x] `.husky/pre-push` 能识别核心路径变更，轻量模式下打印黄色警告与修复命令。
+- [x] `.husky/pre-push` 支持交互式 strict 模式询问，用户选择后写入本地 git config。
+- [x] 严格模式下，核心路径变更若未填写 ledger 或命中复杂度敏感文件无 ledger，则阻塞 push。
+- [x] 新增 `scripts/push-gate.mjs` 承载主要检测逻辑，便于本地手动运行与测试。
+- [x] `.agents/skills/git-commit/SKILL.md` 更新：提醒改动核心文件时填写 ledger。
+- [x] `docs/harness/git-workflow.md` 更新：补充 ledger、strict 模式、bypass 环境变量说明。
+- [x] `package.json` 新增 `check:strict` 脚本（严格模式完整检查）。
+- [x] `npm run check:all` 通过，且 hook 脚本可手动验证。
 
 ## 涉及模块
 
