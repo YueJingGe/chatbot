@@ -19,6 +19,8 @@
     "stylelint": "stylelint \"web/src/**/*.less\" --fix",
     "stylelint:check": "stylelint \"web/src/**/*.less\"",
     "check:all": "npm run format:check && npm run lint:check && npm run stylelint:check && npm run build:web",
+    "type-check": "npm run type-check --workspace=web",
+    "check:strict": "npm run format:check && npm run lint:check && npm run stylelint:check && npm run type-check",
     "prepare": "husky",
     "postinstall": "node scripts/sync-ignore.js && node scripts/sync-skills.js",
     "sync:ignore": "node scripts/sync-ignore.js",
