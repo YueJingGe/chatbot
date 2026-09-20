@@ -4,10 +4,24 @@
 #   release/*：允许创建/删除分支，仅拦截直接推提交（更新）
 #   feature/* fix/* hotfix/*：push 前自动同步 main，未同步则 rebase 后拒绝本次 push（需重新 push）
 #   develop：不设本地拦截（沙箱，允许快速迭代），保护依赖 GitHub ruleset
+#
+# 核心路径变更治理：
+#   当改动涉及 web/src/hooks/、web/src/types/、server/、.agents/、docs/harness/ 时，
+#   提醒或强制填写 docs/ledger/CORE-LEDGER.md。
+#   轻量模式（默认）仅警告不阻塞；严格模式阻塞 push。
+#   首次命中核心路径会交互式询问是否启用严格模式。
+#   绕过：CHATBOT_LEDGER_SKIP=1 git push
 
 zero="0000000000000000000000000000000000000000"
+ledger_base="origin/main"
+ledger_head="HEAD"
 
 while read -r local_ref local_oid remote_ref remote_oid; do
+  ledger_head="$local_oid"
+  if [ "$remote_oid" != "$zero" ]; then
+    ledger_base="$remote_oid"
+  fi
+
   case "$remote_ref" in
     refs/heads/main)
       echo "❌ 禁止直接 push 到 main"
@@ -67,5 +81,14 @@ case "$current_branch" in
     fi
     ;;
 esac
+
+# 核心路径变更治理
+if [ "$CHATBOT_LEDGER_SKIP" != "1" ]; then
+  if [ -t 1 ]; then
+    node scripts/push-gate.mjs --base "$ledger_base" --head "$ledger_head" --interactive
+  else
+    node scripts/push-gate.mjs --base "$ledger_base" --head "$ledger_head"
+  fi
+fi
 
 exit 0
