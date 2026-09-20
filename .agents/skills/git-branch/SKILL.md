@@ -190,7 +190,8 @@ git log main..release/vX.Y.Z --oneline  # 展示 commit 清单
 
 如果是 release 分支发布，则额外执行：
 4. `git push origin --delete release/vX.Y.Z`
-5. 跟用户确认后续是否还有功能待发布，如确定有，则执行：
+5. 清理已发布的开发分支：删除已合入 `main` 的 `feature/*`、`fix/*`、`hotfix/*` 分支（本地 + 远端）
+6. 跟用户确认后续是否还有功能待发布，如确定有，则执行：
 `git checkout main && git checkout -b release/v<next-version> && git push -u origin release/v<next-version>`（执行前确认完整版本号）
 如没有，则跳过。
 
