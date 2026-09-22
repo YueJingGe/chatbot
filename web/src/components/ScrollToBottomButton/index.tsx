@@ -1,5 +1,5 @@
 import { memo } from "react";
-import styles from "./ScrollToBottomButton.module.less";
+import styles from "./index.module.less";
 
 interface ScrollToBottomButtonProps {
   visible: boolean;

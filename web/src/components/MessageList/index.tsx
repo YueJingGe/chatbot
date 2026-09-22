@@ -1,9 +1,9 @@
 import { memo, useCallback } from "react";
 import { message } from "antd";
 
-import { copyToClipboard } from "../utils/copy";
-import { stripMarkdown } from "../utils/markdown";
-import styles from "./MessageList.module.less";
+import { copyToClipboard } from "../../utils/copy";
+import { stripMarkdown } from "../../utils/markdown";
+import styles from "./index.module.less";
 
 interface Message {
   id: string | number;

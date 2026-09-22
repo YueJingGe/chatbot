@@ -7,7 +7,7 @@
 ## 依赖关系
 
 ```
-创建 ScrollToBottomButton.tsx
+创建 ScrollToBottomButton/index.tsx
         ↓
 修改 App.tsx（ref、滚动状态、回调）
         ↓
@@ -18,9 +18,9 @@ npm run build 验证
 
 ## 任务分解
 
-### 任务 1：新建 ScrollToBottomButton.tsx
+### 任务 1：新建 ScrollToBottomButton/index.tsx
 
-- **文件**：`web/src/components/ScrollToBottomButton.tsx`
+- **文件**：`web/src/components/ScrollToBottomButton/index.tsx`
 - **内容**：
   - 定义 `ScrollToBottomButtonProps` 接口：`onClick`、`visible`。
   - 使用 `React.memo` 包装函数组件。

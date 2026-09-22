@@ -4,7 +4,7 @@ import { message } from "antd";
 import { describe, expect, it, vi } from "vitest";
 
 import { copyToClipboard } from "../../utils/copy";
-import MessageList from "../MessageList";
+import MessageList from "./index";
 
 vi.mock("../../utils/copy", () => ({
   copyToClipboard: vi.fn().mockResolvedValue(undefined),

@@ -57,6 +57,10 @@ chatbot/
 │   │   ├── vite-env.d.ts                     # Vite 类型声明
 │   │   ├── assets/                           # 静态资源
 │   │   └── components/                       # 叶子组件（React.memo）
+│   │       └── <Component>/                  # 每个组件独立目录
+│   │           ├── index.tsx                 # 组件入口
+│   │           ├── index.module.less         # 组件样式
+│   │           └── index.test.tsx            # 组件测试（存在时）
 │   ├── public/                               # 公共静态文件
 │   ├── index.html
 │   ├── vite.config.ts                        # Vite 配置 + dev proxy
@@ -140,7 +144,10 @@ npm run stylelint
 # Stylelint 检查
 npm run stylelint:check
 
-# 全量检查（format + lint + stylelint + build）
+# 前端测试
+npm run test --workspace=web
+
+# 全量检查（format + lint + stylelint + test + build）
 npm run check:all
 ```
 

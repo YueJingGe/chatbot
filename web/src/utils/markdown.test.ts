@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { stripMarkdown } from "../markdown";
+import { stripMarkdown } from "./markdown";
 
 describe("stripMarkdown", () => {
   it("returns plain text for a paragraph", () => {

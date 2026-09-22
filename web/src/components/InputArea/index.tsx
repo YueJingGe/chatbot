@@ -1,5 +1,5 @@
 import { memo, KeyboardEvent } from "react";
-import styles from "./InputArea.module.less";
+import styles from "./index.module.less";
 
 interface InputAreaProps {
   inputText: string;

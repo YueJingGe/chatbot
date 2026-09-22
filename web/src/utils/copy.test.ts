@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { copyToClipboard } from "../copy";
+import { copyToClipboard } from "./copy";
 
 describe("copyToClipboard", () => {
   it("writes the given text to navigator.clipboard", async () => {
