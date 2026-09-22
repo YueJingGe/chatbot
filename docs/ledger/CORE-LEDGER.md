@@ -40,3 +40,9 @@
 - Changed: `new-requirement` skill 由“自动路由”改为“显式路由”，仅在用户明确说“新需求”“新功能”“加一个 xxx”或显式调用 `/new-requirement` 时触发；不再从“帮我做 xxx”“做 xxx”等模糊表述自动推断。
 - Why the change is unavoidable: 用户反馈“新增一个纯工具函数”被误判为 L1 新需求并生成 spec，导致小改动流程过重；同时 TDD skill 原依赖外部插件，未纳入项目单一事实源，存在规则漂移风险。
 - Smaller-diff alternative considered: 仅放宽 L0 文件数阈值（把测试文件不计入），保留自动路由。被否决，因为问题的根源是触发条件过宽，即使放宽阈值仍会为非需求类任务生成 spec；显式触发更符合“用户说需求才走需求流程”的直觉。
+
+### 2026-09-22 | harness | git-commit skill 增加提交与推送双重确认
+
+- Changed: `git-commit` skill 触发条件从“用户要求提交或完成任务后”收紧为“用户明确说提交/commit 时才触发”；流程增加 commit 前确认、push 前确认两步；不再在 commit 后自动 push。
+- Why the change is unavoidable: 用户反馈完成任务后 agent 自动 commit/push，未等待确认，导致无法审查就推送到远端；同时容易把尚未验收的 harness 调整提前发布。
+- Smaller-diff alternative considered: 仅取消自动 push，保留完成任务后自动 commit。被否决，因为用户本意是“只有用户要求才触发提交”，自动 commit 同样越界。
