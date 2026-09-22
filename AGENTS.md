@@ -7,7 +7,7 @@ AI 对话机器人 monorepo，npm workspaces 管理前端（web/）和后端（s
 - `npm run dev` — 并发启动前后端（端口 5173 / 3000）
 - `npm run dev:web` / `dev:server` — 仅启动一端
 - `npm run build:web` — 构建前端到 `web/dist/`
-- `npm run check:all` — Prettier + ESLint + Stylelint + Build
+- `npm run check:all` — Prettier + ESLint + Stylelint + Test + Build
 - `npm run sync:agents` — 同步 `.agents/` 到各 AI 工具
 
 ## Map（结构索引）
@@ -43,7 +43,7 @@ AI 对话机器人 monorepo，npm workspaces 管理前端（web/）和后端（s
 - AI 启动时读 `.agents/ignore`
 - 只读事实查询（≤3 文件 & ≤1 命令可答）：直接执行并回答，不建 Todo、不扩张阅读。
 - 命名/格式/写法不确定：查 `docs/reference/`
-- 改 web/src/** 逻辑：读 `.agents/context/frontend-context.md` + `docs/harness/frontend-rules.md`
+- 改 web/src/** 逻辑：读 `.agents/context/frontend-context.md` + `docs/harness/frontend-rules.md`；新增或改变行为时调 `test-driven-development` skill，并补/改同目录 `*.test.ts(x)`
 - 改 server/**：读 `.agents/context/backend-context.md` + `docs/harness/backend-rules.md`
 - 加依赖/改 workspace：读 `.agents/context/project-overview.md` + `docs/harness/architecture.md`
 - 改 `.agents/**`、`AGENTS.md`、`docs/harness/**`、`package.json` harness script、`.husky/**`：先读 `.agents/context/harness-governance.md`

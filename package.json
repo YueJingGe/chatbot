@@ -18,7 +18,7 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md,less,css}\"",
     "stylelint": "stylelint \"web/src/**/*.less\" --fix",
     "stylelint:check": "stylelint \"web/src/**/*.less\"",
-    "check:all": "npm run format:check && npm run lint:check && npm run stylelint:check && npm run build:web",
+    "check:all": "npm run format:check && npm run lint:check && npm run stylelint:check && npm run test --workspace=web && npm run build:web",
     "type-check": "npm run type-check --workspace=web",
     "check:strict": "npm run format:check && npm run lint:check && npm run stylelint:check && npm run type-check",
     "prepare": "husky",
