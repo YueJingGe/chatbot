@@ -1,5 +1,6 @@
 import { memo, useCallback } from "react";
 import { message } from "antd";
+import ReactMarkdown from "react-markdown";
 
 import { copyToClipboard } from "../../utils/copy";
 import { stripMarkdown } from "../../utils/markdown";
@@ -147,7 +148,7 @@ const MessageList = memo(({ messages }: MessageListProps) => {
             {message.statusMessage && !message.content ? (
               <span className={styles.status}>{message.statusMessage}</span>
             ) : message.content ? (
-              message.content
+              <ReactMarkdown>{message.content}</ReactMarkdown>
             ) : (
               message.role === "assistant" && (
                 <span className={styles["typing-indicator"]} aria-label="正在输入">

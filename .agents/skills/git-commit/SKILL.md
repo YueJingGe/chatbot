@@ -1,6 +1,6 @@
 ---
 name: git-commit
-description: Git 提交工作流（commit message 格式 + 本地 commit）。commit 前和 push 前均需用户显式确认；推送走 git-branch skill 的 push 段；代码质量 review 走 code-review skill；工具检查由 husky pre-commit 钩子自动跑。
+description: Git 提交工作流（commit message 格式 + 本地 commit）。commit 前须以交互式提问确认 message 与文件清单，push 前须再次确认；推送走 git-branch skill 的 push 段；代码质量 review 走 code-review skill；工具检查由 husky pre-commit 钩子自动跑。
 ---
 
 # Git Commit 工作流
@@ -13,15 +13,17 @@ description: Git 提交工作流（commit message 格式 + 本地 commit）。co
 1. 跑 `npm run check:all`（含 build）
 2. 如失败：用 `npm run format` / `npm run lint` / `npm run stylelint` 修复后重跑
 3. 如改动涉及核心路径（`web/src/hooks/`、`web/src/types/`、`server/`、`.agents/`、`docs/harness/`），提醒用户检查或填写 `docs/ledger/CORE-LEDGER.md`
-4. 展示当前 `git status --short` 与变更摘要
-5. **第一次确认**：询问用户"是否提交？"，等待明确回复（如"是"/"提交"/"yes"）
-6. 用户确认后执行：`git add -A && git commit -m "<type>(<scope>): <中文描述>"`
-7. 汇报 commit hash、message、当前分支
-8. **第二次确认**：询问用户"是否推送？"，等待明确回复
-9. 用户确认后，执行 `git-branch` skill 的 push 段（检查落后 → 确定目标分支 → push）
+4. 提交前核查：确认当前分支（`git rev-parse --abbrev-ref HEAD`），展示 `git status --short`（标注暂存/未暂存/未跟踪）与变更摘要；审查变更内容，发现疑似临时内容（临时注释、调试代码）或与本任务无关的改动时，先向用户指出并询问处理方式
+5. 草拟 commit message：对照 `.commitlintrc.cjs` 的 type/scope 白名单选择，并说明选择依据
+6. **message 确认（必做）**：展示「拟提交文件清单 + message 全文 + 依据说明」，以带选项的交互式提问请用户确认（支持提问面板的环境用面板，否则用编号选项）：A 按此提交 / B 修改（按补充意见重新草拟并再次确认）/ C 取消提交。发起提问后必须停下等待答复：用户给出的"提交/commit"指令只是流程入口，不代替本步骤的确认。
+7. 用户确认后，按确认的文件范围执行 `git add`（默认 `git add -A`；用户要求排除部分文件时用显式路径），再执行 `git commit -m "<type>(<scope>): <中文描述>"`
+8. 汇报 commit hash、message、当前分支
+9. **推送确认**：询问用户"是否推送？"，等待明确回复
+10. 用户确认后，执行 `git-branch` skill 的 push 段（检查落后 → 确定目标分支 → push）
 
 > 工具检查（lint-staged）由 husky pre-commit 钩子兜底。
 > 任何一步用户未确认或回复"否"/"不"，则停止，不继续后续动作。
+> 步骤 6 的 message 确认未通过前，不得执行 commit；反例：收到"提交"后直接列出文件与 message 并 commit（未做交互式确认）。
 
 ## commit message 格式
 

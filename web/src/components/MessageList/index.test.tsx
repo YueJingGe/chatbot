@@ -29,6 +29,38 @@ const assistantMessage = {
   content: "**好的**，这是代码：\n```js\nconst a = 1;\n```",
 };
 
+describe("MessageList markdown rendering", () => {
+  it("renders unordered list items from markdown dashes", () => {
+    const markdown = "- 第一项\n- 第二项";
+    render(<MessageList messages={[{ id: "md-list", role: "assistant", content: markdown }]} />);
+
+    const listItems = screen.getAllByRole("listitem");
+    expect(listItems).toHaveLength(2);
+    expect(listItems[0]).toHaveTextContent("第一项");
+    expect(listItems[1]).toHaveTextContent("第二项");
+  });
+
+  it("renders code blocks inside pre and code elements", () => {
+    const markdown = "```js\nconst a = 1;\n```";
+    render(<MessageList messages={[{ id: "md-code", role: "assistant", content: markdown }]} />);
+
+    const pre = document.querySelector("pre");
+    const code = document.querySelector("code");
+    expect(pre).toBeInTheDocument();
+    expect(code).toBeInTheDocument();
+    expect(code).toHaveTextContent("const a = 1;");
+  });
+
+  it("renders bold text as strong", () => {
+    const markdown = "**bold**";
+    render(<MessageList messages={[{ id: "md-bold", role: "assistant", content: markdown }]} />);
+
+    const strong = document.querySelector("strong");
+    expect(strong).toBeInTheDocument();
+    expect(strong).toHaveTextContent("bold");
+  });
+});
+
 describe("MessageList copy", () => {
   it("shows copy button on user message hover and copies content on click", async () => {
     const user = userEvent.setup();

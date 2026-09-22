@@ -35,6 +35,45 @@
   font-size: 0.95rem;
   overflow-wrap: break-word;
 
+  p {
+    margin: 0 0 var(--space-sm);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  ul,
+  ol {
+    margin: 0 0 var(--space-sm);
+    padding-left: var(--space-lg);
+  }
+
+  li {
+    margin-bottom: var(--space-xs);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  a {
+    color: var(--color-primary);
+    text-decoration: underline;
+
+    &:hover {
+      color: var(--color-primary-hover);
+      text-decoration: none;
+    }
+  }
+
+  blockquote {
+    margin: 0 0 var(--space-sm);
+    padding-left: var(--space-md);
+    border-left: 3px solid var(--color-bot-border);
+    color: var(--color-text-muted);
+  }
+
   pre {
     background: rgb(0 0 0 / 4%);
     padding: var(--space-sm) var(--space-md);
