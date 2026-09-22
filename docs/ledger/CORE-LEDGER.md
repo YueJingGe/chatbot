@@ -33,3 +33,10 @@
 - Reused: 复用已验证的 Vitest + Testing Library + jsdom 工具链与 `web/src/test-utils/vitest.setup.ts`。
 - Why the change is unavoidable: 消息复制功能已用 TDD 实现，但 harness 未固化测试策略、AGENTS 未定义触发规则、`check:all` 不跑测试，导致后续前端改动可能回退到无测试状态。
 - Smaller-diff alternative considered: 仅在 `frontend-context.md` 中口头记录测试命令，不纳入 AGENTS 触发与质量门禁。被否决，因为无法保证后续需求会实际执行测试。
+
+### 2026-09-22 | harness | 本地化 TDD skill 并收紧 new-requirement 触发条件
+
+- Added: 将 `test-driven-development` skill 从 Qoder marketplace 插件复制到 `.agents/skills/test-driven-development/`，并同步到 `.claude/skills/`。
+- Changed: `new-requirement` skill 由“自动路由”改为“显式路由”，仅在用户明确说“新需求”“新功能”“加一个 xxx”或显式调用 `/new-requirement` 时触发；不再从“帮我做 xxx”“做 xxx”等模糊表述自动推断。
+- Why the change is unavoidable: 用户反馈“新增一个纯工具函数”被误判为 L1 新需求并生成 spec，导致小改动流程过重；同时 TDD skill 原依赖外部插件，未纳入项目单一事实源，存在规则漂移风险。
+- Smaller-diff alternative considered: 仅放宽 L0 文件数阈值（把测试文件不计入），保留自动路由。被否决，因为问题的根源是触发条件过宽，即使放宽阈值仍会为非需求类任务生成 spec；显式触发更符合“用户说需求才走需求流程”的直觉。
