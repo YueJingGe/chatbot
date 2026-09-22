@@ -46,3 +46,11 @@
 - Changed: `git-commit` skill 触发条件从“用户要求提交或完成任务后”收紧为“用户明确说提交/commit 时才触发”；流程增加 commit 前确认、push 前确认两步；不再在 commit 后自动 push。
 - Why the change is unavoidable: 用户反馈完成任务后 agent 自动 commit/push，未等待确认，导致无法审查就推送到远端；同时容易把尚未验收的 harness 调整提前发布。
 - Smaller-diff alternative considered: 仅取消自动 push，保留完成任务后自动 commit。被否决，因为用户本意是“只有用户要求才触发提交”，自动 commit 同样越界。
+
+### 2026-09-22 | harness | TDD 触发条件改为代码改动类型并强化 bug fix 证据
+
+- Changed: `AGENTS.md` 第 46 行 TDD 触发条件从“新增或改变行为”改为“新增、修改或修复组件、hook、工具函数、状态或交互行为”；第 58 行“声称修复”的验收标准增加“必须包含复现 bug 的测试失败输出，以及修复后同一测试通过的输出”。
+- Changed: `test-driven-development` skill 增加“Bug Fix TDD”专节，明确要求先写复现测试、保留失败输出、再修复代码；并在 Common Rationalizations 与 Red Flags 中增加 bug fix 专属条目。
+- Changed: `docs/harness/frontend-testing.md` 扩展“测试先行”章节，新增“Bug Fix 的 TDD 要求”小节， checklist 同步要求保留失败输出。
+- Why the change is unavoidable: 用户指出 TDD 触发应看代码改动类型而非 prompt 关键词；同时“修改bug吧”那次交互显示 agent 先改代码后补测试，说明仅有触发条件无法保证真正执行 Red-Green，必须增加 bug fix 专用流程与证据要求。
+- Smaller-diff alternative considered: 仅改 AGENTS.md 触发条件，不动 TDD skill 与 frontend-testing.md。被否决，因为只改入口仍会让 agent 在“已触发 TDD”后跳过 Red 阶段；必须从入口、流程、证据三处同时收紧。

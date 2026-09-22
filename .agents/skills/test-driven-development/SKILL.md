@@ -195,6 +195,19 @@ Keep tests green. Don't add behavior.
 
 Next failing test for next feature.
 
+## Bug Fix TDD
+
+修 bug 时，TDD 不是“补测试验证修复”，而是“用测试先把 bug 钉住”。
+
+1. **复现**：写一个测试，用最小输入让 bug 出现。
+   - 如果 bug 是 UI 渲染问题，断言具体 DOM 结构（如列表应渲染为 `<ul><li>`）。
+   - 如果 bug 是逻辑错误，断言函数输出。
+2. **Red**：运行测试，确认它**因当前 bug 而失败**。保留失败输出（命令行截图/文本）。
+3. **Green**：修改最小代码使测试通过。不要顺手重构无关代码。
+4. **边界**：在 green 后补 1-2 个相邻边界测试，防止修复遗漏同类场景。
+
+**没有失败输出，就不算 TDD 修 bug。**
+
 ## Good Tests
 
 | Quality | Good | Bad |
@@ -268,6 +281,9 @@ Tests-first force edge case discovery before implementing. Tests-after verify yo
 | "TDD will slow me down" | TDD faster than debugging. Pragmatic = test-first. |
 | "Manual test faster" | Manual doesn't prove edge cases. You'll re-test every change. |
 | "Existing code has no tests" | You're improving it. Add tests for existing code. |
+| "Bug is obvious, just fix it" | Obvious to you now; without a test, it breaks again silently. |
+| "I'll fix first then add a test" | That's tests-after; the test passes immediately and proves nothing. |
+| "Hard to reproduce in a test" | Then you don't understand the bug well enough to fix it safely. |
 
 ## Red Flags - STOP and Start Over
 
@@ -284,6 +300,14 @@ Tests-first force edge case discovery before implementing. Tests-after verify yo
 - "Already spent X hours, deleting is wasteful"
 - "TDD is dogmatic, I'm being pragmatic"
 - "This is different because..."
+
+### Bug Fix 专属 Red Flags
+
+- 修复代码在复现测试之前提交
+- 没有保留测试失败的命令输出
+- 测试在修复后才被添加
+- "这个 bug 太简单，不需要先写测试"
+- "DOM/样式问题不好写测试"
 
 **All of these mean: Delete code. Start over with TDD.**
 
