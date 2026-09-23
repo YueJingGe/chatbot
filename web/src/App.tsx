@@ -7,7 +7,7 @@ import { QuestionHistoryPanel } from "./components/QuestionHistoryPanel";
 import { useConversation } from "./hooks/useConversation";
 import styles from "./App.module.less";
 
-function App() {
+export function App() {
   const {
     conversations,
     messages,

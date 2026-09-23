@@ -149,7 +149,7 @@
 
 |类别|格式|示例|
 |-|-|-|
-|分支|type/description|`feat/weather-api`、`fix/scroll-bug`|
+|分支|type/description|`feature/weather-api`、`fix/scroll-bug`|
 |提交|见 `.agents/skills/git-commit/SKILL.md`|`feat(frontend): 添加天气查询`|
 
 ## 代码迁移命名

@@ -34,7 +34,7 @@
     "web/src/**/*.{ts,tsx}": [
       "eslint --fix --cache",
       "prettier --write",
-      "sh -c \"cd web && npm run test:changed\""
+      "sh -c \"cd web && arch -arm64 npm run test:changed\""
     ],
     "server/**/*.{js,cjs}": [
       "eslint --fix --cache",

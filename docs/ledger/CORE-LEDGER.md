@@ -61,6 +61,7 @@
 - Added: `commit`/`cm` 双入口 script；`.husky/pre-commit` 增加 `lint.skipLintStaged` 跳过判断；`.czrc` 限定 czg 向导 type 为 9 类。
 - Changed: `.agents/skills/git-commit/SKILL.md` 删除 type/scope 表格，改为直接引用 `.commitlintrc.cjs`；`.commitlintrc.cjs` 注释去悬空引用；`llms.txt` 更新命令表。
 - Changed: lint-staged 中 eslint/stylelint 增加 `--cache`。
+- Changed: lint-staged 的 web/src 规则中 `test:changed` 命令增加 `arch -arm64` 前缀，避免 x86_64 架构的 git 启动 hook 时 node 以 x64 运行而缺少 `@rollup/rollup-darwin-x64`。
 
 ### 2026-09-23 | harness | git-commit skill 交互确认与 add 方式收紧
 
@@ -73,3 +74,10 @@
 - Changed: `.agents/skills/git-commit/SKILL.md` 步骤 5/6 从"生成单个 message 草案后 A/B/C 确认"改为"根据改动生成 2-3 个候选 message（不同 type/scope 倾向），用 `AskUserQuestion` 让用户选择 A/B/C 或 D 取消"。
 - Why the change is unavoidable: 用户希望根据代码改动看到多个 message 倾向再选，而不是只能接受/修改/拒绝单个草案；多候选更贴合"根据改动交互式问我倾向哪个描述"的交互方向。
 - Smaller-diff alternative considered: 保留单草案 + "B 修改"选项，让用户用文字补充。被否决，因为无法让用户在多个完整候选间直接比较选择，交互效率更低。
+
+### 2026-09-23 | harness | git-workflow.md 补充 develop 规则与保护策略缺口
+
+- Added: `docs/harness/git-workflow.md` 新增 `develop` 分支使用规则（集成测试分支、feature/fix 合入方式、与 main 同步方式）；新增 GitHub ruleset 已知缺口说明（PR 来源分支未限制，需人工把关）；新增 post-checkout/post-merge hook 自动同步说明。
+- Changed: `docs/reference/naming.md` 分支示例 `feat/weather-api` 修正为 `feature/weather-api`；`docs/reference/react-components.md` 扩展为项目实际组件写法参考；归档目录扁平化并统一 `YYYY-MM-DD-` 前缀；`web/src/App.tsx` 改为命名导出并保留默认导出兼容。
+- Why the change is unavoidable: 规范文档与实际运行存在偏差（develop 定位不清、ruleset 缺口只散落在 ISSUES、分支示例错误、组件导出实践未文档化），沉淀后减少 agent/新成员对流程的误解。
+- Smaller-diff alternative considered: 仅修正 naming.md 一行，其他不动。被否决，因为单点修正无法解决 develop 用法、PR 层面保护、组件规范引用等多处不一致。
