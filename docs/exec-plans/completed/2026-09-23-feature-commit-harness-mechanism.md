@@ -16,6 +16,9 @@
 - [x] 任务 10：验证 czg 双入口（`npm run commit`/`cm` 存在、向导 type 选项 9 类、中断 czg 后无残留 `lint.skipLintStaged`）
 - [x] 任务 11：补充 `docs/ledger/CORE-LEDGER.md` 本次核心路径变更条目（`.agents/**`、`.husky/**`、package.json harness script）
 - [x] 任务 12：meta-验证（新会话真 prompt 提交类指令）与 spec/exec-plan 归档
+- [x] 任务 13：修复 `git-commit/SKILL.md` 确认面板，`AskUserQuestion` 的 question 字段必须内联文件清单、message 全文及依据，禁止"以下"等悬空引用
+- [x] 任务 14：修复 `git-commit/SKILL.md` add 步骤，改为对本次拟提交文件用显式路径 `git add <path>`，禁止 `git add -A` / `git add .` 兜底
+- [x] 任务 15：将 message 确认从单草案 A/B/C 改为根据改动生成 2-3 个候选 message 倾向，用户选择 A/B/C 或 D 取消
 
 ## 依赖关系
 
@@ -25,6 +28,7 @@
 - 任务 8 依赖任务 2、4、5、6、7
 - 任务 9、10、11 依赖任务 8
 - 任务 12 依赖任务 9、10、11
+- 任务 13、14、15 为归档后补丁，依赖任务 2（skill 已落地），可与任务 8 后验证并行
 
 ## 验证方式
 
@@ -35,3 +39,6 @@
 - [x] `npx czg` 向导 type 选项为 9 类、scope 选项来自 `scope-enum`
 - [x] 中断 czg 后 `git config --get lint.skipLintStaged` 返回空
 - [x] 新会话真 prompt 验证 `git-commit` skill 仍能正确生成 message
+- [x] 新会话提交时确认面板展示 2-3 个候选 message 全文及各自依据
+- [x] 新会话提交时确认面板内联展示文件清单
+- [x] 提交时对显式路径文件执行 `git add`，未使用 `git add -A` 或 `git add .`

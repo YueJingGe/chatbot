@@ -67,5 +67,9 @@
 - Changed: `.agents/skills/git-commit/SKILL.md` 要求 `AskUserQuestion` 的 question 字段必须内联当前分支、文件清单、message 全文及依据，禁止"以下"等悬空引用；提交前 add 改为对每个文件用显式路径，禁止 `git add -A` / `git add .` 兜底。
 - Why the change is unavoidable: 实测新会话调用 skill 时确认面板未展示清单，用户无法审查拟提交内容与 message；`git add -A` 兜底会把工作区其他未确认改动一并提交，已造成过越权提交实例。
 - Smaller-diff alternative considered: 仅在 skill 里加"展示清单"的模糊要求，不指定必须内联到 question 字段。被否决，因为模糊要求无法保证确认面板里实际出现清单。
-- Why the change is unavoidable: 人工提交入口缺失、czg 向导 type 选项与 commitlint 不同步、skill 与配置双写易漂移，导致"规范指路、执行靠机制"的目标未达成；同时 harness 规则与 AI skill 缺乏机器级校验，仅靠人工发现同步遗漏。
-- Smaller-diff alternative considered: 仅补 `commit` script 与 `.czrc`，不新增 check-harness。被否决，因为 skill 瘦身、lint-staged 缓存等改动仍依赖人工核对，没有自动化兜底，后续容易再次漂移。
+
+### 2026-09-23 | harness | git-commit skill message 选择改为多候选倾向
+
+- Changed: `.agents/skills/git-commit/SKILL.md` 步骤 5/6 从"生成单个 message 草案后 A/B/C 确认"改为"根据改动生成 2-3 个候选 message（不同 type/scope 倾向），用 `AskUserQuestion` 让用户选择 A/B/C 或 D 取消"。
+- Why the change is unavoidable: 用户希望根据代码改动看到多个 message 倾向再选，而不是只能接受/修改/拒绝单个草案；多候选更贴合"根据改动交互式问我倾向哪个描述"的交互方向。
+- Smaller-diff alternative considered: 保留单草案 + "B 修改"选项，让用户用文字补充。被否决，因为无法让用户在多个完整候选间直接比较选择，交互效率更低。

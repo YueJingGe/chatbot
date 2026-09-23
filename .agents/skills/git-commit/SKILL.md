@@ -14,8 +14,8 @@ description: Git 提交工作流（commit message 格式 + 本地 commit）。co
 2. 如失败：用 `npm run format` / `npm run lint` / `npm run stylelint` 修复后重跑
 3. 如改动涉及核心路径（`web/src/hooks/`、`web/src/types/`、`server/`、`.agents/`、`docs/harness/`），提醒用户检查或填写 `docs/ledger/CORE-LEDGER.md`
 4. 提交前核查：确认当前分支（`git rev-parse --abbrev-ref HEAD`），展示 `git status --short`（标注暂存/未暂存/未跟踪）与变更摘要；审查变更内容，发现疑似临时内容（临时注释、调试代码）或与本任务无关的改动时，先向用户指出并询问处理方式
-5. 草拟 commit message：对照 `.commitlintrc.cjs` 的 type/scope 白名单选择，并说明选择依据
-6. **message 确认（必做）**：用 `AskUserQuestion` 发起带选项的交互式提问。`question` 字段必须内联完整信息，禁止出现"以下""上述"等悬空引用：当前分支、`git status --short` 文件清单（逐条标注状态与改动性质）、commit message 全文、type/scope 选择依据。选项为：A 按此提交 / B 修改（按补充意见重新草拟并再次确认）/ C 取消提交。发起提问后必须停下等待答复：用户给出的"提交/commit"指令只是流程入口，不代替本步骤的确认。
+5. 草拟候选 message：根据改动内容，对照 `.commitlintrc.cjs` 的 type/scope 白名单生成 **2-3 个倾向选项**（例如不同 type 侧重或不同 scope 切分），每个选项用完整 message 描述呈现，并简要说明依据
+6. **message 选择（必做）**：用 `AskUserQuestion` 发起带选项的交互式提问。`question` 字段必须内联完整信息，禁止出现"以下""上述"等悬空引用：当前分支、`git status --short` 文件清单（逐条标注状态与改动性质）、2-3 个候选 message（A/B/C）及各自依据、D 取消提交。用户选择后执行对应动作：A/B/C 按该 message 进入提交步骤；D 停止。发起提问后必须停下等待答复：用户给出的"提交/commit"指令只是流程入口，不代替本步骤的确认。
 7. 用户确认后，对本次拟提交的每个文件用显式路径执行 `git add <path>`（禁止 `git add -A` 或 `git add .` 兜底），再执行 `git commit -m "<type>(<scope>): <中文描述>"`
 8. 汇报 commit hash、message、当前分支
 9. **推送确认**：询问用户"是否推送？"，等待明确回复
