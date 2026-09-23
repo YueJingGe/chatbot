@@ -7,7 +7,7 @@ AI 对话机器人 monorepo，npm workspaces 管理前端（web/）和后端（s
 - `npm run dev` — 并发启动前后端（端口 5173 / 3000）
 - `npm run dev:web` / `dev:server` — 仅启动一端
 - `npm run build:web` — 构建前端到 `web/dist/`
-- `npm run check:all` — Prettier + ESLint + Stylelint + Test + Build
+- `npm run check:all` — Harness + Prettier + ESLint + Stylelint + Test + Build
 - `npm run sync:agents` — 同步 `.agents/` 到各 AI 工具
 
 ## Map（结构索引）

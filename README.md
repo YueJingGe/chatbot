@@ -72,7 +72,7 @@ chatbot/
 │   ├── extensions.json                       # 推荐扩展
 │   └── settings.json                         # 编辑器设置
 ├── .husky/                                   # Git hooks
-│   └── pre-commit                            # pre-commit hook（lint-staged）
+│   └── pre-commit                            # pre-commit hook（lint-staged；commit/cm 入口已先跑过时跳过）
 ├── ISSUES/                                   # 开发日志（按日期）
 ├── 总结/                                     # 项目总结
 ├── image/                                    # 项目截图
@@ -147,7 +147,7 @@ npm run stylelint:check
 # 前端测试
 npm run test --workspace=web
 
-# 全量检查（format + lint + stylelint + test + build）
+# 全量检查（harness + format + lint + stylelint + test + build）
 npm run check:all
 ```
 

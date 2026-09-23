@@ -15,7 +15,7 @@
 - [x] 任务 9：构造三类失败场景验证 `check-harness` 拦截能力（skill 未同步 / frontmatter 缺失 / AGENTS.md 引用失联）
 - [x] 任务 10：验证 czg 双入口（`npm run commit`/`cm` 存在、向导 type 选项 9 类、中断 czg 后无残留 `lint.skipLintStaged`）
 - [x] 任务 11：补充 `docs/ledger/CORE-LEDGER.md` 本次核心路径变更条目（`.agents/**`、`.husky/**`、package.json harness script）
-- [ ] 任务 12：meta-验证（新会话真 prompt 提交类指令）与 spec/exec-plan 归档
+- [x] 任务 12：meta-验证（新会话真 prompt 提交类指令）与 spec/exec-plan 归档
 
 ## 依赖关系
 
@@ -28,10 +28,10 @@
 
 ## 验证方式
 
-- [ ] `npm run check:all` 通过
-- [ ] `npm run check:harness` 对当前仓库零误报
-- [ ] 构造失败场景下 `check-harness` 退出码非 0 并输出修复提示
-- [ ] `npm run sync:agents` 后 `.claude/skills/git-commit` 与 `.agents/skills/git-commit` 一致
-- [ ] `npx czg` 向导 type 选项为 9 类、scope 选项来自 `scope-enum`
-- [ ] 中断 czg 后 `git config --get lint.skipLintStaged` 返回空
-- [ ] 新会话真 prompt 验证 `git-commit` skill 仍能正确生成 message
+- [x] `npm run check:all` 通过
+- [x] `npm run check:harness` 对当前仓库零误报
+- [x] 构造失败场景下 `check-harness` 退出码非 0 并输出修复提示
+- [x] `npm run sync:agents` 后 `.claude/skills/git-commit` 与 `.agents/skills/git-commit` 一致
+- [x] `npx czg` 向导 type 选项为 9 类、scope 选项来自 `scope-enum`
+- [x] 中断 czg 后 `git config --get lint.skipLintStaged` 返回空
+- [x] 新会话真 prompt 验证 `git-commit` skill 仍能正确生成 message

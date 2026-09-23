@@ -27,15 +27,15 @@
 
 ## 验收标准
 
-- [ ] `scripts/check-harness.mjs` 新增，`npm run check:harness` 通过且对当前仓库零误报；构造三类失败场景（skill 未同步 / frontmatter 缺失 / AGENTS.md 引用失联）均能拦截并输出修复提示
-- [ ] `npm run check:all` 输出包含 harness 检查项且全绿（本地与 CI 路径一致）
-- [ ] `.czrc` 存在，`npx czg` 向导的 type 选项恰为 9 类、scope 选项来自 `scope-enum`（人工验证）
-- [ ] `npm run commit`、`npm run cm` 两个入口可用；中断 `npx czg` 后 `git config --get lint.skipLintStaged` 无残留
-- [ ] `git-commit/SKILL.md` 不再包含 type/scope 表格，message 规则引用 `.commitlintrc.cjs`；`npm run sync:agents` 后 `.claude/skills/git-commit` 与源一致
-- [ ] `.commitlintrc.cjs` 中"在 SKILL 基础上"的悬空引用已修正
-- [ ] `llms.txt` 命令描述与 `check:all` 实际组成一致（含 test 与 harness）
-- [ ] meta-验证：新会话用真 prompt（提交类指令）确认 skill 仍能正确指路生成 message（删表未破坏流程）
-- [ ] `npm run sync:agents`、`npm run check:all` 通过；`docs/ledger/CORE-LEDGER.md` 已补本次条目
+- [x] `scripts/check-harness.mjs` 新增，`npm run check:harness` 通过且对当前仓库零误报；构造三类失败场景（skill 未同步 / frontmatter 缺失 / AGENTS.md 引用失联）均能拦截并输出修复提示
+- [x] `npm run check:all` 输出包含 harness 检查项且全绿（本地与 CI 路径一致）
+- [x] `.czrc` 存在，`npx czg` 向导的 type 选项恰为 9 类、scope 选项来自 `scope-enum`（人工验证）
+- [x] `npm run commit`、`npm run cm` 两个入口可用；中断 `npx czg` 后 `git config --get lint.skipLintStaged` 无残留
+- [x] `git-commit/SKILL.md` 不再包含 type/scope 表格，message 规则引用 `.commitlintrc.cjs`；`npm run sync:agents` 后 `.claude/skills/git-commit` 与源一致
+- [x] `.commitlintrc.cjs` 中"在 SKILL 基础上"的悬空引用已修正
+- [x] `llms.txt` 命令描述与 `check:all` 实际组成一致（含 test 与 harness）
+- [x] meta-验证：新会话用真 prompt（提交类指令）确认 skill 仍能正确指路生成 message（删表未破坏流程）
+- [x] `npm run sync:agents`、`npm run check:all` 通过；`docs/ledger/CORE-LEDGER.md` 已补本次条目
 
 ## 涉及模块
 
