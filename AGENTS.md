@@ -56,5 +56,3 @@ AI 对话机器人 monorepo，npm workspaces 管理前端（web/）和后端（s
 - commit 走 `git-commit` SKILL（本地 commit），message 规则以 `.commitlintrc.cjs` 为准；push 走 `git-branch` SKILL（检查落后 → push）；分支/合并/发布/冲突/hotfix 也走 `git-branch` SKILL
 - 实现完成：`npm run check:all` 通过后主动询问是否需要 code review
 - 完成任务 / 声称修复：必须给可验证证据（命令输出 / 截图 / 数据），不是「应该好了」；修 bug 的证据必须包含复现该 bug 的测试失败输出，以及修复后同一测试通过的输出
-
-修改
