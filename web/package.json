@@ -9,6 +9,7 @@
     "type-check": "tsc -b --noEmit",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:changed": "vitest run --changed",
     "test:watch": "vitest"
   },
   "dependencies": {

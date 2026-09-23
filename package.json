@@ -18,7 +18,10 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md,less,css}\"",
     "stylelint": "stylelint \"web/src/**/*.less\" --fix",
     "stylelint:check": "stylelint \"web/src/**/*.less\"",
-    "check:all": "npm run format:check && npm run lint:check && npm run stylelint:check && npm run test --workspace=web && npm run build:web",
+    "check:all": "npm run check:harness && npm run format:check && npm run lint:check && npm run stylelint:check && npm run test --workspace=web && npm run build:web",
+    "check:harness": "node scripts/check-harness.mjs",
+    "cm": "git config --unset lint.skipLintStaged; czg",
+    "commit": "git add -A && lint-staged && git config lint.skipLintStaged true && czg; git config --unset lint.skipLintStaged",
     "type-check": "npm run type-check --workspace=web",
     "check:strict": "npm run format:check && npm run lint:check && npm run stylelint:check && npm run type-check",
     "prepare": "husky",
@@ -29,18 +32,19 @@
   },
   "lint-staged": {
     "web/src/**/*.{ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
+      "eslint --fix --cache",
+      "prettier --write",
+      "sh -c \"cd web && npm run test:changed\""
     ],
     "server/**/*.{js,cjs}": [
-      "eslint --fix",
+      "eslint --fix --cache",
       "prettier --write"
     ],
     "*.{ts,tsx,js}": [
       "prettier --write"
     ],
     "*.{less,css}": [
-      "stylelint --fix",
+      "stylelint --fix --cache",
       "prettier --write"
     ],
     "*.md": [

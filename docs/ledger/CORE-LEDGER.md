@@ -53,4 +53,13 @@
 - Changed: `test-driven-development` skill 增加“Bug Fix TDD”专节，明确要求先写复现测试、保留失败输出、再修复代码；并在 Common Rationalizations 与 Red Flags 中增加 bug fix 专属条目。
 - Changed: `docs/harness/frontend-testing.md` 扩展“测试先行”章节，新增“Bug Fix 的 TDD 要求”小节， checklist 同步要求保留失败输出。
 - Why the change is unavoidable: 用户指出 TDD 触发应看代码改动类型而非 prompt 关键词；同时“修改bug吧”那次交互显示 agent 先改代码后补测试，说明仅有触发条件无法保证真正执行 Red-Green，必须增加 bug fix 专用流程与证据要求。
-- Smaller-diff alternative considered: 仅改 AGENTS.md 触发条件，不动 TDD skill 与 frontend-testing.md。被否决，因为只改入口仍会让 agent 在“已触发 TDD”后跳过 Red 阶段；必须从入口、流程、证据三处同时收紧。
+- Smaller-diff alternative considered: 仅改 AGENTS.md 触发条件，不动 TDD skill 与 frontend-testing.md。被否决，因为只改入口仍会让 agent 在"已触发 TDD"后跳过 Red 阶段；必须从入口、流程、证据三处同时收紧。
+
+### 2026-09-23 | harness | 提交机制与 Harness 自校验
+
+- Added: `scripts/check-harness.mjs` 与 `npm run check:harness`；`check:all` 首位并入 harness 检查。
+- Added: `commit`/`cm` 双入口 script；`.husky/pre-commit` 增加 `lint.skipLintStaged` 跳过判断；`.czrc` 限定 czg 向导 type 为 9 类。
+- Changed: `.agents/skills/git-commit/SKILL.md` 删除 type/scope 表格，改为直接引用 `.commitlintrc.cjs`；`.commitlintrc.cjs` 注释去悬空引用；`llms.txt` 更新命令表。
+- Changed: lint-staged 中 eslint/stylelint 增加 `--cache`；`web/src/**/*.{ts,tsx}` 阶段新增 `npm run test:changed`（`vitest run --changed`），提交时自动跑相关前端测试。
+- Why the change is unavoidable: 人工提交入口缺失、czg 向导 type 选项与 commitlint 不同步、skill 与配置双写易漂移，导致"规范指路、执行靠机制"的目标未达成；同时 harness 规则与 AI skill 缺乏机器级校验，仅靠人工发现同步遗漏。
+- Smaller-diff alternative considered: 仅补 `commit` script 与 `.czrc`，不新增 check-harness。被否决，因为 skill 瘦身、lint-staged 缓存等改动仍依赖人工核对，没有自动化兜底，后续容易再次漂移。

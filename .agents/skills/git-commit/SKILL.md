@@ -29,17 +29,7 @@ description: Git 提交工作流（commit message 格式 + 本地 commit）。co
 
 `<type>(<scope>): <中文描述>`
 
-|type|含义|scope|
-|-|-|-|
-|`feat`|新功能|`frontend`（web/）、`backend`（server/）、`docs`（docs/）|
-|`fix`|修复 bug|同 feat|
-|`docs`|仅文档|可省略|
-|`refactor`|代码重构|可省略|
-|`style`|代码格式|可省略|
-|`perf`|性能优化|可省略|
-|`test`|测试相关|可省略|
-|`chore`|构建/依赖/辅助工具|可省略|
-|`ci`|CI 相关|可省略|
+type 与 scope 白名单以 `.commitlintrc.cjs` 为准；AI 生成 message 前须读取该文件，按白名单选择并说明依据。
 
 **示例**：`feat(frontend): 添加消息列表自动滚动到底部`
 

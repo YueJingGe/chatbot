@@ -16,7 +16,7 @@ const workspaceNames = workspaces
 module.exports = {
   extends: ["@commitlint/config-conventional"],
   rules: {
-    // type 白名单：在 SKILL 基础上补充 perf/test/ci
+    // type 白名单：9 类，覆盖功能、修复、文档、格式、重构、性能、测试、辅助工具、CI
     "type-enum": [
       2,
       "always",
