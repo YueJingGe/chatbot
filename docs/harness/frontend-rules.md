@@ -21,6 +21,7 @@
 |禁止 JSX 中传内联对象/函数|导致 memo 失效|
 |组件使用命名导出|`export { ComponentName }`，禁止匿名默认导出|
 |props 必须解构|禁止 `props.xxx` 写法|
+|组件目录|每个组件使用 `components/<Component>/index.tsx` 与 `index.module.less`；存在组件测试时使用同目录 `index.test.tsx`|
 
 ## 状态管理
 

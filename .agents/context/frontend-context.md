@@ -30,11 +30,11 @@
 |组件|职责|关键 props / state|备注|
 |-|-|-|-|
 |[App.tsx](../../web/src/App.tsx)|顶层容器，集成所有子组件，管理全局状态|messages / inputText / isLoading / isAtBottom|流式 SSE 在此消费|
-|[MessageList](../../web/src/components/MessageList.tsx)|渲染消息列表|messages|必须 `memo`；每条带 `data-message-id` 用于滚动定位|
-|[InputArea](../../web/src/components/InputArea.tsx)|输入框 + 发送按钮|inputText / setInputText / isLoading / sendMessage|必须 `memo`|
-|[ScrollToBottomButton](../../web/src/components/ScrollToBottomButton.tsx)|滚到底部悬浮按钮|visible / onClick|必须 `memo`|
-|[ConversationSidebar](../../web/src/components/ConversationSidebar.tsx)|左侧历史会话栏|conversations / activeId / onNewConversation / onSelectConversation|必须 `memo`；≤900px 隐藏|
-|[QuestionHistoryPanel](../../web/src/components/QuestionHistoryPanel.tsx)|右侧当前会话 question 列表|questions / onSelectQuestion|必须 `memo`；hover 展开|
+|[MessageList](../../web/src/components/MessageList/index.tsx)|渲染消息列表|messages|必须 `memo`；每条带 `data-message-id` 用于滚动定位|
+|[InputArea](../../web/src/components/InputArea/index.tsx)|输入框 + 发送按钮|inputText / setInputText / isLoading / sendMessage|必须 `memo`|
+|[ScrollToBottomButton](../../web/src/components/ScrollToBottomButton/index.tsx)|滚到底部悬浮按钮|visible / onClick|必须 `memo`|
+|[ConversationSidebar](../../web/src/components/ConversationSidebar/index.tsx)|左侧历史会话栏|conversations / activeId / onNewConversation / onSelectConversation|必须 `memo`；≤900px 隐藏|
+|[QuestionHistoryPanel](../../web/src/components/QuestionHistoryPanel/index.tsx)|右侧当前会话 question 列表|questions / onSelectQuestion|必须 `memo`；hover 展开|
 |[useConversation](../../web/src/hooks/useConversation.ts)|会话管理 hook|见返回值|localStorage 持久化 + debounce 300ms|
 
 ## 状态归属
@@ -65,10 +65,15 @@
 - **响应式断点**：≤900px 隐藏 sidebar；≤480px 全宽 + 紧凑样式
 - **BEM element 禁连字符**：详见 [docs/reference/naming.md](../../docs/reference/naming.md)
 
+## 测试
+
+- 工具链：Vitest + Testing Library + jsdom；初始化文件为 `web/src/test-utils/vitest.setup.ts`。
+- 测试文件与被测源码同目录，命名为 `*.test.ts(x)`；由 `web/vitest.config.ts` 发现。
+- 测试规范见 [docs/harness/frontend-testing.md](../../docs/harness/frontend-testing.md)；执行命令为 `npm run test --workspace=web`。
+
 ## 已知技术债
 
 - `web/tsconfig.tsbuildinfo` 被提交了，应在 `.gitignore` 排除（运行 `tsc -b` 自动生成）
-- 暂无单元测试
 - 暂无错误边界（Error Boundary），单条消息渲染失败会拖垮整个列表
 - `useConversation` 的 `getConversationTitle` 在每次 `updateMessages` 调用时执行，频繁输入场景有微小性能损耗
 - antd 全量引入，bundle size 较大（597 kB / gzip 195 kB），后续可按需引入

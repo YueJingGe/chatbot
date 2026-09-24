@@ -12,7 +12,7 @@
 - [x] 任务 6：改造 `App.tsx`（布局重构 + 集成 sidebar/panel/hook）
 - [x] 任务 7：更新 `App.module.less`（新增 layout + sidebar 样式）
 - [x] 任务 8：更新 `index.css`（新增 sidebar CSS 变量）
-- [x] 任务 9：改造 `MessageList.tsx`（添加 `data-message-id`）
+- [x] 任务 9：改造 `MessageList/index.tsx`（添加 `data-message-id`）
 - [x] 任务 10：`npm run build:web` 验证构建通过
 
 ## 依赖关系

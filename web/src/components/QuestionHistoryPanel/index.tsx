@@ -1,6 +1,6 @@
 import { memo, useState, useCallback, KeyboardEvent } from "react";
 import { Tooltip, Empty } from "antd";
-import styles from "./QuestionHistoryPanel.module.less";
+import styles from "./index.module.less";
 
 interface QuestionItem {
   id: string;
