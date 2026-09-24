@@ -62,7 +62,8 @@ function getChangedFiles(base) {
       const porcelain = runGit(["status", "--porcelain"]);
       return porcelain.map((line) => line.slice(3)).filter(Boolean);
     }
-    return runGit(["diff", "--name-only", `${base}..HEAD`]);
+    // 排除已删除文件（D）：重命名/目录化后旧文件路径不应再被要求带测试
+    return runGit(["diff", "--name-only", "--diff-filter=ACMRT", `${base}..HEAD`]);
   } catch {
     return [];
   }
@@ -89,6 +90,9 @@ function shouldCheck(file) {
   const basename = file.split("/").pop();
   const entryFiles = ["main.tsx", "App.tsx", "vite-env.d.ts"];
   if (entryFiles.includes(basename)) return false;
+
+  // setup / config 文件非逻辑代码，豁免
+  if (file.includes("/test-utils/") && /\.setup\.ts$/.test(file)) return false;
 
   return true;
 }
