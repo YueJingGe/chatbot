@@ -18,3 +18,83 @@
 ```
 
 ## 变更记录
+
+### 2026-09-22 | frontend | 组件目录化与测试同目录组织
+
+- Added: `docs/harness/frontend-rules.md` 中新增「组件目录」规则，要求每个组件使用 `components/<Component>/index.tsx` 与 `index.module.less`。
+- Reused: 保留现有 React.memo、CSS Modules、BEM 命名等既有约定。
+- Removed: 删除 `web/src/components/__tests__/` 与 `web/src/utils/__tests__/` 子目录；测试文件平铺到源码同目录。
+- Why the change is unavoidable: 用户明确要求 `components/` 下文件以 `demo` 为样例采用目录化结构；测试与源码同目录可降低新增测试的认知成本，并避免后续删除 `demo/` 时需要调整 Vitest 配置。
+- Smaller-diff alternative considered: 仅移动源码而不同步规则文档。被否决，因为规则文档是 AI 协作的事实源，代码与文档不同步会导致后续 agent 继续生成旧结构。
+
+### 2026-09-22 | harness | 前端测试规范与 AGENTS 触发规则
+
+- Added: 新增 `docs/harness/frontend-testing.md` 规范；在 `AGENTS.md` Default Protocol 中要求新增或改变前端行为时调用 `test-driven-development` skill 并补充同目录测试；根 `package.json` 的 `check:all` 在构建前运行 `npm run test --workspace=web`。
+- Reused: 复用已验证的 Vitest + Testing Library + jsdom 工具链与 `web/src/test-utils/vitest.setup.ts`。
+- Why the change is unavoidable: 消息复制功能已用 TDD 实现，但 harness 未固化测试策略、AGENTS 未定义触发规则、`check:all` 不跑测试，导致后续前端改动可能回退到无测试状态。
+- Smaller-diff alternative considered: 仅在 `frontend-context.md` 中口头记录测试命令，不纳入 AGENTS 触发与质量门禁。被否决，因为无法保证后续需求会实际执行测试。
+
+### 2026-09-22 | harness | 本地化 TDD skill 并收紧 new-requirement 触发条件
+
+- Added: 将 `test-driven-development` skill 从 Qoder marketplace 插件复制到 `.agents/skills/test-driven-development/`，并同步到 `.claude/skills/`。
+- Changed: `new-requirement` skill 由“自动路由”改为“显式路由”，仅在用户明确说“新需求”“新功能”“加一个 xxx”或显式调用 `/new-requirement` 时触发；不再从“帮我做 xxx”“做 xxx”等模糊表述自动推断。
+- Why the change is unavoidable: 用户反馈“新增一个纯工具函数”被误判为 L1 新需求并生成 spec，导致小改动流程过重；同时 TDD skill 原依赖外部插件，未纳入项目单一事实源，存在规则漂移风险。
+- Smaller-diff alternative considered: 仅放宽 L0 文件数阈值（把测试文件不计入），保留自动路由。被否决，因为问题的根源是触发条件过宽，即使放宽阈值仍会为非需求类任务生成 spec；显式触发更符合“用户说需求才走需求流程”的直觉。
+
+### 2026-09-22 | harness | git-commit skill 增加提交与推送双重确认
+
+- Changed: `git-commit` skill 触发条件从“用户要求提交或完成任务后”收紧为“用户明确说提交/commit 时才触发”；流程增加 commit 前确认、push 前确认两步；不再在 commit 后自动 push。
+- Why the change is unavoidable: 用户反馈完成任务后 agent 自动 commit/push，未等待确认，导致无法审查就推送到远端；同时容易把尚未验收的 harness 调整提前发布。
+- Smaller-diff alternative considered: 仅取消自动 push，保留完成任务后自动 commit。被否决，因为用户本意是“只有用户要求才触发提交”，自动 commit 同样越界。
+
+### 2026-09-22 | harness | TDD 触发条件改为代码改动类型并强化 bug fix 证据
+
+- Changed: `AGENTS.md` 第 46 行 TDD 触发条件从“新增或改变行为”改为“新增、修改或修复组件、hook、工具函数、状态或交互行为”；第 58 行“声称修复”的验收标准增加“必须包含复现 bug 的测试失败输出，以及修复后同一测试通过的输出”。
+- Changed: `test-driven-development` skill 增加“Bug Fix TDD”专节，明确要求先写复现测试、保留失败输出、再修复代码；并在 Common Rationalizations 与 Red Flags 中增加 bug fix 专属条目。
+- Changed: `docs/harness/frontend-testing.md` 扩展“测试先行”章节，新增“Bug Fix 的 TDD 要求”小节， checklist 同步要求保留失败输出。
+- Why the change is unavoidable: 用户指出 TDD 触发应看代码改动类型而非 prompt 关键词；同时“修改bug吧”那次交互显示 agent 先改代码后补测试，说明仅有触发条件无法保证真正执行 Red-Green，必须增加 bug fix 专用流程与证据要求。
+- Smaller-diff alternative considered: 仅改 AGENTS.md 触发条件，不动 TDD skill 与 frontend-testing.md。被否决，因为只改入口仍会让 agent 在"已触发 TDD"后跳过 Red 阶段；必须从入口、流程、证据三处同时收紧。
+
+### 2026-09-23 | harness | 提交机制与 Harness 自校验
+
+- Added: `scripts/check-harness.mjs` 与 `npm run check:harness`；`check:all` 首位并入 harness 检查。
+- Added: `commit`/`cm` 双入口 script；`.husky/pre-commit` 增加 `lint.skipLintStaged` 跳过判断；`.czrc` 限定 czg 向导 type 为 9 类。
+- Changed: `.agents/skills/git-commit/SKILL.md` 删除 type/scope 表格，改为直接引用 `.commitlintrc.cjs`；`.commitlintrc.cjs` 注释去悬空引用；`llms.txt` 更新命令表。
+- Changed: lint-staged 中 eslint/stylelint 增加 `--cache`。
+- Changed: lint-staged 的 web/src 规则中 `test:changed` 命令增加 `arch -arm64` 前缀，避免 x86_64 架构的 git 启动 hook 时 node 以 x64 运行而缺少 `@rollup/rollup-darwin-x64`。
+
+### 2026-09-23 | harness | git-commit skill 交互确认与 add 方式收紧
+
+- Changed: `.agents/skills/git-commit/SKILL.md` 要求 `AskUserQuestion` 的 question 字段必须内联当前分支、文件清单、message 全文及依据，禁止"以下"等悬空引用；提交前 add 改为对每个文件用显式路径，禁止 `git add -A` / `git add .` 兜底。
+- Why the change is unavoidable: 实测新会话调用 skill 时确认面板未展示清单，用户无法审查拟提交内容与 message；`git add -A` 兜底会把工作区其他未确认改动一并提交，已造成过越权提交实例。
+- Smaller-diff alternative considered: 仅在 skill 里加"展示清单"的模糊要求，不指定必须内联到 question 字段。被否决，因为模糊要求无法保证确认面板里实际出现清单。
+
+### 2026-09-23 | harness | git-commit skill message 选择改为多候选倾向
+
+- Changed: `.agents/skills/git-commit/SKILL.md` 步骤 5/6 从"生成单个 message 草案后 A/B/C 确认"改为"根据改动生成 2-3 个候选 message（不同 type/scope 倾向），用 `AskUserQuestion` 让用户选择 A/B/C 或 D 取消"。
+- Why the change is unavoidable: 用户希望根据代码改动看到多个 message 倾向再选，而不是只能接受/修改/拒绝单个草案；多候选更贴合"根据改动交互式问我倾向哪个描述"的交互方向。
+- Smaller-diff alternative considered: 保留单草案 + "B 修改"选项，让用户用文字补充。被否决，因为无法让用户在多个完整候选间直接比较选择，交互效率更低。
+
+### 2026-09-23 | harness | git-workflow.md 补充 develop 规则与保护策略缺口
+
+- Added: `docs/harness/git-workflow.md` 新增 `develop` 分支使用规则（集成测试分支、feature/fix 合入方式、与 main 同步方式）；新增 GitHub ruleset 已知缺口说明（PR 来源分支未限制，需人工把关）；新增 post-checkout/post-merge hook 自动同步说明。
+- Changed: `docs/reference/naming.md` 分支示例 `feat/weather-api` 修正为 `feature/weather-api`；`docs/reference/react-components.md` 扩展为项目实际组件写法参考；归档目录扁平化并统一 `YYYY-MM-DD-` 前缀；`web/src/App.tsx` 改为命名导出并保留默认导出兼容。
+- Why the change is unavoidable: 规范文档与实际运行存在偏差（develop 定位不清、ruleset 缺口只散落在 ISSUES、分支示例错误、组件导出实践未文档化），沉淀后减少 agent/新成员对流程的误解。
+- Smaller-diff alternative considered: 仅修正 naming.md 一行，其他不动。被否决，因为单点修正无法解决 develop 用法、PR 层面保护、组件规范引用等多处不一致。
+
+### 2026-09-24 | harness | 前端 TDD 分层治理（Skill + 门禁 + 文档/计划）
+
+- Added: `scripts/check-frontend-tdd.mjs` 检查本次 git 变更中 `web/src/**` 逻辑文件是否带同目录测试；`fix`/`hotfix` 类提交额外检查是否包含测试文件变更。
+- Added: `npm run check:frontend-tdd` script，并入 `npm run check:all`；`.husky/pre-commit` 与 `.husky/pre-push` 挂载该门禁。
+- Changed: `docs/harness/frontend-testing.md` 新增"三层治理"小节，明确 Skill 层、门禁层、文档/计划层职责与引用关系；spec/exec-plan 模板在验收与 Verification Strategy 中引用 TDD skill 与门禁，不重复定义规则。
+- Why the change is unavoidable: 已有 TDD 依赖 AI 会话中自觉调用 skill，存在绕过或遗忘风险；同时 Skill、门禁、计划模板存在多套写法的漂移可能，需要机器兜底与单一引用链。
+- Smaller-diff alternative considered: 仅在 `frontend-testing.md` 中口头要求补测试，不新增门禁脚本。被否决，因为无机器校验的规则会被事后补测试冒充按序执行，无法保证 Red-Green 真实发生。
+
+### 2026-09-24 | harness | Push-gate ledger 惰性模板与 What to do next
+
+- Added: `scripts/push-gate.mjs` 解析 ledger 条目中日期与 scope，判断本次核心路径改动是否被近期条目覆盖。
+- Added: 核心路径变更未被覆盖时，自动在 `docs/ledger/CORE-LEDGER.md` 末尾追加带日期、scope、涉及文件清单与待填写字段的模板条目，并输出可执行的 "What to do next" 提示。
+- Changed: `scripts/push-gate.mjs` 复杂度敏感命中提示改为"请在现有 ledger 条目中补充变更理由"；轻量模式仅 warning，strict 模式阻塞 push。
+- Changed: `.agents/skills/git-commit/SKILL.md` 提醒措辞更新为"pre-push 会兜底生成模板，但仍建议在 commit 前主动补录"。
+- Why the change is unavoidable: 旧检查只验证 ledger 文件是否存在，无法保证每次核心路径改动都被记录；缺少可执行 next step 导致 push 被拦后用户不知如何处理。
+- Smaller-diff alternative considered: 保留文件存在检查，仅改进错误提示。被否决，因为文件级检查仍会漏掉同一文件多次改动的记录缺失。

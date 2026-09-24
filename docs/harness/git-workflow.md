@@ -33,6 +33,15 @@ hotfix/*                   ← 从 main 切，紧急修复，绕过 release，�
 - 禁止 `feature/*` → `main`（必须经 `release` 或 `hotfix` 路径）
 - 禁止 AI 自主执行 `release/*` → `main` 的合并操作
 
+## 2.1 develop 分支使用规则
+
+`develop` 是**集成测试分支**，用于日常集成和 CI 验证，不作为发布源。
+
+- `feature/*`、`fix/*` 完成后，优先通过 PR 合入 `develop` 做集成测试。
+- `develop` 上的改动**不能**直接合入 `main`；需要发布时，从 `main` 新建 `release/*`，再把纳入本版本的 feature/fix 重新 PR 到该 release。
+- `develop` 应始终包含 `main` 的最新内容；当 `main` 前进时，执行 `git checkout develop && git merge main && git push origin develop` 同步。
+- `develop` 允许直接 push（本地 hook 不拦截），但建议仍走 PR 以便 CI 审查。
+
 ## 3. 版本号与 Tag 规则
 
 - 遵循 **SemVer 2.0.0**：
@@ -81,8 +90,18 @@ hotfix/*                   ← 从 main 切，紧急修复，绕过 release，�
 
 - `main` 和 `release/*` 禁止直接 push，仅允许通过 PR 合入。
 - `feature/*`、`fix/*`、`hotfix/*` push 前自动执行 `git rebase main`（hook 实现），若落后则拒绝 push，提示重新推送。
+- 分支切换（`git checkout`、`git worktree add`）或合并后，`post-checkout` / `post-merge` hook 会自动执行 `npm run sync:agents`，保持 `.claude/` 等副本与 `.agents/` 同步。
 
-### 8.1 核心路径变更治理
+### 8.1 GitHub ruleset 已知缺口
+
+本地 `pre-push` hook 只能拦截 `git push`，无法拦截 GitHub 网页端的 PR 合并。当前仓库的 GitHub ruleset 尚未配置"限制 PR 来源分支"，因此：
+
+- `feature/*` / `fix/*` 理论上可直接开 PR 到 `main`（违反路径约束）；
+- `develop` 理论上也可直接开 PR 到 `main`（明确禁止）。
+
+在 ruleset 补齐之前，需由人工在创建/审查 PR 时把关目标分支。
+
+### 8.2 核心路径变更治理
 
 为控制核心模块（数据流、类型契约、后端 API、协作规范、架构规则）的变更质量，pre-push hook 对以下路径启用 ledger 检查：
 

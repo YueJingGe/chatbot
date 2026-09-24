@@ -1,1 +1,8 @@
+#!/bin/sh
+# 若 commit/cm script 已先跑过 lint-staged，跳过重复执行
+if [ "$(git config --get --bool lint.skipLintStaged)" = "true" ]; then
+  exit 0
+fi
+
+node scripts/check-frontend-tdd.mjs
 npx lint-staged

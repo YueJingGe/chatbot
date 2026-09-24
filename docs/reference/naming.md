@@ -7,8 +7,10 @@
 |类别|格式|示例|
 |-|-|-|
 |目录|kebab-case|`components/`、`exec-plans/`|
-|组件文件|PascalCase.tsx|`MessageList.tsx`|
-|组件样式|PascalCase.module.less|`MessageList.module.less`|
+|组件目录|PascalCase|`components/MessageList/`|
+|组件入口|index.tsx|`components/MessageList/index.tsx`|
+|组件样式|index.module.less|`components/MessageList/index.module.less`|
+|组件测试|index.test.tsx|`components/MessageList/index.test.tsx`|
 |工具文件|camelCase.js/ts|`weather.js`|
 |配置文件|kebab-case|`vite.config.ts`|
 |文档|kebab-case.md|`docs/harness/frontend-rules.md`|
@@ -147,7 +149,7 @@
 
 |类别|格式|示例|
 |-|-|-|
-|分支|type/description|`feat/weather-api`、`fix/scroll-bug`|
+|分支|type/description|`feature/weather-api`、`fix/scroll-bug`|
 |提交|见 `.agents/skills/git-commit/SKILL.md`|`feat(frontend): 添加天气查询`|
 
 ## 代码迁移命名

@@ -10,7 +10,7 @@
 
 **不改动的部分：**
 
-- 前端代码（`App.tsx`、`MessageList.tsx`、`InputArea.tsx`）无需修改
+- 前端代码（`App.tsx`、`components/MessageList/index.tsx`、`components/InputArea/index.tsx`）无需修改
 - 数据流链路不变（仍是 SSE 流式传输）
 - 不引入新依赖
 

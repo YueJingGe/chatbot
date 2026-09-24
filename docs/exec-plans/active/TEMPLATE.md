@@ -15,5 +15,6 @@
 
 ## 验证方式
 
-- [ ] `npm run check:all` 通过
+- [ ] `npm run check:all` 通过（含 `check:harness`、`check:frontend-tdd`）
+- [ ] 若涉及前端行为改动，TDD 已按 `.agents/skills/test-driven-development/SKILL.md` 执行，并保留 Red-Green 证据；门禁 `scripts/check-frontend-tdd.mjs` 不重复定义规则，仅做机器兜底
 - [ ] 手动测试 xxx

@@ -34,6 +34,7 @@
   --space-xl: 32px;
 
   /* 圆角 */
+  --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 12px;
   --radius-lg: 16px;
@@ -49,6 +50,11 @@
   /* 阴影 */
   --shadow-card: 0 2px 20px rgb(0 0 0 / 6%);
   --shadow-focus: 0 0 0 3px rgb(194 120 92 / 20%);
+  --shadow-dropdown: 0 4px 12px rgb(0 0 0 / 10%);
+
+  /* 交互态遮罩 */
+  --color-overlay-hover: rgb(0 0 0 / 6%);
+  --color-overlay-active: rgb(0 0 0 / 4%);
 }
 
 /* ===== 全局重置 ===== */

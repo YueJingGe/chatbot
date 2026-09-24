@@ -57,6 +57,10 @@ chatbot/
 │   │   ├── vite-env.d.ts                     # Vite 类型声明
 │   │   ├── assets/                           # 静态资源
 │   │   └── components/                       # 叶子组件（React.memo）
+│   │       └── <Component>/                  # 每个组件独立目录
+│   │           ├── index.tsx                 # 组件入口
+│   │           ├── index.module.less         # 组件样式
+│   │           └── index.test.tsx            # 组件测试（存在时）
 │   ├── public/                               # 公共静态文件
 │   ├── index.html
 │   ├── vite.config.ts                        # Vite 配置 + dev proxy
@@ -68,7 +72,7 @@ chatbot/
 │   ├── extensions.json                       # 推荐扩展
 │   └── settings.json                         # 编辑器设置
 ├── .husky/                                   # Git hooks
-│   └── pre-commit                            # pre-commit hook（lint-staged）
+│   └── pre-commit                            # pre-commit hook（lint-staged；commit/cm 入口已先跑过时跳过）
 ├── ISSUES/                                   # 开发日志（按日期）
 ├── 总结/                                     # 项目总结
 ├── image/                                    # 项目截图
@@ -140,7 +144,10 @@ npm run stylelint
 # Stylelint 检查
 npm run stylelint:check
 
-# 全量检查（format + lint + stylelint + build）
+# 前端测试
+npm run test --workspace=web
+
+# 全量检查（harness + format + lint + stylelint + test + build）
 npm run check:all
 ```
 
