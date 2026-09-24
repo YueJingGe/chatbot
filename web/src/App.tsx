@@ -5,6 +5,7 @@ import ScrollToBottomButton from "./components/ScrollToBottomButton";
 import { ConversationSidebar } from "./components/ConversationSidebar";
 import { QuestionHistoryPanel } from "./components/QuestionHistoryPanel";
 import { useConversation } from "./hooks/useConversation";
+import { checkIsAtBottom } from "./utils/scroll";
 import styles from "./App.module.less";
 
 export function App() {
@@ -33,16 +34,11 @@ export function App() {
     isLoadingRef.current = isLoading;
   }, [messages, inputText, isLoading]);
 
-  const checkIsAtBottom = useCallback((element: HTMLDivElement) => {
-    const threshold = 30;
-    return element.scrollHeight - element.scrollTop - element.clientHeight <= threshold;
-  }, []);
-
   const handleScroll = useCallback(() => {
     if (chatHistoryRef.current) {
       setIsAtBottom(checkIsAtBottom(chatHistoryRef.current));
     }
-  }, [checkIsAtBottom]);
+  }, []);
 
   const scrollToBottom = useCallback(() => {
     if (chatHistoryRef.current) {
