@@ -208,6 +208,12 @@ function isReferencePath(text) {
   return knownPathPrefixes.some((prefix) => text.startsWith(prefix));
 }
 
+// AGENTS.md 中允许引用但不一定在仓库中存在的路径（如构建输出、本地环境文件）
+const allowedMissingPaths = new Set([
+  "web/dist/", // build 输出目录，CI 干净 checkout 时不存在
+  "server/.env", // 本地环境文件，不纳入版本控制
+]);
+
 function checkAgentsMdReferences() {
   if (!existsSync(agentsMdPath)) {
     pushError("AGENTS_MD_MISSING", "AGENTS.md 不存在", "");
@@ -221,6 +227,7 @@ function checkAgentsMdReferences() {
     const text = match[1].trim();
     if (!isReferencePath(text)) continue;
     if (seen.has(text)) continue;
+    if (allowedMissingPaths.has(text)) continue;
     seen.add(text);
 
     const targetPath = resolve(repoRoot, text);
