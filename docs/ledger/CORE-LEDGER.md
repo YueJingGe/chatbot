@@ -81,3 +81,20 @@
 - Changed: `docs/reference/naming.md` 分支示例 `feat/weather-api` 修正为 `feature/weather-api`；`docs/reference/react-components.md` 扩展为项目实际组件写法参考；归档目录扁平化并统一 `YYYY-MM-DD-` 前缀；`web/src/App.tsx` 改为命名导出并保留默认导出兼容。
 - Why the change is unavoidable: 规范文档与实际运行存在偏差（develop 定位不清、ruleset 缺口只散落在 ISSUES、分支示例错误、组件导出实践未文档化），沉淀后减少 agent/新成员对流程的误解。
 - Smaller-diff alternative considered: 仅修正 naming.md 一行，其他不动。被否决，因为单点修正无法解决 develop 用法、PR 层面保护、组件规范引用等多处不一致。
+
+### 2026-09-24 | harness | 前端 TDD 分层治理（Skill + 门禁 + 文档/计划）
+
+- Added: `scripts/check-frontend-tdd.mjs` 检查本次 git 变更中 `web/src/**` 逻辑文件是否带同目录测试；`fix`/`hotfix` 类提交额外检查是否包含测试文件变更。
+- Added: `npm run check:frontend-tdd` script，并入 `npm run check:all`；`.husky/pre-commit` 与 `.husky/pre-push` 挂载该门禁。
+- Changed: `docs/harness/frontend-testing.md` 新增"三层治理"小节，明确 Skill 层、门禁层、文档/计划层职责与引用关系；spec/exec-plan 模板在验收与 Verification Strategy 中引用 TDD skill 与门禁，不重复定义规则。
+- Why the change is unavoidable: 已有 TDD 依赖 AI 会话中自觉调用 skill，存在绕过或遗忘风险；同时 Skill、门禁、计划模板存在多套写法的漂移可能，需要机器兜底与单一引用链。
+- Smaller-diff alternative considered: 仅在 `frontend-testing.md` 中口头要求补测试，不新增门禁脚本。被否决，因为无机器校验的规则会被事后补测试冒充按序执行，无法保证 Red-Green 真实发生。
+
+### 2026-09-24 | harness | Push-gate ledger 惰性模板与 What to do next
+
+- Added: `scripts/push-gate.mjs` 解析 ledger 条目中日期与 scope，判断本次核心路径改动是否被近期条目覆盖。
+- Added: 核心路径变更未被覆盖时，自动在 `docs/ledger/CORE-LEDGER.md` 末尾追加带日期、scope、涉及文件清单与待填写字段的模板条目，并输出可执行的 "What to do next" 提示。
+- Changed: `scripts/push-gate.mjs` 复杂度敏感命中提示改为"请在现有 ledger 条目中补充变更理由"；轻量模式仅 warning，strict 模式阻塞 push。
+- Changed: `.agents/skills/git-commit/SKILL.md` 提醒措辞更新为"pre-push 会兜底生成模板，但仍建议在 commit 前主动补录"。
+- Why the change is unavoidable: 旧检查只验证 ledger 文件是否存在，无法保证每次核心路径改动都被记录；缺少可执行 next step 导致 push 被拦后用户不知如何处理。
+- Smaller-diff alternative considered: 保留文件存在检查，仅改进错误提示。被否决，因为文件级检查仍会漏掉同一文件多次改动的记录缺失。

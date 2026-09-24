@@ -26,7 +26,8 @@ LLM：阿里云百炼 DashScope（OpenAI 兼容模式）qwen-max
 |npm run dev:web|启动前端（端口 5173）|
 |npm run dev:server|启动后端（端口 3000）|
 |npm run build:web|构建前端|
-|npm run check:all|全量检查（harness + format + lint + stylelint + test + build）|
+|npm run check:all|全量检查（harness + frontend-tdd + format + lint + stylelint + test + build）|
+|npm run check:frontend-tdd|前端 TDD 门禁（测试存在性 + fix 提交兜底）|
 |npm run format|Prettier 格式化|
 |npm run lint|ESLint 自动修复|
 |npm run stylelint|Stylelint 自动修复|
