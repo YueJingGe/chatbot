@@ -1,5 +1,5 @@
 import { memo, KeyboardEvent } from "react";
-import styles from "./InputArea.module.less";
+import styles from "./index.module.less";
 
 interface InputAreaProps {
   inputText: string;
@@ -11,6 +11,8 @@ interface InputAreaProps {
 
 const InputArea = memo(
   ({ inputText, setInputText, isLoading, sendMessage, handleKeyPress }: InputAreaProps) => {
+    const isSendDisabled = isLoading || inputText.trim() === "";
+
     return (
       <div className={styles["input-area"]}>
         <div className={styles["input-wrapper"]}>
@@ -28,7 +30,7 @@ const InputArea = memo(
           <button
             className={`${styles["send-button"]}${isLoading ? ` ${styles["send-button--loading"]}` : ""}`}
             onClick={sendMessage}
-            disabled={isLoading}
+            disabled={isSendDisabled}
             title="发送"
             aria-label="发送消息"
           >

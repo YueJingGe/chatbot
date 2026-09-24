@@ -1,8 +1,8 @@
 import { memo, useCallback, KeyboardEvent } from "react";
 import { Button, List } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import type { Conversation } from "../types/conversation";
-import styles from "./ConversationSidebar.module.less";
+import type { Conversation } from "../../types/conversation";
+import styles from "./index.module.less";
 
 interface ConversationSidebarProps {
   conversations: Conversation[];

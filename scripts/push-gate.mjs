@@ -229,6 +229,91 @@ function ensureLedgerTemplate() {
   );
 }
 
+function readLedgerText() {
+  ensureLedgerTemplate();
+  return readFileSync(ledgerPath, "utf8");
+}
+
+function parseLedgerEntries(content) {
+  const entries = [];
+  const headingRegex = /^###\s+(\d{4}-\d{2}-\d{2})\s*\|\s*([^|]+)\s*\|\s*(.+)$/gmu;
+  let match;
+
+  while ((match = headingRegex.exec(content)) !== null) {
+    const date = match[1];
+    const scope = match[2].trim();
+    const title = match[3].trim();
+    const start = match.index;
+    const nextHeading = content.search(
+      new RegExp(`^(?!${match[0].replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}).*###\\s+\\d{4}`, "mu")
+    );
+    const body =
+      nextHeading > start ? content.slice(start, nextHeading).trim() : content.slice(start).trim();
+    entries.push({ date, scope, title, body, start });
+  }
+
+  return entries;
+}
+
+function matchesCoreFiles(entry, files) {
+  const text = `${entry.title}\n${entry.body}`;
+  return files.some((file) => text.includes(file) || text.includes(file.split("/").pop()));
+}
+
+function hasRecentLedgerCoverage(files, entries, days = 7) {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - days);
+  return entries.some((entry) => {
+    const entryDate = new Date(entry.date);
+    return entryDate >= cutoff && matchesCoreFiles(entry, files);
+  });
+}
+
+function todayStr() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+}
+
+function inferScope(files) {
+  if (files.some((f) => f.startsWith(".agents/"))) return "harness";
+  if (files.some((f) => f.startsWith("docs/harness/"))) return "harness";
+  if (files.some((f) => f.startsWith("web/src/hooks/"))) return "frontend";
+  if (files.some((f) => f.startsWith("web/src/types/"))) return "frontend";
+  if (files.some((f) => f.startsWith("server/"))) return "backend";
+  return "core";
+}
+
+function appendLedgerTemplate(files, complexityHits) {
+  ensureLedgerTemplate();
+  const content = readLedgerText();
+  const date = todayStr();
+  const scope = inferScope(files);
+  const fileList = files.map((f) => `  - ${f}`).join("\n");
+  const complexityNote =
+    complexityHits.length > 0
+      ? `\n- 复杂度敏感命中：${complexityHits.map((h) => `${h.file} (${h.type})`).join(", ")}`
+      : "";
+
+  const entry = [
+    "",
+    `### ${date} | ${scope} | 待填写描述`,
+    "",
+    "- Added: 待填写",
+    "- Reused: 待填写",
+    "- Removed: 待填写",
+    "- Consolidated: 待填写",
+    `- Why the change is unavoidable: 待填写${complexityNote}`,
+    "- Smaller-diff alternative considered: 待填写",
+    "",
+    "涉及文件：",
+    fileList,
+    "",
+  ].join("\n");
+
+  writeFileSync(ledgerPath, content.trimEnd() + entry, "utf8");
+  return { date, scope };
+}
+
 function formatList(items, maxItems = 8) {
   const visible = items.slice(0, maxItems);
   const more = items.length > maxItems ? `  ... 等 ${items.length} 个文件` : "";
@@ -264,15 +349,7 @@ function main() {
 
   const coreFiles = files.filter(isCorePath);
   const complexityHits = detectComplexityHits(coreFiles);
-  const ledgerExists = existsSync(ledgerPath);
   const strict = isStrictMode(options);
-
-  if (options.writeTemplate && coreFiles.length > 0) {
-    ensureLedgerTemplate();
-    console.log(`[push-gate] 已生成 ledger 模板：${ledgerPath}`);
-    console.log("          请填写后重新提交/推送。");
-    return;
-  }
 
   if (coreFiles.length === 0) {
     console.log("[push-gate] 未涉及核心路径，跳过 ledger 检查");
@@ -292,21 +369,25 @@ function main() {
     }
   }
 
+  const ledgerContent = readLedgerText();
+  const ledgerEntries = parseLedgerEntries(ledgerContent);
+  const covered = hasRecentLedgerCoverage(coreFiles, ledgerEntries);
   const issues = [];
 
-  if (!ledgerExists) {
+  if (!covered) {
+    const { date, scope } = appendLedgerTemplate(coreFiles, complexityHits);
     issues.push({
-      code: "CORE_LEDGER_MISSING",
+      code: "CORE_LEDGER_ENTRY_MISSING",
       level: strict ? "error" : "warning",
-      message: `核心路径文件变更，但 ${ledgerPath} 不存在。`,
+      message: `核心路径变更未在最近 ledger 条目中找到对应记录，已惰性生成 ${date} | ${scope} 模板。`,
     });
   }
 
-  if (complexityHits.length > 0) {
+  if (complexityHits.length > 0 && covered) {
     issues.push({
       code: "COMPLEXITY_LEDGER_REQUIRED",
       level: strict ? "error" : "warning",
-      message: `命中复杂度敏感文件，需在 ledger 中说明变更理由。`,
+      message: `命中复杂度敏感文件，请在现有 ledger 条目中补充变更理由。`,
     });
   }
 
@@ -335,10 +416,12 @@ function main() {
     console.log(`  ${issueColor}${issue.code}:${colors.reset} ${issue.message}`);
   }
 
-  console.log(`${colors.cyan}修复提示：${colors.reset}`);
-  console.log(`  1. 生成模板：node scripts/push-gate.mjs --write-template`);
-  console.log(`  2. 填写 ledger：${ledgerPath}`);
-  console.log(`  3. 重新 add/commit/push`);
+  console.log(`${colors.cyan}What to do next:${colors.reset}`);
+  console.log(`  1. 编辑 ledger：${ledgerPath}`);
+  console.log(`     填写刚生成的模板条目（日期、scope、Why the change is unavoidable 等）`);
+  console.log(`  2. 重新暂存：git add ${ledgerPath}`);
+  console.log(`  3. 修订提交：git commit --amend --no-edit 或新增一次 commit`);
+  console.log(`  4. 重新推送：git push`);
   console.log(`${colors.cyan}如需绕过（merge/rebase/integration push）：${colors.reset}`);
   console.log(`  CHATBOT_LEDGER_SKIP=1 git push`);
   console.log(`  或指定基础分支：CHATBOT_LEDGER_BASE_REF=<branch> git push`);

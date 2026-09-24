@@ -52,8 +52,8 @@ localStorage keys：
 ### 1. ConversationSidebar（左侧边栏）
 
 ```
-web/src/components/ConversationSidebar.tsx
-web/src/components/ConversationSidebar.module.less
+web/src/components/ConversationSidebar/index.tsx
+web/src/components/ConversationSidebar/index.module.less
 ```
 
 **布局**：
@@ -89,8 +89,8 @@ interface ConversationSidebarProps {
 ### 2. QuestionHistoryPanel（右侧悬浮面板）
 
 ```
-web/src/components/QuestionHistoryPanel.tsx
-web/src/components/QuestionHistoryPanel.module.less
+web/src/components/QuestionHistoryPanel/index.tsx
+web/src/components/QuestionHistoryPanel/index.module.less
 ```
 
 **布局**：
@@ -215,11 +215,11 @@ web/src/hooks/useConversation.ts
 
 - 前端：web/src/types/conversation.ts（新）
 - 前端：web/src/hooks/useConversation.ts（新）
-- 前端：web/src/components/ConversationSidebar.tsx + .module.less（新）
-- 前端：web/src/components/QuestionHistoryPanel.tsx + .module.less（新）
+- 前端：web/src/components/ConversationSidebar/index.tsx + index.module.less（新）
+- 前端：web/src/components/QuestionHistoryPanel/index.tsx + index.module.less（新）
 - 前端：web/src/App.tsx（改造布局 + 集成）
 - 前端：web/src/App.module.less（新增 sidebar + layout 样式）
-- 前端：web/src/components/MessageList.tsx（添加 data-message-id）
+- 前端：web/src/components/MessageList/index.tsx（添加 data-message-id）
 - 前端：web/src/index.css（新增 sidebar CSS 变量 + antd 样式覆盖）
 - 依赖：web/package.json 新增 `antd` 和 `@ant-design/icons`
 

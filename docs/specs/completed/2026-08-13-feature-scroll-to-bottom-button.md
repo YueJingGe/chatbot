@@ -45,7 +45,7 @@
 
 - `web/src/App.tsx`：获取聊天容器 ref、计算滚动状态、传递给按钮组件。
 - `web/src/App.css`：新增按钮样式、响应式调整。
-- `web/src/components/ScrollToBottomButton.tsx`：新增悬浮按钮组件。
+- `web/src/components/ScrollToBottomButton/index.tsx`：新增悬浮按钮组件。
 
 ## 非目标
 
