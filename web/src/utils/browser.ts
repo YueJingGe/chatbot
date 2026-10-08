@@ -43,3 +43,26 @@ export function getHarmonyTerminal(candidateUserAgent?: string): HarmonyTerminal
 
   return null;
 }
+
+export function isWindowsUserAgent(candidateUserAgent: string): boolean {
+  return !isHarmonyUserAgent(candidateUserAgent) && /windows/i.test(candidateUserAgent);
+}
+
+export const isWindows = isWindowsUserAgent(ua);
+
+const DESKTOP_USER_AGENT_REGEX =
+  /TONGYI_DESKTOP\/|\(PC\s*;[^)]*(?:OpenHarmony|HarmonyOS)|\(OHOS\s*;\s*OHOS\s+x86_64\s*\)/i;
+const MOBILE_USER_AGENT_REGEX =
+  /mobile|android|iphone|ipad|ipod|blackberry|iemobile|opera mini|windows phone|\bphone\b/i;
+
+export function isMobileUserAgent(candidateUserAgent: string): boolean {
+  // Harmony Native 和 Harmony PC 浏览器的 UA 都包含 Harmony，不能据此判断为移动端。
+  if (DESKTOP_USER_AGENT_REGEX.test(candidateUserAgent)) return false;
+  return MOBILE_USER_AGENT_REGEX.test(candidateUserAgent);
+}
+
+export const isMobile = (): boolean => {
+  const currentUserAgent =
+    navigator.userAgent || navigator.vendor || (window as HarmonyWindow).opera || "";
+  return isMobileUserAgent(currentUserAgent);
+};

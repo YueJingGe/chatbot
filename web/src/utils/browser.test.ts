@@ -1,6 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { getHarmonyTerminal, isHarmonyUserAgent } from "./browser";
+import {
+  getHarmonyTerminal,
+  isHarmonyUserAgent,
+  isMobileUserAgent,
+  isWindowsUserAgent,
+} from "./browser";
 
 const HARMONY_NATIVE_UA =
   "Mozilla/5.0 (X11; OHOS 5.0) AppleWebKit/537.36 Chrome/144.0.0.0 Safari/537.36 TONGYI_DESKTOP/4.1.0.175";
@@ -105,5 +110,96 @@ describe("getHarmonyTerminal", () => {
     vi.stubGlobal("window", { opera });
     const browser = await import("./browser");
     expect(browser.getHarmonyTerminal()).toBe(vendor || opera ? "pc-web" : null);
+  });
+});
+
+describe("isMobileUserAgent", () => {
+  it.each(harmonyCases)("正确区分 Harmony %s 的移动端形态", (_name, userAgent, terminal) => {
+    expect(isMobileUserAgent(userAgent)).toBe(terminal === "phone-web");
+  });
+
+  it.each([
+    ["Android", "Mozilla/5.0 (Linux; Android 14) Mobile", true],
+    ["iPhone", "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) Mobile", true],
+    ["iPad", "Mozilla/5.0 (iPad; CPU OS 18_0 like Mac OS X)", true],
+    ["Windows", WINDOWS_UA, false],
+    ["macOS", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)", false],
+    ["Linux", "Mozilla/5.0 (X11; Linux x86_64)", false],
+    ["空 UA", "", false],
+    ["仅 Harmony 标记", "Mozilla/5.0 (OHOS 5.0)", false],
+  ] as const)("保留 %s 的判断", (_name, userAgent, expected) => {
+    expect(isMobileUserAgent(userAgent)).toBe(expected);
+  });
+
+  it.each([
+    HARMONY_NATIVE_UA,
+    HARMONY_OLD_NATIVE_UA,
+    HARMONY_PC_UA,
+    HARMONY_UU_PC_UA,
+    `${WINDOWS_UA} TONGYI_DESKTOP/4.1.0`,
+  ])("桌面特征优先于 Mobile/Android 且忽略大小写：%s", (userAgent) => {
+    expect(isMobileUserAgent(`${userAgent} Mobile Android`.toLowerCase())).toBe(false);
+  });
+});
+
+describe("isMobile", () => {
+  it.each(harmonyCases)("根据当前 UA 判断 Harmony %s", async (_name, userAgent, terminal) => {
+    const browser = await loadBrowser(userAgent);
+    expect(browser.isMobile()).toBe(terminal === "phone-web");
+  });
+
+  it("每次调用重新读取 UA，不使用模块初始化时的快照", async () => {
+    const browser = await loadBrowser(WINDOWS_UA);
+    expect(browser.isMobile()).toBe(false);
+    vi.stubGlobal("navigator", { userAgent: HARMONY_PHONE_UA, vendor: "" });
+    expect(browser.isMobile()).toBe(true);
+  });
+
+  it.each([
+    [HARMONY_PHONE_UA, "", true],
+    ["", HARMONY_PHONE_UA, true],
+    ["", "", false],
+  ] as const)("保留 vendor / opera / 空串回退：%s %s", async (vendor, opera, expected) => {
+    const browser = await loadBrowser(WINDOWS_UA);
+    vi.stubGlobal("navigator", { userAgent: "", vendor });
+    vi.stubGlobal("window", { opera });
+    expect(browser.isMobile()).toBe(expected);
+  });
+
+  it("只消费 UA，不读取 Harmony 模板信号", async () => {
+    const browser = await loadBrowser("Mozilla/5.0 (Linux; Android 14) Mobile", true);
+    expect(browser.getHarmonyTerminal()).toBe("pc-web");
+    expect(browser.isMobile()).toBe(true);
+  });
+});
+
+describe("isWindowsUserAgent / isWindows", () => {
+  it.each(harmonyCases)("不把 Harmony %s 识别为 Windows", async (_name, userAgent) => {
+    expect(isWindowsUserAgent(userAgent)).toBe(false);
+    const browser = await loadBrowser(userAgent);
+    expect(browser.isWindows).toBe(false);
+  });
+
+  it.each([
+    ["Windows", WINDOWS_UA, true],
+    ["小写 Windows", WINDOWS_UA.toLowerCase(), true],
+    ["Windows 客户端", `${WINDOWS_UA} TONGYI_DESKTOP/4.1.0`, true],
+    ["macOS", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)", false],
+    ["Android", "Mozilla/5.0 (Linux; Android 14) Mobile", false],
+    ["iOS", "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) Mobile", false],
+    ["空 UA", "", false],
+  ] as const)("保留 %s 的判断", async (_name, userAgent, expected) => {
+    expect(isWindowsUserAgent(userAgent)).toBe(expected);
+    const browser = await loadBrowser(userAgent);
+    expect(browser.isWindows).toBe(expected);
+  });
+
+  it("isWindows 保留模块初始化时的纯 UA 快照，不消费模板信号", async () => {
+    const browser = await loadBrowser(WINDOWS_UA, true);
+    expect(browser.getHarmonyTerminal()).toBe("pc-web");
+    expect(browser.isWindows).toBe(true);
+    expect(browser.isWindowsUserAgent(WINDOWS_UA)).toBe(true);
+    vi.stubGlobal("navigator", { userAgent: HARMONY_PC_UA, vendor: "" });
+    expect(browser.isWindows).toBe(true);
   });
 });

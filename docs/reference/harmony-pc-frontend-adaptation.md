@@ -9,7 +9,7 @@
 
 ## 1. 统一识别终端
 
-公共工具位于 [`web/src/utils/browser.ts`](../../web/src/utils/browser.ts)，导出 `getHarmonyTerminal`、`isHarmonyUserAgent` 和 `HarmonyTerminal` 类型。不要在业务代码中重复写 UA 正则。
+公共工具位于 [`web/src/utils/browser.ts`](../../web/src/utils/browser.ts)，导出 `getHarmonyTerminal`、`isHarmonyUserAgent`、`isMobileUserAgent`、`isMobile`、`isWindowsUserAgent`、`isWindows` 和 `HarmonyTerminal` 类型。不要在业务代码中重复写 UA 正则。
 
 导入路径须相对于调用文件；以下示例位于 `web/src/App.tsx`，其他位置应调整路径：
 
@@ -63,7 +63,7 @@ UU 浏览器没有 `PC`、`OpenHarmony` 或 `ArkWeb` 标记，公共方法使用
 
 ## 2. 页面形态
 
-需要接入 Harmony 分流时，按下面的规则判断其 Desktop/H5 形态；这不是所有操作系统的通用移动端检测：
+页面只按下面的规则判断 Desktop/H5：
 
 ```ts
 const terminal = getHarmonyTerminal();
@@ -75,6 +75,8 @@ const isHarmonyDesktop = terminal === "pc-native" || terminal === "pc-web";
 - `phone-web` 必须走 H5 布局。
 - 不要用 `navigator.platform` 判断 Harmony，Harmony PC Web 实测可能返回 `Linux x86_64`。
 - 不要直接使用 `/windows/i` 或 `/android/i` 判断，优先调用公共方法。
+
+已有移动端判断应使用 `isMobileUserAgent()` / `isMobile()`，已有 Windows 判断应使用 `isWindowsUserAgent()` / `isWindows`。
 
 ## 3. 请求与业务边界
 
@@ -107,16 +109,18 @@ namespace 不存在、method 不存在、Promise pending、Promise reject 应分
 |现象|优先检查|
 |-|-|
 |对话回复异常|检查 `/api/chat` 的实际 `messages`、响应状态和 SSE 数据；按真实前后端契约定位，不套用外部项目协议|
-|Harmony PC 显示移动端页面|先检查 `getHarmonyTerminal()` 的返回值，再确认业务是否接入分流、当前视口与 CSS 媒体查询是否导致布局变化|
-|Harmony PC Web 被识别成 Windows|检查调用方是否先处理 `getHarmonyTerminal()` 的非空结果；`null` 时保留其他系统原有判断|
+|Harmony PC 显示移动端页面|检查 `getHarmonyTerminal()` 和 `isMobile()`；确认 PC UA 没有被 `Windows`、`Android` 或 `Harmony` 关键字提前判成移动端；|
+|Harmony PC Web 被识别成 Windows|禁止直接 `/windows/i`，改用 `isWindowsUserAgent()`|
 |Native 功能没有反应|从安全全局入口检查具体方法；区分缺失、pending 和 reject，并核查超时、降级及客户端日志|
 |UA 是普通 Windows Chrome|确认宿主是否注入 `window.__IS_HARMONY__ === true`；当前项目未实现注入，无信号时返回 `null`，不继续猜测|
 
-## 6. 验证清单
+## 6. 提交前检查
 
-- 终端工具：新版/旧版 Native 为 `pc-native`，PC Web/UU/二合一设备为 `pc-web`，Phone Web 为 `phone-web`。
-- 普通 Windows、macOS、Android、iOS UA 返回 `null`；仅有 Harmony 标记但无法确定终端形态时也不猜测。
-- 模板信号仅在无参调用且值严格为 `true` 时兜底；显式 UA 和 `isHarmonyUserAgent()` 不消费该信号。
-- 涉及业务分流时，Native/PC Web 走 PC，Phone Web 走 H5，`null` 保留原有逻辑；不要把工具单测通过等同于布局已接入。
-- 涉及 Native 调用时，namespace 或方法缺失不抛异常，调用超时或拒绝时有 Web 降级。
-- 仅改终端识别时，不改变 `/api/chat` 契约或新增外部项目参数。
+- Harmony PC Native：`pc-native`、非移动端、非 Windows。
+- Harmony PC Web：`pc-web`、非移动端、非 Windows。
+- Harmony Phone Web：`phone-web`、移动端；需要 Harmony 分支时不再进入 Android 业务分支。
+- Windows、macOS、Android、iOS 原有判断不回归。
+- Native API 缺失或超时不会阻断页面。
+- 鉴权和业务请求符合 Native=`ohos`、PC Web=`pc`、Phone Web=`h5`。
+- Web CMS 请求在 PC Native 使用 `fr=ohos`，PC Web 使用 `fr=pc&model=ohos`，Phone Web 保持 `fr=h5`。
+- 埋点、业务请求和 CMS 分别遵守自己的终端约定，不因字段同名而强行统一。
