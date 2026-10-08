@@ -98,3 +98,15 @@
 - Changed: `.agents/skills/git-commit/SKILL.md` 提醒措辞更新为"pre-push 会兜底生成模板，但仍建议在 commit 前主动补录"。
 - Why the change is unavoidable: 旧检查只验证 ledger 文件是否存在，无法保证每次核心路径改动都被记录；缺少可执行 next step 导致 push 被拦后用户不知如何处理。
 - Smaller-diff alternative considered: 保留文件存在检查，仅改进错误提示。被否决，因为文件级检查仍会漏掉同一文件多次改动的记录缺失。
+
+### 2026-10-08 | harness | 新增 harmony-frontend-adaptation skill 与配套适配参考
+
+- Added: `.agents/skills/harmony-frontend-adaptation/SKILL.md` 与 `agents/openai.yaml`，提供 Harmony 终端判断、PC/H5 分流、Native API 能力检测的任务 workflow；`AGENTS.md` Default Protocol 增加触发入口；配套 `docs/reference/harmony-pc-frontend-adaptation.md` 与 `web/src/utils/browser.ts` 终端识别工具。
+- Reused: 复用 `web/src/utils/browser.ts` 的 `getHarmonyTerminal()` 等公共判断，不在 skill 中重复 UA 正则。
+- Why the change is unavoidable: Harmony 真机适配依赖实机调试得出的终端识别与降级经验，散落在会话中会丢失；纳入 `.agents/` 单一事实源后可通过 `sync:agents` 分发到各 AI 工具，避免后续 agent 重新踩坑或写出互相矛盾的 UA 判断。
+- Smaller-diff alternative considered: 仅保留 `docs/reference/` 参考文档，不加 skill 触发入口。被否决，因为该经验属于按需触发的任务 workflow，没有显式入口时 AI 在相关任务中不会主动查阅。
+
+涉及文件：
+
+- .agents/skills/harmony-frontend-adaptation/SKILL.md
+- .agents/skills/harmony-frontend-adaptation/agents/openai.yaml
