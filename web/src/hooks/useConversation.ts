@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { message } from "antd";
 import type { Conversation, ConversationMessage } from "../types/conversation";
+import { generateUuid } from "../utils/uuid";
 
 const STORAGE_KEY_CONVERSATIONS = "chatbot_conversations";
 const STORAGE_KEY_ACTIVE_ID = "chatbot_active_id";
@@ -8,11 +9,11 @@ const STORAGE_KEY_ACTIVE_ID = "chatbot_active_id";
 function createDefaultConversation(): Conversation {
   const now = Date.now();
   return {
-    id: crypto.randomUUID(),
+    id: generateUuid(),
     title: "新对话",
     messages: [
       {
-        id: crypto.randomUUID(),
+        id: generateUuid(),
         role: "assistant",
         content: "你好！我是你的AI助手。",
       },
