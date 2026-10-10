@@ -4,11 +4,19 @@ import InputArea from "./components/InputArea";
 import ScrollToBottomButton from "./components/ScrollToBottomButton";
 import { ConversationSidebar } from "./components/ConversationSidebar";
 import { QuestionHistoryPanel } from "./components/QuestionHistoryPanel";
+import { PlatformFooter } from "./components/PlatformFooter";
 import { useConversation } from "./hooks/useConversation";
 import { checkIsAtBottom } from "./utils/scroll";
+import { getPlatformInfo } from "./utils/browser";
+import { generateUuid } from "./utils/uuid";
 import styles from "./App.module.less";
 
 export function App() {
+  const platform = getPlatformInfo();
+  const title = "ai 对话";
+  // 页面分流只消费 pageType；未知保留原有「在线」回退。
+  const onlineText =
+    platform.pageType === "pc" ? "pc在线" : platform.pageType === "h5" ? "mobile在线" : "在线";
   const {
     conversations,
     messages,
@@ -80,7 +88,7 @@ export function App() {
     abortControllerRef.current = abortController;
 
     const newUserMessage = {
-      id: crypto.randomUUID(),
+      id: generateUuid(),
       role: "user" as const,
       content: textToSend,
     };
@@ -90,7 +98,7 @@ export function App() {
     setInputText("");
     setIsLoading(true);
 
-    const assistantMessageId = crypto.randomUUID();
+    const assistantMessageId = generateUuid();
     const messagesWithAssistant = [
       ...updatedMessages,
       { id: assistantMessageId, role: "assistant" as const, content: "" },
@@ -215,10 +223,10 @@ export function App() {
 
       <div className={styles.container}>
         <header className={styles.header}>
-          <h1>AI 对话</h1>
+          <h1>{title}</h1>
           <p className={styles.subtitle}>
             <span className={styles["status-dot"]}></span>
-            在线
+            {onlineText}
           </p>
         </header>
 
@@ -247,7 +255,9 @@ export function App() {
           />
         </main>
 
-        <footer className={styles.footer}>Powered by 阿里云百炼</footer>
+        <footer className={styles.footer}>
+          Powered by 阿里云百炼 <PlatformFooter platform={platform} />
+        </footer>
       </div>
     </div>
   );

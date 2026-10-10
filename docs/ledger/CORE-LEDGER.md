@@ -98,3 +98,26 @@
 - Changed: `.agents/skills/git-commit/SKILL.md` 提醒措辞更新为"pre-push 会兜底生成模板，但仍建议在 commit 前主动补录"。
 - Why the change is unavoidable: 旧检查只验证 ledger 文件是否存在，无法保证每次核心路径改动都被记录；缺少可执行 next step 导致 push 被拦后用户不知如何处理。
 - Smaller-diff alternative considered: 保留文件存在检查，仅改进错误提示。被否决，因为文件级检查仍会漏掉同一文件多次改动的记录缺失。
+
+### 2026-10-10 | harness | 新增 platform-frontend-adaptation skill
+
+- Added:
+  - 平台设备适配技能 `platform-frontend-adaptation skill`
+  - 平台设备适配规则 `docs/reference/platform-frontend-adaptation.md`
+  - 平台设备适配公共方法 `web/src/utils/browser.ts`
+  - 平台设备适配应用于`右上角在线文案`展示
+  - 平台设备适配应用于`页面底部`展示
+- Reused: 待填写
+- Removed: 待填写
+- Consolidated: 待填写
+- Why the change is unavoidable: 待填写
+- Smaller-diff alternative considered: 待填写
+
+涉及文件：
+
+- .agents/skills/harmony-frontend-adaptation/SKILL.md
+- .agents/skills/harmony-frontend-adaptation/agents/openai.yaml
+- .agents/skills/platform-frontend-adaptation/SKILL.md
+- .agents/skills/platform-frontend-adaptation/agents/openai.yaml
+- web/src/hooks/useConversation.test.ts
+- web/src/hooks/useConversation.ts

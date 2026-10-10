@@ -47,6 +47,7 @@ AI 对话机器人 monorepo，npm workspaces 管理前端（web/）和后端（s
 - 改 server/**：读 `.agents/context/backend-context.md` + `docs/harness/backend-rules.md`
 - 加依赖/改 workspace：读 `.agents/context/project-overview.md` + `docs/harness/architecture.md`
 - 改 `.agents/**`、`AGENTS.md`、`docs/harness/**`、`package.json` harness script、`.husky/**`：先读 `.agents/context/harness-governance.md`
+- 用户要求前端设备/平台适配、跨端兼容、系统识别、PC/H5 分流或 Native/WebView 能力检测与降级时，使用 `.agents/skills/platform-frontend-adaptation/SKILL.md`，无需点名具体系统；单纯 UI 美化、原生安装打包、HDC/ADB、代理证书和单纯实机浏览器操作不加载该 Skill
 - 任何代码改动：先调 `.agents/skills/karpathy-guidelines/SKILL.md`（显式假设、最小改动、可验证标准）
 - 凡涉及用户可见行为/视觉/交互的改动（UI 组件、Hook、状态、API 契约、数据流），除小 bugfix / 单文件小改动 / 无设计决策外，须先走 superpowers 插件系统提供的 `brainstorming` SKILL
 - 接到新需求：走 `.agents/skills/new-requirement/SKILL.md` 路由
