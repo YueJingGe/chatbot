@@ -11,6 +11,7 @@ interface Message {
   role: string;
   content?: string;
   statusMessage?: string;
+  quote?: string;
 }
 
 interface MessageListProps {
@@ -144,7 +145,11 @@ const MessageList = memo(({ messages }: MessageListProps) => {
           data-message-id={message.id}
           className={`${styles.message} ${message.role === "user" ? styles["user-message"] : styles["bot-message"]}`}
         >
-          <div className={styles.bubble}>
+          <div
+            className={styles.bubble}
+            data-selectable={message.role === "assistant" ? "assistant" : undefined}
+          >
+            {message.quote ? <div className={styles.quote}>{message.quote}</div> : null}
             {message.statusMessage && !message.content ? (
               <span className={styles.status}>{message.statusMessage}</span>
             ) : message.content ? (

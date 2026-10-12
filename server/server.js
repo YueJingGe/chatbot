@@ -79,6 +79,36 @@ const TOOL_HANDLERS = {
   },
 };
 
+// ---------------- 5.7 引用文本拼接 ----------------
+const REF_TEXT_MIME_TYPE = "ref_text/plain";
+
+/**
+ * 处理带引用的消息列表后发给模型：
+ * 1. 剔除所有引用项（历史中的引用项不重复拼接），并剥离 mimeType 字段不透传
+ * 2. 仅消费最后一个引用项，拼进末尾的问题项（[引用材料] + [问题]）
+ */
+function mergeRefTextMessages(userMessages) {
+  const refContents = userMessages
+    .filter((msg) => msg.mimeType === REF_TEXT_MIME_TYPE)
+    .map((msg) => (typeof msg.content === "string" ? msg.content : ""));
+  const lastRefContent = refContents.length > 0 ? refContents[refContents.length - 1] : null;
+
+  const plainMessages = userMessages
+    .filter((msg) => msg.mimeType !== REF_TEXT_MIME_TYPE)
+    .map((msg) => {
+      if (msg.mimeType === undefined) return msg;
+      const clean = Object.assign({}, msg);
+      delete clean.mimeType;
+      return clean;
+    });
+
+  const lastMessage = plainMessages[plainMessages.length - 1];
+  if (lastRefContent !== null && lastMessage && lastMessage.role === "user") {
+    lastMessage.content = `[引用材料]\n${lastRefContent}\n\n[问题]\n${lastMessage.content}`;
+  }
+  return plainMessages;
+}
+
 // ---------------- 6. 核心：处理聊天请求的API接口 ----------------
 const REQUEST_TIMEOUT = parseInt(process.env.REQUEST_TIMEOUT, 10) || 60000; // 默认 60s
 
@@ -108,7 +138,7 @@ app.post("/api/chat", async (req, res) => {
         4. 回答应简洁、准确、有帮助。
         5. 当前服务器实时时间为：${getCurrentDateTime()}。当用户询问日期、时间、星期几等问题时，请以此时间为准进行回答。`,
     };
-    const messages = [systemMessage, ...userMessages];
+    const messages = [systemMessage, ...mergeRefTextMessages(userMessages)];
 
     // 3. 超时控制
     const controller = new AbortController();
