@@ -8,7 +8,7 @@ description: 分支操作流程（开分支/合并/发布/解冲突/hotfix）。
 > 执行之前先阅读 `docs/harness/git-workflow.md` 规范
 
 ## 红线（不可违反）
-1. 不在 `main` / `release/*` 上直接 commit
+1. 不在 `main` / `release/*` / `develop` 上直接 commit
 2. 不 force-push，除非 `--force-with-lease`
 3. 不修改发布分支历史（`pull --ff-only`，分叉则停止）
 4. commit 走 `git-commit` skill（含 message 格式），本 skill 只管 push 及分支操作

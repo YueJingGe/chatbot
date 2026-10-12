@@ -30,6 +30,7 @@ hotfix/*                   ← 从 main 切，紧急修复，绕过 release，�
 **禁止项：**
 
 - 禁止 `develop` → `main`：任何情况下都不能直接合入 main，PR 也不行
+- 禁止在 `develop` 上直接开发改动/提交：develop 仅通过 PR 接收 `feature/*`、`fix/*` 合入（发布后 `main` → `develop` 同步除外）
 - 禁止 `feature/*` → `main`（必须经 `release` 或 `hotfix` 路径）
 - 禁止 AI 自主执行 `release/*` → `main` 的合并操作
 
@@ -40,7 +41,7 @@ hotfix/*                   ← 从 main 切，紧急修复，绕过 release，�
 - `feature/*`、`fix/*` 完成后，优先通过 PR 合入 `develop` 做集成测试。
 - `develop` 上的改动**不能**直接合入 `main`；需要发布时，从 `main` 新建 `release/*`，再把纳入本版本的 feature/fix 重新 PR 到该 release。
 - `develop` 应始终包含 `main` 的最新内容；当 `main` 前进时，执行 `git checkout develop && git merge main && git push origin develop` 同步。
-- `develop` 允许直接 push（本地 hook 不拦截），但建议仍走 PR 以便 CI 审查。
+- `develop` 不接受直接开发改动与开发提交的 push（本地 hook 不拦截 develop，靠本规则约束 AI 与人工）；仅发布后的 `main` → `develop` 同步允许直接 push。
 
 ## 3. 版本号与 Tag 规则
 
