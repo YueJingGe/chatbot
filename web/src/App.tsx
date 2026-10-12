@@ -5,11 +5,16 @@ import ScrollToBottomButton from "./components/ScrollToBottomButton";
 import { ConversationSidebar } from "./components/ConversationSidebar";
 import { QuestionHistoryPanel } from "./components/QuestionHistoryPanel";
 import { PlatformFooter } from "./components/PlatformFooter";
+import { SelectionToolbar } from "./components/SelectionToolbar";
 import { useConversation } from "./hooks/useConversation";
+import { useTextSelection } from "./hooks/useTextSelection";
+import { REF_TEXT_MIME_TYPE } from "./types/conversation";
 import { checkIsAtBottom } from "./utils/scroll";
 import { getPlatformInfo } from "./utils/browser";
 import { generateUuid } from "./utils/uuid";
 import styles from "./App.module.less";
+
+const QUOTE_STORAGE_KEY = "chatbot_quote";
 
 export function App() {
   const platform = getPlatformInfo();
@@ -30,11 +35,21 @@ export function App() {
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isAtBottom, setIsAtBottom] = useState(true);
+  // 引用为单值状态：多次引用以最后一次为准；持久化到 localStorage 跨刷新保留
+  const [quote, setQuote] = useState(() => localStorage.getItem(QUOTE_STORAGE_KEY) ?? "");
   const chatHistoryRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef(messages);
   const inputTextRef = useRef(inputText);
   const isLoadingRef = useRef(isLoading);
+  const quoteRef = useRef(quote);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  const {
+    text: selectedText,
+    rect: selectionRect,
+    visible: selectionVisible,
+    hide: hideSelection,
+  } = useTextSelection({ allowedSelector: "[data-selectable='assistant']" });
 
   useEffect(() => {
     messagesRef.current = messages;
@@ -77,6 +92,29 @@ export function App() {
     }
   }, []);
 
+  // 引用唯一修改入口：同步 ref 供 sendMessage 读取最新值，并持久化到 localStorage
+  const updateQuote = useCallback((value: string) => {
+    quoteRef.current = value;
+    setQuote(value);
+    if (value) {
+      localStorage.setItem(QUOTE_STORAGE_KEY, value);
+    } else {
+      localStorage.removeItem(QUOTE_STORAGE_KEY);
+    }
+  }, []);
+
+  const handleQuote = useCallback(
+    (text: string) => {
+      updateQuote(text);
+      hideSelection();
+    },
+    [updateQuote, hideSelection]
+  );
+
+  const handleClearQuote = useCallback(() => {
+    updateQuote("");
+  }, [updateQuote]);
+
   const sendMessage = useCallback(async () => {
     const textToSend = inputTextRef.current.trim();
     if (!textToSend || isLoadingRef.current) return;
@@ -87,10 +125,12 @@ export function App() {
     const abortController = new AbortController();
     abortControllerRef.current = abortController;
 
+    const quoteToSend = quoteRef.current;
     const newUserMessage = {
       id: generateUuid(),
       role: "user" as const,
       content: textToSend,
+      ...(quoteToSend ? { quote: quoteToSend } : {}),
     };
     const updatedMessages = [...messagesRef.current, newUserMessage];
     updateMessages(updatedMessages);
@@ -110,10 +150,16 @@ export function App() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: updatedMessages.map((msg) => ({
-            role: msg.role,
-            content: msg.content,
-          })),
+          // 引用作为 messages 独立项发送，带 mimeType 标记供服务端识别
+          messages: [
+            ...(quoteToSend
+              ? [{ role: "user" as const, content: quoteToSend, mimeType: REF_TEXT_MIME_TYPE }]
+              : []),
+            ...updatedMessages.map((msg) => ({
+              role: msg.role,
+              content: msg.content,
+            })),
+          ],
         }),
         signal: abortController.signal,
       });
@@ -125,6 +171,7 @@ export function App() {
       const reader = response.body.getReader();
       const decoder = new TextDecoder("utf-8");
       let fullReply = "";
+      let hasServerError = false;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -142,6 +189,7 @@ export function App() {
             try {
               const data = JSON.parse(dataStr);
               if (data.error) {
+                hasServerError = true;
                 updateAssistantMessage(assistantMessageId, {
                   content: `抱歉，服务端出错：${data.error}`,
                 });
@@ -165,6 +213,11 @@ export function App() {
           }
         }
       }
+
+      // 发送全链路无错完成才消费引用；网络错误、请求中断、服务端错误均保留引用便于重试
+      if (quoteToSend && !hasServerError) {
+        updateQuote("");
+      }
     } catch (error) {
       if (error instanceof Error && error.name === "AbortError") {
         return;
@@ -177,7 +230,7 @@ export function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [updateMessages, updateAssistantMessage]);
+  }, [updateMessages, updateAssistantMessage, updateQuote]);
 
   const handleKeyPress = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
@@ -243,6 +296,13 @@ export function App() {
               <MessageList messages={messages} />
             </div>
             <ScrollToBottomButton visible={!isAtBottom} onClick={handleScrollToBottomClick} />
+            <SelectionToolbar
+              text={selectedText}
+              rect={selectionRect}
+              visible={selectionVisible}
+              onQuote={handleQuote}
+              onHide={hideSelection}
+            />
             <QuestionHistoryPanel questions={questions} onSelectQuestion={handleSelectQuestion} />
           </div>
 
@@ -252,6 +312,8 @@ export function App() {
             isLoading={isLoading}
             sendMessage={sendMessage}
             handleKeyPress={handleKeyPress}
+            quote={quote}
+            onClearQuote={handleClearQuote}
           />
         </main>
 

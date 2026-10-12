@@ -98,6 +98,44 @@
   }
 }
 
+/* ===== 引用条 ===== */
+.quote-bar {
+  display: flex;
+  gap: var(--space-xs);
+  align-items: center;
+  margin-bottom: var(--space-sm);
+  padding: var(--space-xs) var(--space-md);
+  background: var(--color-input-bg);
+  border-radius: var(--radius-sm);
+}
+
+.quote-bar__text {
+  flex: 1;
+  overflow: hidden;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quote-bar__close {
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-xs);
+  transition: color var(--transition-fast);
+
+  &:hover {
+    color: var(--color-text);
+    background: var(--color-overlay-hover);
+  }
+}
+
 /* ===== 提示文字 ===== */
 .hint {
   margin-top: var(--space-sm);
