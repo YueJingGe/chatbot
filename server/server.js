@@ -4,6 +4,7 @@ const express = require("express");
 const cors = require("cors");
 const OpenAI = require("openai");
 const { getWeatherTool } = require("./weather");
+const { getDatetimeTool } = require("./datetime");
 
 // ---------------- 2. 创建Express应用 ----------------
 const app = express();
@@ -69,6 +70,37 @@ const TOOLS = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "get_datetime",
+      description:
+        "获取当前日期时间（公历+农历+干支+生肖+节气），或将指定日期在公历/农历之间换算。凡涉及农历、干支、生肖、节气、星期或任意日期换算的问题，必须调用本工具获取准确信息，禁止凭记忆推算。",
+      parameters: {
+        type: "object",
+        properties: {
+          year: {
+            type: "integer",
+            description: "年；lunar 为 true 时表示农历年",
+          },
+          month: {
+            type: "integer",
+            description: "月；lunar 为 true 时表示农历月",
+          },
+          day: {
+            type: "integer",
+            description: "日；lunar 为 true 时表示农历日",
+          },
+          lunar: {
+            type: "boolean",
+            description: "输入日期是否为农历，默认 false；省略 year/month/day 时忽略本参数",
+            default: false,
+          },
+        },
+        required: [],
+      },
+    },
+  },
 ];
 
 // 工具名称 → 执行函数的映射
@@ -77,7 +109,40 @@ const TOOL_HANDLERS = {
     const { location, forecast_days } = JSON.parse(args);
     return getWeatherTool(location, forecast_days || 0);
   },
+  get_datetime: async (rawArgs) => {
+    return getDatetimeTool(JSON.parse(rawArgs));
+  },
 };
+
+// ---------------- 5.7 引用文本拼接 ----------------
+const REF_TEXT_MIME_TYPE = "ref_text/plain";
+
+/**
+ * 处理带引用的消息列表后发给模型：
+ * 1. 剔除所有引用项（历史中的引用项不重复拼接），并剥离 mimeType 字段不透传
+ * 2. 仅消费最后一个引用项，拼进末尾的问题项（[引用材料] + [问题]）
+ */
+function mergeRefTextMessages(userMessages) {
+  const refContents = userMessages
+    .filter((msg) => msg.mimeType === REF_TEXT_MIME_TYPE)
+    .map((msg) => (typeof msg.content === "string" ? msg.content : ""));
+  const lastRefContent = refContents.length > 0 ? refContents[refContents.length - 1] : null;
+
+  const plainMessages = userMessages
+    .filter((msg) => msg.mimeType !== REF_TEXT_MIME_TYPE)
+    .map((msg) => {
+      if (msg.mimeType === undefined) return msg;
+      const clean = Object.assign({}, msg);
+      delete clean.mimeType;
+      return clean;
+    });
+
+  const lastMessage = plainMessages[plainMessages.length - 1];
+  if (lastRefContent !== null && lastMessage && lastMessage.role === "user") {
+    lastMessage.content = `[引用材料]\n${lastRefContent}\n\n[问题]\n${lastMessage.content}`;
+  }
+  return plainMessages;
+}
 
 // ---------------- 6. 核心：处理聊天请求的API接口 ----------------
 const REQUEST_TIMEOUT = parseInt(process.env.REQUEST_TIMEOUT, 10) || 60000; // 默认 60s
@@ -106,9 +171,10 @@ app.post("/api/chat", async (req, res) => {
         2. 当用户使用代词（如"它"、"这个"、"那里"）或简略表达时，结合历史明确指代对象。
         3. 如果用户的问题与历史相关，请自然衔接，不要重复已提供的信息。
         4. 回答应简洁、准确、有帮助。
-        5. 当前服务器实时时间为：${getCurrentDateTime()}。当用户询问日期、时间、星期几等问题时，请以此时间为准进行回答。`,
+        5. 当前服务器实时时间为：${getCurrentDateTime()}。当用户询问日期、时间、星期几等问题时，请以此时间为准进行回答。
+        6. 涉及农历、干支、生肖、节气或任意日期换算的问题，必须调用 get_datetime 工具获取准确信息后回答，禁止凭记忆推算。`,
     };
-    const messages = [systemMessage, ...userMessages];
+    const messages = [systemMessage, ...mergeRefTextMessages(userMessages)];
 
     // 3. 超时控制
     const controller = new AbortController();
@@ -182,7 +248,9 @@ app.post("/api/chat", async (req, res) => {
         const statusMessage =
           toolCall.function.name === "get_weather"
             ? `🌤️ 正在查询${args.location || ""}的天气...`
-            : `正在调用 ${toolCall.function.name}...`;
+            : toolCall.function.name === "get_datetime"
+              ? "📅 正在查询日期信息..."
+              : `正在调用 ${toolCall.function.name}...`;
         res.write(
           `data: ${JSON.stringify({
             status: "tool_call",

@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 import InputArea from "./index";
 
@@ -29,5 +29,23 @@ describe("InputArea", () => {
   test("发送按钮在加载状态时被禁用", () => {
     render(<InputArea {...defaultProps} inputText="hello" isLoading />);
     expect(screen.getByRole("button", { name: "发送消息" })).toBeDisabled();
+  });
+
+  test("传入引用时显示引用条内容", () => {
+    render(<InputArea {...defaultProps} quote="选中的引用文本" />);
+    expect(screen.getByText("选中的引用文本")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "关闭引用" })).toBeInTheDocument();
+  });
+
+  test("点击关闭引用按钮时调用 onClearQuote", () => {
+    const onClearQuote = vi.fn();
+    render(<InputArea {...defaultProps} quote="选中的引用文本" onClearQuote={onClearQuote} />);
+    fireEvent.click(screen.getByRole("button", { name: "关闭引用" }));
+    expect(onClearQuote).toHaveBeenCalledTimes(1);
+  });
+
+  test("未传引用时不显示引用条", () => {
+    render(<InputArea {...defaultProps} />);
+    expect(screen.queryByRole("button", { name: "关闭引用" })).not.toBeInTheDocument();
   });
 });

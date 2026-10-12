@@ -1,0 +1,28 @@
+.selection-toolbar {
+  position: fixed;
+  z-index: 20;
+  display: flex;
+  gap: var(--space-xs);
+  padding: var(--space-xs);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-dropdown);
+}
+
+.selection-toolbar__button {
+  display: flex;
+  gap: var(--space-xs);
+  align-items: center;
+  padding: 4px 10px;
+  font-size: 13px;
+  color: var(--color-text);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+
+  &:hover {
+    background: var(--color-overlay-hover);
+  }
+}
