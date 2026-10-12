@@ -122,3 +122,30 @@ describe("MessageList copy", () => {
     });
   });
 });
+
+describe("MessageList quote and selectable", () => {
+  it("renders quote line above user content when message has quote", () => {
+    render(
+      <MessageList
+        messages={[{ id: "q1", role: "user", content: "帮我总结", quote: "这是引用的原文" }]}
+      />
+    );
+
+    expect(screen.getByText("这是引用的原文")).toBeInTheDocument();
+    expect(screen.getByText("帮我总结")).toBeInTheDocument();
+  });
+
+  it("marks assistant bubble as selectable container", () => {
+    const { container } = render(<MessageList messages={[assistantMessage]} />);
+
+    const selectable = container.querySelector("[data-selectable='assistant']");
+    expect(selectable).toBeInTheDocument();
+    expect(selectable).toHaveTextContent("好的");
+  });
+
+  it("does not mark user bubble as selectable container", () => {
+    const { container } = render(<MessageList messages={[userMessage]} />);
+
+    expect(container.querySelector("[data-selectable='assistant']")).not.toBeInTheDocument();
+  });
+});

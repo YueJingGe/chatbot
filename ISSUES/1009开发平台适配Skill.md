@@ -3,3 +3,5 @@
 ## 把平台适配经验沉淀成 Agent Skill
 
 掘金文章地址：https://juejin.cn/spost/7694845307456733234
+
+![alt text](1009开发平台适配Skill.png)

@@ -121,3 +121,23 @@
 - .agents/skills/platform-frontend-adaptation/agents/openai.yaml
 - web/src/hooks/useConversation.test.ts
 - web/src/hooks/useConversation.ts
+
+### 2026-10-12 | frontend | 选中文本引用与复制
+
+- Added: 新增 `useTextSelection` hook（选区监听与 assistant 气泡内校验）、`SelectionToolbar` 弹层组件（引用/复制，复制后 3 秒自动消失）、输入框引用条（`InputArea` 新增 quote props）、用户气泡引用行（`MessageList` 渲染 quote）、`ConversationMessage.quote` 字段与 `REF_TEXT_MIME_TYPE` 契约常量、server `mergeRefTextMessages`（识别 `ref_text/plain` 独立项，仅消费最后一个，拼进当轮问题 `[引用材料]/[问题]`，不透传 mimeType）。
+- Reused: 复用 antd `message` 反馈、`copyToClipboard` 工具、SSE 流式链路与函数式消息状态更新。
+- Consolidated: 引用清空逻辑统一收口在 App `updateQuote`（状态与 localStorage 同源）：发送成功消费、失败/中断/服务端错误保留。
+- Why the change is unavoidable: 用户要求选中回答文本后可引用到对话或复制，多次操作以最后一次为准；引用需随请求供模型参考并持久化展示，必须打通选区→状态→请求契约→服务端拼接全链路。
+- Smaller-diff alternative considered: 仅前端把引用拼进问题文本发送、不动契约。被否决：服务端无法区分引用与用户输入，历史消息会重复拼接，且引用项需独立标记以便契约演进。
+
+涉及文件：
+
+- web/src/hooks/useTextSelection.ts + useTextSelection.test.ts
+- web/src/components/SelectionToolbar/index.tsx + index.module.less + index.test.tsx
+- web/src/components/InputArea/index.tsx + index.module.less + index.test.tsx
+- web/src/components/MessageList/index.tsx + index.module.less + index.test.tsx
+- web/src/types/conversation.ts + conversation.test.ts
+- web/src/App.tsx + App.test.tsx
+- server/server.js
+- docs/specs/completed/2026-10-12-feature-text-selection-quote-copy.md
+- docs/exec-plans/completed/2026-10-12-feature-text-selection-quote-copy.md
