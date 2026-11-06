@@ -141,3 +141,25 @@
 - server/server.js
 - docs/specs/completed/2026-10-12-feature-text-selection-quote-copy.md
 - docs/exec-plans/completed/2026-10-12-feature-text-selection-quote-copy.md
+
+### 2026-11-05 | harness | 前后端契约单一事实源 + 依赖门禁 + Codex Git 命令门禁
+
+- Added: `docs/harness/architecture.md` 新增「API / SSE 契约」节（请求体字段、4 类 SSE 帧 payload、3 个异常出口、5 条契约变更规则）与「新增依赖门禁」节（5 条）；`AGENTS.md` Default Protocol 新增 1 行契约同步触发；新增 `.codex/rules/git-gates.rules`（`git push`/`reset`/`restore`/`checkout --`/`clean`/`revert` → prompt；`npm run check:all`/`git status`/`git diff`/`git log` → allow）。新增 `.codex/hooks.json`（PreToolUse 拦截 Bash）与 `.codex/hooks/block-dangerous.py`（递归强制删除的变体识别）；`.gitignore` 白名单放行 `/.codex/`；`.coderabbit.yaml` 的 server 审查指令对齐契约节。
+- Fixed: 2026-11-06 复审修正——拦截 hook 由 PostToolUse 改为 PreToolUse（原先命令执行后才拦截，等同无防护），并收紧匹配（-rf / -fr / -r -f / --recursive --force / sudo / 绝对路径 / `sh -c` 嵌套；按 shell 分隔符切段解析，避免 commit message 等文本误伤）；删除 Bash 命令记录脚本；`server/server.js` 把 SSE 响应头后置到请求体校验之后（400 恢复 JSON Content-Type），并新增非法 JSON 请求体的 400 `{ error }` 出口；`docs/harness/backend-rules.md` 与 `.agents/context/backend-context.md` 的 SSE 描述改为引用契约节，消除多事实源。
+- Reused: 契约字段全部从 `server/server.js` 写入端与 `web/src/App.tsx` 解析端现有实现反推，未发明新字段；依赖门禁复用 AGENTS.md 既有「加依赖/改 workspace：读 `docs/harness/architecture.md`」触发行，未新增 Protocol 行；`.codex/rules` 语法照抄现有 `default.rules`（含 `match`/`not_match` 内联断言）。
+- Removed: `.codex/hooks/log-bash.py`（Bash 命令记录功能，日志收益不抵维护成本）；未改动 `default.rules`。
+- Why the change is unavoidable: 契约此前分散在后端写入与前端解析两处，任一侧改字段都没有规则要求同步，前端只会静默丢帧；新增依赖此前只有 monorepo 边界表、无准入门禁；push 与回滚类不可逆命令此前仅靠文档自觉，无机器兜底。
+- Smaller-diff alternative considered: 只写 `.codex/rules` 不动文档。被否决——rules 只约束命令行为，无法阻止契约漂移；反之只写文档则 push/回滚仍靠自觉。本次严格按用户指定范围落地，后端测试规范、前端错误处理规范、`npm install` 门禁按用户要求暂不做。
+
+涉及文件：
+
+- docs/harness/architecture.md
+- docs/harness/backend-rules.md
+- .agents/context/backend-context.md
+- AGENTS.md
+- .coderabbit.yaml
+- .gitignore
+- server/server.js
+- .codex/hooks.json
+- .codex/hooks/block-dangerous.py
+- .codex/rules/git-gates.rules

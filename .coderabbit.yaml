@@ -26,8 +26,8 @@ reviews:
   # 按路径注入项目红线，让审查对齐 harness 规范
   path_instructions:
     - path: "web/src/**/*.{ts,tsx}"
-      instructions: "遵循 docs/harness/frontend-rules.md：叶子组件用 React.memo、callback 用 useCallback、列表 key 稳定唯一且禁用数组索引、禁 dangerouslySetInnerHTML、禁前端硬编码 API key、状态集中在 App.tsx。"
+      instructions: "遵循 docs/harness/frontend-rules.md：叶子组件用 React.memo、callback 用 useCallback、列表 key 稳定唯一且禁用数组索引、禁 dangerouslySetInnerHTML、禁前端硬编码 API key、状态就近原则（状态放在使用它的最近公共父组件，避免不必要的 props 透传）。"
     - path: "web/src/**/*.less"
       instructions: "遵循 docs/harness/frontend-rules.md：使用 CSS 变量、BEM 命名、禁 CSS-in-JS。"
     - path: "server/**/*.js"
-      instructions: "遵循 docs/harness/backend-rules.md：SSE 事件格式规范、AbortController 清理、错误响应统一 code/message 结构、响应必须 JSON、用 process.env 禁硬编码 API key。"
+      instructions: "遵循 docs/harness/backend-rules.md：SSE 帧格式以 docs/harness/architecture.md 的「API / SSE 契约」为准、所有出口必须 clearTimeout、AbortController 控制超时、用 process.env 禁硬编码 API key。"

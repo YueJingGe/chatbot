@@ -1,0 +1,111 @@
+# 本项目 Git 命令门禁（随仓库团队共享）
+#
+# 语法要点：
+# - pattern 是「有序参数精确前缀」，按参数逐个写，不支持通配。
+# - 多条规则命中同一命令时取最严格：forbidden > prompt > allow。
+# - decision 省略时默认 allow。
+#
+# 注意：.rules 语法错误不会报错，且会让本目录内其他 .rules 一起失效
+#      （openai/codex#11603）。改完必须重启会话实测一次。
+
+# ---- 1. push 必须人工点头（AGENTS.md 红线：push 代码要经过同意）----
+prefix_rule(
+    pattern = ["git", "push"],
+
+    decision = "prompt",
+
+    justification = "推送远端不可逆，先确认分支与提交范围",
+
+    match = [
+        "git push",
+        "git push origin feature/x",
+        "git push --force-with-lease",
+    ],
+    not_match = [
+        "git status",
+        "git log -1",
+    ],
+)
+
+# ---- 2. 回滚 / 撤销类：执行前先向用户确认范围（commit hash 或具体文件）----
+prefix_rule(
+    pattern = ["git", "reset"],
+
+    decision = "prompt",
+
+    justification = "reset 会丢弃提交或工作区改动，先确认目标 commit",
+)
+
+prefix_rule(
+    pattern = ["git", "restore"],
+
+    decision = "prompt",
+
+    justification = "restore 会丢弃工作区改动，先确认文件范围",
+)
+
+prefix_rule(
+    pattern = ["git", "checkout", "--"],
+
+    decision = "prompt",
+
+    justification = "checkout -- 丢弃工作区改动；切分支（checkout -b / checkout <branch>）不受影响",
+
+    match = [
+        "git checkout -- web/src/App.tsx",
+        "git checkout -- .",
+    ],
+    not_match = [
+        "git checkout -b feature/x",
+        "git checkout develop",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "clean"],
+
+    decision = "prompt",
+
+    justification = "clean 删除未跟踪文件，不可恢复",
+)
+
+prefix_rule(
+    pattern = ["git", "revert"],
+
+    decision = "prompt",
+
+    justification = "revert 生成反向提交，先确认目标 commit",
+)
+
+# ---- 3. 高频只读 / 本地校验：放行，消除审批噪音 ----
+prefix_rule(
+    pattern = ["npm", "run", "check:all"],
+
+    decision = "allow",
+
+    justification = "本地静态检查 + 测试 + 构建，产物只写项目内 web/dist/",
+)
+
+prefix_rule(
+    pattern = ["git", "status"],
+
+    decision = "allow",
+
+    justification = "只读，无副作用",
+)
+
+prefix_rule(
+    pattern = ["git", "diff"],
+
+    decision = "allow",
+
+    justification = "只读，无副作用",
+)
+
+prefix_rule(
+    pattern = ["git", "log"],
+
+    decision = "allow",
+
+    justification = "只读，无副作用",
+)

@@ -4,6 +4,8 @@
 
 ## SSE 响应
 
+> 帧字段、异常出口、变更规则的权威定义见 `docs/harness/architecture.md` 的「API / SSE 契约」；本节只补实现层红线，与契约冲突时以契约为准。
+
 |规则|说明|
 |-|-|
 |必须设置三个响应头|`Content-Type`、`Cache-Control`、`Connection`|

@@ -45,6 +45,7 @@ AI 对话机器人 monorepo，npm workspaces 管理前端（web/）和后端（s
 - 命名/格式/写法不确定：查 `docs/reference/`
 - 改 web/src/** 逻辑：读 `.agents/context/frontend-context.md` + `docs/harness/frontend-rules.md`；新增、修改或修复组件、hook、工具函数、状态或交互行为时调 `test-driven-development` skill，并补/改同目录 `*.test.ts(x)`
 - 改 server/**：读 `.agents/context/backend-context.md` + `docs/harness/backend-rules.md`
+- 改 `/api/chat` 请求体或 SSE 帧字段：读 `docs/harness/architecture.md` 的「API / SSE 契约」，`server/` 与 `web/src/` 必须同批改，并在 `docs/ledger/CORE-LEDGER.md` 记条目
 - 加依赖/改 workspace：读 `.agents/context/project-overview.md` + `docs/harness/architecture.md`
 - 改 `.agents/**`、`AGENTS.md`、`docs/harness/**`、`package.json` harness script、`.husky/**`：先读 `.agents/context/harness-governance.md`
 - 用户要求前端设备/平台适配、跨端兼容、系统识别、PC/H5 分流或 Native/WebView 能力检测与降级时，使用 `.agents/skills/platform-frontend-adaptation/SKILL.md`，无需点名具体系统；单纯 UI 美化、原生安装打包、HDC/ADB、代理证书和单纯实机浏览器操作不加载该 Skill
