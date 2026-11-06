@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "p=\"$(git rev-parse --show-toplevel 2>/dev/null)/.codex/hooks/block-dangerous.py\"; [ -f \"$p\" ] || exit 0; exec /usr/bin/python3 \"$p\"",
+            "statusMessage": "检查 Bash 命令"
+          }
+        ]
+      }
+    ]
+  }
+}
