@@ -23,6 +23,8 @@
 !/.agents/
 !/.vscode/
 !/.github/
+# .codex/ — Codex 团队共享配置（hooks / rules）
+!/.codex/
 
 # ============================================
 # .agents/ 白名单：只共享对团队有价值的子目录

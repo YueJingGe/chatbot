@@ -150,20 +150,20 @@ const REQUEST_TIMEOUT = parseInt(process.env.REQUEST_TIMEOUT, 10) || 60000; // �
 const MAX_TOOL_ROUNDS = 5;
 
 app.post("/api/chat", async (req, res) => {
-  // 1. 设置流式响应头
-  res.setHeader("Content-Type", "text/event-stream;charset=utf-8");
-  res.setHeader("Cache-Control", "no-cache");
-  res.setHeader("Connection", "keep-alive");
-
   try {
     const userMessages = req.body.messages; // 完整历史
 
-    // 1. 校验请求体
+    // 1. 校验请求体：该分支必须返回 JSON，因此不能提前设置 SSE 响应头
     if (!Array.isArray(userMessages)) {
       return res.status(400).json({ error: "请求格式错误：messages 必须为数组" });
     }
 
-    // 2. 构建 system prompt 和消息列表
+    // 2. 设置流式响应头
+    res.setHeader("Content-Type", "text/event-stream;charset=utf-8");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
+    // 3. 构建 system prompt 和消息列表
     const systemMessage = {
       role: "system",
       content: `你是一个专业的客服助手。请遵循以下规则：
@@ -176,11 +176,11 @@ app.post("/api/chat", async (req, res) => {
     };
     const messages = [systemMessage, ...mergeRefTextMessages(userMessages)];
 
-    // 3. 超时控制
+    // 4. 超时控制
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
-    // 4. Tool calling 循环（全程流式）
+    // 5. Tool calling 循环（全程流式）
     for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
       const stream = await openai.chat.completions.create({
         model: process.env.MODEL_NAME,
@@ -283,6 +283,14 @@ app.post("/api/chat", async (req, res) => {
       res.end();
     }
   }
+});
+
+// 请求体不是合法 JSON：express.json() 默认返回 HTML 错误页，这里统一为契约里的 JSON 错误结构
+app.use((err, _req, res, next) => {
+  if (err?.type === "entity.parse.failed") {
+    return res.status(400).json({ error: "请求体不是合法 JSON" });
+  }
+  return next(err);
 });
 
 // ---------------- 7. 启动服务器 ----------------

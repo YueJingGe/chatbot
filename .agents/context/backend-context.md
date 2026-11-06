@@ -12,12 +12,7 @@ OpenAI 客户端为模块级单例。
 
 ### SSE 事件类型
 
-|事件格式|说明|
-|-|-|
-|`data: { "chunk": "内容" }`|文本流式内容|
-|`data: { "status": "tool_call", ... }`|工具调用状态提示|
-|`data: { "error": "错误信息" }`|错误事件|
-|`data: [DONE]`|流结束标志|
+契约（帧字段、异常出口、变更规则）以 `docs/harness/architecture.md` 的「API / SSE 契约」为准，此处不重复。
 
 ## 环境变量
 
