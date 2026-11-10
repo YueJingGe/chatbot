@@ -30,7 +30,7 @@ function runGit(args) {
     cwd: repoRoot,
     stdio: ["pipe", "pipe", "ignore"],
   })
-    .trim()
+    .trimEnd()
     .split("\n")
     .filter(Boolean);
 }
