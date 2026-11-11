@@ -42,6 +42,7 @@ export function App() {
   const inputTextRef = useRef(inputText);
   const isLoadingRef = useRef(isLoading);
   const quoteRef = useRef(quote);
+  const quoteRevisionRef = useRef(0);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const {
@@ -95,6 +96,7 @@ export function App() {
   // 引用唯一修改入口：同步 ref 供 sendMessage 读取最新值，并持久化到 localStorage
   const updateQuote = useCallback((value: string) => {
     quoteRef.current = value;
+    quoteRevisionRef.current += 1;
     setQuote(value);
     if (value) {
       localStorage.setItem(QUOTE_STORAGE_KEY, value);
@@ -126,6 +128,7 @@ export function App() {
     abortControllerRef.current = abortController;
 
     const quoteToSend = quoteRef.current;
+    const quoteRevisionToSend = quoteRevisionRef.current;
     const newUserMessage = {
       id: generateUuid(),
       role: "user" as const,
@@ -170,6 +173,7 @@ export function App() {
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder("utf-8");
+      let buffer = "";
       let fullReply = "";
       let hasServerError = false;
 
@@ -177,8 +181,10 @@ export function App() {
         const { done, value } = await reader.read();
         if (done) break;
 
-        const chunkStr = decoder.decode(value);
-        const lines = chunkStr.split("\n").filter((line) => line.trim() !== "");
+        // 网络分块不等于 SSE 帧：保留未完成行，同时缓存跨块 UTF-8 字节。
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
 
         for (const line of lines) {
           if (line.startsWith("data: ")) {
@@ -215,7 +221,7 @@ export function App() {
       }
 
       // 发送全链路无错完成才消费引用；网络错误、请求中断、服务端错误均保留引用便于重试
-      if (quoteToSend && !hasServerError) {
+      if (quoteToSend && !hasServerError && quoteRevisionRef.current === quoteRevisionToSend) {
         updateQuote("");
       }
     } catch (error) {
