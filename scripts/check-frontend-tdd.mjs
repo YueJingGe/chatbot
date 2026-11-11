@@ -30,7 +30,7 @@ function runGit(args) {
     cwd: repoRoot,
     stdio: ["pipe", "pipe", "ignore"],
   })
-    .trim()
+    .trimEnd()
     .split("\n")
     .filter(Boolean);
 }
@@ -60,7 +60,12 @@ function getChangedFiles(base) {
     if (base === "HEAD") {
       // 检查工作区 + 暂存区 + 未跟踪文件（pre-commit 场景）
       const porcelain = runGit(["status", "--porcelain"]);
-      return porcelain.map((line) => line.slice(3)).filter(Boolean);
+      // 排除已删除文件（D / AD）：与下面 --diff-filter=ACMRT 的语义保持一致，
+      // 删除逻辑文件（连同其测试）不应被要求补同目录测试
+      return porcelain
+        .filter((line) => line[0] !== "D" && line[1] !== "D")
+        .map((line) => line.slice(3))
+        .filter(Boolean);
     }
     // 排除已删除文件（D）：重命名/目录化后旧文件路径不应再被要求带测试
     return runGit(["diff", "--name-only", "--diff-filter=ACMRT", `${base}..HEAD`]);

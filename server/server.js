@@ -150,6 +150,7 @@ const REQUEST_TIMEOUT = parseInt(process.env.REQUEST_TIMEOUT, 10) || 60000; // �
 const MAX_TOOL_ROUNDS = 5;
 
 app.post("/api/chat", async (req, res) => {
+  let timeoutId;
   try {
     const userMessages = req.body.messages; // 完整历史
 
@@ -178,17 +179,19 @@ app.post("/api/chat", async (req, res) => {
 
     // 4. 超时控制
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+    timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
     // 5. Tool calling 循环（全程流式）
     for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
-      const stream = await openai.chat.completions.create({
-        model: process.env.MODEL_NAME,
-        messages,
-        tools: TOOLS,
-        stream: true,
-        signal: controller.signal,
-      });
+      const stream = await openai.chat.completions.create(
+        {
+          model: process.env.MODEL_NAME,
+          messages,
+          tools: TOOLS,
+          stream: true,
+        },
+        { signal: controller.signal }
+      );
 
       // 累积当前轮次的 tool_call 参数
       const currentToolCalls = {};
@@ -222,7 +225,6 @@ app.post("/api/chat", async (req, res) => {
 
       // 没有工具调用 → 内容已在流中转发，结束
       if (finishReason !== "tool_calls") {
-        clearTimeout(timeoutId);
         res.write("data: [DONE]\n\n");
         res.end();
         return;
@@ -270,7 +272,6 @@ app.post("/api/chat", async (req, res) => {
     }
 
     // 超过最大轮次
-    clearTimeout(timeoutId);
     res.write(`data: ${JSON.stringify({ error: "工具调用次数超限" })}\n\n`);
     res.write("data: [DONE]\n\n");
     res.end();
@@ -282,6 +283,8 @@ app.post("/api/chat", async (req, res) => {
       res.write(`data: ${JSON.stringify({ error: "处理中断" })}\n\n`);
       res.end();
     }
+  } finally {
+    clearTimeout(timeoutId);
   }
 });
 

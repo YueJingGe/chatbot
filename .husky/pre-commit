@@ -4,5 +4,5 @@ if [ "$(git config --get --bool lint.skipLintStaged)" = "true" ]; then
   exit 0
 fi
 
-node scripts/check-frontend-tdd.mjs
+node scripts/check-frontend-tdd.mjs || exit $?
 npx lint-staged

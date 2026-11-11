@@ -192,6 +192,82 @@ function createSSEResponse(chunks: string[]) {
   return new Response(stream, { status: 200 });
 }
 
+function createSplitSSEResponse(payload: string, splitAt: number) {
+  const bytes = new TextEncoder().encode(payload);
+  const stream = new ReadableStream<Uint8Array>({
+    start(controller) {
+      controller.enqueue(bytes.slice(0, splitAt));
+      controller.enqueue(bytes.slice(splitAt));
+      controller.close();
+    },
+  });
+  return new Response(stream, { status: 200 });
+}
+
+function sendQuestion() {
+  fireEvent.change(screen.getByRole("textbox", { name: "聊天输入框" }), {
+    target: { value: "帮我解释" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "发送消息" }));
+}
+
+describe("App SSE 分块", () => {
+  it.each([5, 16, 17, 18, 22])("在第 %i 字节拆帧后仍完整显示中文回复", async (splitAt) => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValue(
+          createSplitSSEResponse('data: {"chunk":"你好"}\n\ndata: [DONE]\n\n', splitAt)
+        )
+    );
+    render(<App />);
+    sendQuestion();
+
+    await waitFor(() => expect(screen.getByText("你好")).toBeInTheDocument());
+  });
+
+  it("错误帧跨块时显示服务端错误并保留引用", async () => {
+    localStorage.setItem("chatbot_quote", "待重试的引用");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(createSplitSSEResponse('data: {"error":"模型调用失败"}\n\n', 14))
+    );
+    render(<App />);
+    sendQuestion();
+
+    await waitFor(() => expect(screen.getByText(/服务端出错/)).toBeInTheDocument());
+    expect(localStorage.getItem("chatbot_quote")).toBe("待重试的引用");
+  });
+});
+
+describe("App 请求期间更新引用", () => {
+  it.each(["新的引用", "旧的引用"])("成功返回后保留后来选择的 %s", async (newQuote) => {
+    localStorage.setItem("chatbot_quote", "旧的引用");
+    let resolveResponse: (response: Response) => void = () => {};
+    const pendingResponse = new Promise<Response>((resolve) => {
+      resolveResponse = resolve;
+    });
+    const fetchMock = vi.fn().mockReturnValue(pendingResponse);
+    vi.stubGlobal("fetch", fetchMock);
+    render(<App />);
+    sendQuestion();
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+
+    const anchor = mountSelectableHost(newQuote);
+    mockSelection(newQuote, anchor);
+    fireEvent.mouseUp(document);
+    fireEvent.click(screen.getByRole("button", { name: "引用" }));
+    resolveResponse(createSSEResponse(["完成"]));
+
+    await waitFor(() => expect(screen.getByText("完成")).toBeInTheDocument());
+    expect(screen.getByRole("button", { name: "关闭引用" }).parentElement).toHaveTextContent(
+      newQuote
+    );
+    expect(localStorage.getItem("chatbot_quote")).toBe(newQuote);
+  });
+});
+
 describe("App 选区引用与复制", () => {
   it("选中回答文本后点击引用，输入框上方显示引用条", () => {
     render(<App />);
