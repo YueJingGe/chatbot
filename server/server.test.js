@@ -40,7 +40,13 @@ function loadChatHandler(createStream) {
     "./datetime": {},
   };
   vm.runInNewContext(readFileSync(path.join(__dirname, "server.js"), "utf8"), {
-    require: (name) => dependencies[name],
+    require: (name) => {
+      // 未登记的模块直接抛错，否则会静默变成 undefined，最终在 VM 深处炸成难定位的 TypeError
+      if (!(name in dependencies)) {
+        throw new Error(`server.test.js 未映射的模块: ${name}`);
+      }
+      return dependencies[name];
+    },
     process: {
       env: {
         DASHSCOPE_API_KEY: "mock-key",

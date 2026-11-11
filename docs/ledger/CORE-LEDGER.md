@@ -167,8 +167,9 @@
 ### 2026-11-10 | core | 修复聊天流与 Git 门禁的六类审查问题
 
 - Fixed: `web/src/App.tsx` 缓存跨网络分块的 SSE 行并流式解码 UTF-8；通过引用修订号仅消费当前请求携带的引用。`server/server.js` 将 AbortSignal 传入 SDK 请求选项，并在 finally 统一清理超时定时器。
-- Fixed: `.husky/pre-commit` 与 `.husky/pre-push` 传播 TDD 和 ledger 检查失败状态；`scripts/check-frontend-tdd.mjs` 保留 porcelain 首行的前导状态空格，避免漏检未暂存文件。
-- Added: `web/src/App.test.tsx` 的分块与引用竞态回归测试、`server/server.test.js` 的路由测试、`scripts/git-gates.test.mjs` 的门禁测试；后端与门禁测试接入 `package.json` 的 `check:all`。
+- Fixed: `scripts/check-frontend-tdd.mjs` 保留 porcelain 首行的前导状态空格，避免漏检未暂存文件；porcelain 分支排除已删除（`D` / `AD`）文件，与 `--diff-filter=ACMRT` 分支语义对齐，删除逻辑文件（连同其同目录测试）不再被要求补测试。
+- Changed: `.husky/pre-commit` 与 `.husky/pre-push` 显式传播 TDD 和 ledger 检查退出码。husky 包装器 `.husky/_/h` 本就以 `sh -e "$s"` 执行 hook，故生产拦截行为不变；显式退出码只覆盖绕过 husky、直接 `sh .husky/pre-commit` 调用的场景。
+- Added: `web/src/App.test.tsx` 的分块与引用竞态回归测试、`server/server.test.js` 的路由测试、`scripts/git-gates.test.mjs` 的门禁测试（以 `sh -e` 镜像 husky 真实调用方式，并额外覆盖非 `-e` 直接调用）；`server/server.test.js` 的 require 桩对未映射模块直接抛错，避免静默 undefined；后端与门禁测试接入 `package.json` 的 `check:all`。
 - Reused: 现有 React refs、ReadableStream、AbortController、Node 内置测试运行器与 Vitest，未新增依赖。
 - Why the change is unavoidable: 用户要求按优先级修复审查发现的问题；修复前的回归测试已复现回复丢失、引用误清空、超时失效、定时器遗留和门禁错误放行。
 - Smaller-diff alternative considered: 仅修改实现但不接入自动回归检查。被否决，因为现有测试曾全部通过却未覆盖这些异常路径，需要让后续 check:all 和 CI 能持续发现回归。
