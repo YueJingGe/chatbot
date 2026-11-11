@@ -83,14 +83,14 @@ case "$current_branch" in
 esac
 
 # 前端 TDD 门禁：检查待 push 的 commits 中逻辑文件是否带同目录测试
-node scripts/check-frontend-tdd.mjs --base origin/main
+node scripts/check-frontend-tdd.mjs --base origin/main || exit $?
 
 # 核心路径变更治理
 if [ "$CHATBOT_LEDGER_SKIP" != "1" ]; then
   if [ -t 1 ]; then
-    node scripts/push-gate.mjs --base "$ledger_base" --head "$ledger_head" --interactive
+    node scripts/push-gate.mjs --base "$ledger_base" --head "$ledger_head" --interactive || exit $?
   else
-    node scripts/push-gate.mjs --base "$ledger_base" --head "$ledger_head"
+    node scripts/push-gate.mjs --base "$ledger_base" --head "$ledger_head" || exit $?
   fi
 fi
 
